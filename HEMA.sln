@@ -1,0 +1,33 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HEMA.Android", "HEMA\HEMA.Android\HEMA.Android.csproj", "{6CA7B1BC-28D2-4E84-81E0-D1D7DCF3838D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HEMA", "HEMA\HEMA\HEMA.csproj", "{99B1A711-99FF-45B7-9331-5BD158CC6ABC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6CA7B1BC-28D2-4E84-81E0-D1D7DCF3838D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CA7B1BC-28D2-4E84-81E0-D1D7DCF3838D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CA7B1BC-28D2-4E84-81E0-D1D7DCF3838D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{6CA7B1BC-28D2-4E84-81E0-D1D7DCF3838D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CA7B1BC-28D2-4E84-81E0-D1D7DCF3838D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CA7B1BC-28D2-4E84-81E0-D1D7DCF3838D}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{99B1A711-99FF-45B7-9331-5BD158CC6ABC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{99B1A711-99FF-45B7-9331-5BD158CC6ABC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{99B1A711-99FF-45B7-9331-5BD158CC6ABC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{99B1A711-99FF-45B7-9331-5BD158CC6ABC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5C87921C-ADCE-455B-9645-5FA0E76375A7}
+	EndGlobalSection
+EndGlobal

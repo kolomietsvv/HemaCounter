@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
-using System.Threading;
 using Xamarin.Forms;
 using Xamarin.Essentials;
 
@@ -8,151 +6,130 @@ namespace HEMA
 {
 	public partial class MainPage : ContentPage
 	{
-		public bool IsTimerStarted { get; set; }
-		public Timer Timer { get; set; }
-		public Stopwatch Stopwatch { get; set; }
-		public int BlueScore { get; set; }
-		public int RedScore { get; set; }
-		public int DoubleHits { get; set; }
-		public int RedPreventions { get; set; }
-		public int BluePreventions { get; set; }
+		Fight fight;
 
 		public MainPage()
 		{
 			InitializeComponent();
-			Stopwatch = new Stopwatch();
+			fight = new Fight(TimerElapsed);
 		}
 
 		private void StartTimer(object sender, EventArgs e)
 		{
-			if (IsTimerStarted)
+			IncreaseDoubleHitsBtn.IsEnabled = fight.IsTimerStarted;
+			DecreaseDoubleHitsBtn.IsEnabled = fight.IsTimerStarted;
+
+			if (fight.IsTimerStarted)
 			{
-				Timer.Change(0, Timeout.Infinite);
-				Stopwatch.Stop();
+				fight.StopTimer();
 				StartBtn.Image.File = "start.png";
 			}
 			else
 			{
-				if (Timer == null)
-					Timer = new Timer(TimerElapsed, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
-				else
-					Timer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(1));
-				Stopwatch.Start();
+				fight.StartTimer();
 				StartBtn.Image.File = "pause.png";
 			}
-			IsTimerStarted = !IsTimerStarted;
 		}
 
 		private void ResetTimer(object sender, EventArgs e)
 		{
-			if (Timer != null)
-			{
-				Timer.Change(0, Timeout.Infinite);
-			}
-
-			Stopwatch.Reset();
-			IsTimerStarted = false;
-			BlueScore = 0;
-			RedScore = 0;
-			DoubleHits = 0;
-			RedPreventions = 0;
-			BluePreventions = 0;
-			DoubleHitsLbl.Text = DoubleHits.ToString();
-			RedPreventionsLbl.Text = RedPreventions.ToString();
-			BluePreventionsLbl.Text = BluePreventions.ToString();
-			BlueScoreLbl.Text = BlueScore.ToString();
-			RedScoreLbl.Text = RedScore.ToString();
-			TimerLbl.Text = Stopwatch.Elapsed.ToString(@"hh\:mm\:ss");
+			fight.Reset();
+			DoubleHitsLbl.Text = fight.DoubleHits.ToString();
+			RedViolationsLbl.Text = fight.RedViolations.ToString();
+			BlueViolationsLbl.Text = fight.BlueViolations.ToString();
+			BlueScoreLbl.Text = fight.BlueScore.ToString();
+			RedScoreLbl.Text = fight.RedScore.ToString();
+			TimerLbl.Text = fight.Elapsed.ToString(@"hh\:mm\:ss");
 			StartBtn.Image.File = "start.png";
 		}
 
 		private void DecreaseBlueScore(object sender, SwipedEventArgs e)
 		{
-			if (!IsTimerStarted && Stopwatch.Elapsed != TimeSpan.Zero && BlueScore > 0)
+			if (!fight.IsTimerStarted && fight.IsStarted && fight.BlueScore > 0)
 			{
-				BlueScore--;
-				BlueScoreLbl.Text = BlueScore.ToString();
+				fight.BlueScore--;
+				BlueScoreLbl.Text = fight.BlueScore.ToString();
 			}
 		}
 
 		private void DecreaseRedScore(object sender, SwipedEventArgs e)
 		{
-			if (!IsTimerStarted && Stopwatch.Elapsed != TimeSpan.Zero && RedScore > 0)
+			if (!fight.IsTimerStarted && fight.IsStarted && fight.RedScore > 0)
 			{
-				RedScore--;
-				RedScoreLbl.Text = RedScore.ToString();
+				fight.RedScore--;
+				RedScoreLbl.Text = fight.RedScore.ToString();
 			}
 		}
 
 		private void IncreaseBlueScore(object sender, SwipedEventArgs e)
 		{
-			if (!IsTimerStarted && Stopwatch.Elapsed != TimeSpan.Zero)
+			if (!fight.IsTimerStarted && fight.IsStarted)
 			{
-				BlueScore++;
-				BlueScoreLbl.Text = BlueScore.ToString();
+				fight.BlueScore++;
+				BlueScoreLbl.Text = fight.BlueScore.ToString();
 			}
 		}
 
 		private void IncreaseRedScore(object sender, SwipedEventArgs e)
 		{
-			if (!IsTimerStarted && Stopwatch.Elapsed != TimeSpan.Zero)
+			if (!fight.IsTimerStarted && fight.IsStarted)
 			{
-				RedScore++;
-				RedScoreLbl.Text = RedScore.ToString();
+				fight.RedScore++;
+				RedScoreLbl.Text = fight.RedScore.ToString();
 			}
 		}
 
 		private void DecreaseDoubleHits(object sender, EventArgs e)
 		{
-			if (!IsTimerStarted && Stopwatch.Elapsed != TimeSpan.Zero && DoubleHits > 0)
+			if (!fight.IsTimerStarted && fight.IsStarted && fight.DoubleHits > 0)
 			{
-				DoubleHits--;
-				DoubleHitsLbl.Text = DoubleHits.ToString();
+				fight.DoubleHits--;
+				DoubleHitsLbl.Text = fight.DoubleHits.ToString();
 			}
 		}
 
 		private void IncreaseDoubleHits(object sender, EventArgs e)
 		{
-			if (!IsTimerStarted && Stopwatch.Elapsed != TimeSpan.Zero)
+			if (!fight.IsTimerStarted && fight.IsStarted)
 			{
-				DoubleHits++;
-				DoubleHitsLbl.Text = DoubleHits.ToString();
+				fight.DoubleHits++;
+				DoubleHitsLbl.Text = fight.DoubleHits.ToString();
 			}
 		}
 
-		private void DecreaseRedPreventions(object sender, EventArgs e)
+		private void DecreaseRedViolations(object sender, EventArgs e)
 		{
-			if (RedPreventions > 0)
+			if (fight.RedViolations > 0)
 			{
-				RedPreventions--;
-				RedPreventionsLbl.Text = RedPreventions.ToString();
+				fight.RedViolations--;
+				RedViolationsLbl.Text = fight.RedViolations.ToString();
 			}
 		}
 
-		private void IncreaseRedPreventions(object sender, EventArgs e)
+		private void IncreaseRedViolations(object sender, EventArgs e)
 		{
-			RedPreventions++;
-			RedPreventionsLbl.Text = RedPreventions.ToString();
+			fight.RedViolations++;
+			RedViolationsLbl.Text = fight.RedViolations.ToString();
 		}
 
-		private void DecreaseBluePreventions(object sender, EventArgs e)
+		private void DecreaseBlueViolations(object sender, EventArgs e)
 		{
-			if (BluePreventions > 0)
+			if (fight.BlueViolations > 0)
 			{
-				BluePreventions--;
-				BluePreventionsLbl.Text = BluePreventions.ToString();
+				fight.BlueViolations--;
+				BlueViolationsLbl.Text = fight.BlueViolations.ToString();
 			}
 		}
 
-		private void IncreaseBluePreventions(object sender, EventArgs e)
+		private void IncreaseBlueViolations(object sender, EventArgs e)
 		{
-			BluePreventions++;
-			BluePreventionsLbl.Text = BluePreventions.ToString();
+			fight.BlueViolations++;
+			BlueViolationsLbl.Text = fight.BlueViolations.ToString();
 		}
 
 		private void TimerElapsed(object state)
 		{
-			MainThread.BeginInvokeOnMainThread(() => TimerLbl.Text = Stopwatch.Elapsed.ToString(@"hh\:mm\:ss"));
+			MainThread.BeginInvokeOnMainThread(() => TimerLbl.Text = fight.Elapsed.ToString(@"hh\:mm\:ss"));
 		}
 	}
 }

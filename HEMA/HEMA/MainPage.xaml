@@ -4,40 +4,57 @@
              xmlns:local="clr-namespace:HEMA"
              x:Class="HEMA.MainPage">
 
-	<StackLayout BackgroundColor="Silver" Orientation="Horizontal">
-		<Grid BackgroundColor="LightSkyBlue" HorizontalOptions="FillAndExpand">
-			<Label Text="0" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontSize="72" x:Name="BlueScoreLbl"/>
-			<Grid.GestureRecognizers>
-				<SwipeGestureRecognizer Direction="Up" Swiped="IncreaseBlueScore" />
-				<SwipeGestureRecognizer Direction="Down" Swiped="DecreaseBlueScore" />
-			</Grid.GestureRecognizers>
-		</Grid>
-		<StackLayout HorizontalOptions="Fill" Orientation="Vertical" Margin="0,10,0,10">
-			<Button Image="stop.png" BackgroundColor="WhiteSmoke" HorizontalOptions="Center" Clicked="ResetTimer"/>
-			<Label Text="00:00:00" HorizontalOptions="Center" FontSize="30" x:Name="TimerLbl"/>
-			<Button Image="start.png" BackgroundColor="WhiteSmoke" HorizontalOptions="Center" Clicked="StartTimer" x:Name="StartBtn"/>
-			<StackLayout HorizontalOptions="FillAndExpand" Orientation="Horizontal" VerticalOptions="EndAndExpand">
-				<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="-" Clicked="DecreaseDoubleHits" x:Name="DecreaseDoubleHitsBtn"/>
-				<Label Text="0" HorizontalOptions="CenterAndExpand" FontSize="30" x:Name="DoubleHitsLbl"/>
-				<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="+" Clicked="IncreaseDoubleHits" x:Name="IncreaseDoubleHitsBtn"/>
+	<Grid BackgroundColor="Silver">
+		<Grid.RowDefinitions>
+			<RowDefinition Height="1.5*"/>
+			<RowDefinition/>
+		</Grid.RowDefinitions>
+		<StackLayout Margin ="0,0,0,-5" Grid.Row="0" Orientation="Horizontal">
+			<Grid BackgroundColor="LightSkyBlue" HorizontalOptions="FillAndExpand">
+				<Label Grid.Row ="0" Text="0" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontSize="72" x:Name="BlueScoreLbl"/>
+				<StackLayout Grid.Row="1" HorizontalOptions="Center" BackgroundColor="LightSkyBlue" Orientation="Horizontal" VerticalOptions="EndAndExpand">
+					<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="-" Clicked="DecreaseBlueViolations" x:Name="DecreaseBlueViolationsBtn"/>
+					<Label Text="0" HorizontalOptions="FillAndExpand" HorizontalTextAlignment="Start" FontSize="30" x:Name="BlueViolationsLbl"/>
+					<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="+" Clicked="IncreaseBlueViolations" x:Name="IncreaseBlueViolationsBtn"/>
+				</StackLayout>
+				<Grid.GestureRecognizers>
+					<SwipeGestureRecognizer Direction="Up" Swiped="IncreaseBlueScore" />
+					<SwipeGestureRecognizer Direction="Down" Swiped="DecreaseBlueScore" />
+				</Grid.GestureRecognizers>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="3*"/>
+					<RowDefinition/>
+				</Grid.RowDefinitions>
+			</Grid>
+			<StackLayout HorizontalOptions="FillAndExpand" Orientation="Vertical">
+				<Button Image="stop.png" BackgroundColor="WhiteSmoke" HorizontalOptions="Center" VerticalOptions="EndAndExpand" Clicked="ResetTimer"/>
+				<Label Text="00:00:00" HorizontalOptions="Center" FontSize="30" VerticalOptions="EndAndExpand" x:Name="TimerLbl"/>
+				<StackLayout HorizontalOptions="Center" Orientation="Horizontal" VerticalOptions="EndAndExpand">
+					<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="-" Clicked="DecreaseDoubleHits" x:Name="DecreaseDoubleHitsBtn" IsEnabled="False"/>
+					<Label Text="0" HorizontalOptions="CenterAndExpand" FontSize="30" x:Name="DoubleHitsLbl"/>
+					<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="+" Clicked="IncreaseDoubleHits" x:Name="IncreaseDoubleHitsBtn" IsEnabled="False"/>
+				</StackLayout>
 			</StackLayout>
-			<StackLayout HorizontalOptions="FillAndExpand" BackgroundColor="LightSkyBlue" Orientation="Horizontal" VerticalOptions="EndAndExpand">
-				<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="-" Clicked="DecreaseBluePreventions" x:Name="DecreaseBluePreventionsBtn"/>
-				<Label Text="0" HorizontalOptions="FillAndExpand" HorizontalTextAlignment="Start" FontSize="30" x:Name="BluePreventionsLbl"/>
-				<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="+" Clicked="IncreaseBluePreventions" x:Name="IncreaseBluePreventionsBtn"/>
-			</StackLayout>
-			<StackLayout HorizontalOptions="FillAndExpand"  BackgroundColor="PaleVioletRed" Orientation="Horizontal" VerticalOptions="EndAndExpand">
-				<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="-" Clicked="DecreaseRedPreventions" x:Name="DecreaseRedPreventionsBtn"/>
-				<Label Text="0" HorizontalOptions="FillAndExpand" HorizontalTextAlignment="End" FontSize="30"  x:Name="RedPreventionsLbl"/>
-				<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="+" Clicked="IncreaseRedPreventions" x:Name="IncreaseRedPreventionsBtn"/>
-			</StackLayout>
+			<Grid BackgroundColor="PaleVioletRed" HorizontalOptions="FillAndExpand">
+				<Label Grid.Row="0" Text="0" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontSize="72" x:Name="RedScoreLbl"/>
+				<StackLayout Grid.Row="1" HorizontalOptions="Center"  BackgroundColor="PaleVioletRed" Orientation="Horizontal" VerticalOptions="End">
+					<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="-" Clicked="DecreaseRedViolations" x:Name="DecreaseRedViolationsBtn"/>
+					<Label Text="0" HorizontalOptions="FillAndExpand" HorizontalTextAlignment="End" FontSize="30"  x:Name="RedViolationsLbl"/>
+					<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="+" Clicked="IncreaseRedViolations" x:Name="IncreaseRedViolationsBtn"/>
+				</StackLayout>
+				<Grid.GestureRecognizers>
+					<SwipeGestureRecognizer Direction="Up" Swiped="IncreaseRedScore" />
+					<SwipeGestureRecognizer Direction="Down" Swiped="DecreaseRedScore" />
+				</Grid.GestureRecognizers>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="3*"/>
+					<RowDefinition/>
+				</Grid.RowDefinitions>
+			</Grid>
 		</StackLayout>
-		<Grid BackgroundColor="PaleVioletRed" HorizontalOptions="FillAndExpand">
-			<Label Text="0" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontSize="72" x:Name="RedScoreLbl"/>
-			<Grid.GestureRecognizers>
-				<SwipeGestureRecognizer Direction="Up" Swiped="IncreaseRedScore" />
-				<SwipeGestureRecognizer Direction="Down" Swiped="DecreaseRedScore" />
-			</Grid.GestureRecognizers>
-		</Grid>
-	</StackLayout>
+		<StackLayout Grid.Row="1">
+			<Button Margin ="0" Image="start.png" BackgroundColor="WhiteSmoke" VerticalOptions ="FillAndExpand"  HorizontalOptions="FillAndExpand" Clicked="StartTimer" x:Name="StartBtn"/>
+		</StackLayout>
+	</Grid>
+
 </ContentPage>

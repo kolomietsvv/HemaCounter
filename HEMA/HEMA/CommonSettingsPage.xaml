@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:d="http://xamarin.com/schemas/2014/forms/design"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             x:Class="HEMA.CommonSettingsPage">
+	<ContentPage.Content>
+		<Grid BackgroundColor="LightSlateGray">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="2*"/>
+				<RowDefinition Height="*"/>
+			</Grid.RowDefinitions>
+			<StackLayout Grid.Row="0" Orientation="Horizontal" >
+				<StackLayout>
+					<StackLayout Orientation="Horizontal" Margin="20,5" HorizontalOptions="FillAndExpand">
+						<Label Text="Число обоюдных поражений подряд" VerticalOptions="Center"/>
+						<Entry Text="{Binding Mode=TwoWay, Path=RootPage.Settings.DoubleHitsInARow, Source={x:Reference RootPage}}" HorizontalTextAlignment="Center" Keyboard="Numeric" HorizontalOptions="EndAndExpand" WidthRequest="40" TextChanged="RemoveExtraCharacters"/>
+					</StackLayout>
+					<StackLayout Orientation="Horizontal" Margin="20,5" HorizontalOptions="FillAndExpand">
+						<Label Text="Общее число обоюдных поражений" VerticalOptions="Center"/>
+						<Entry HorizontalTextAlignment="Center" Keyboard="Numeric" Text="0" HorizontalOptions="EndAndExpand" WidthRequest="40" TextChanged="RemoveExtraCharacters"/>
+					</StackLayout>
+				</StackLayout>
+				<StackLayout>
+					<StackLayout Orientation="Horizontal" Margin="20,5" HorizontalOptions="FillAndExpand">
+						<Label Text="Допустимое число предупреждений без штрафа" VerticalOptions="Center"/>
+						<Entry HorizontalTextAlignment="Center" Keyboard="Numeric" Text="0" HorizontalOptions="EndAndExpand" WidthRequest="40" TextChanged="RemoveExtraCharacters"/>
+					</StackLayout>
+					<StackLayout Orientation="Horizontal" Margin="20,5" HorizontalOptions="Fill">
+						<Label Text="Штрафной бал" VerticalOptions="Center"/>
+						<Entry HorizontalTextAlignment="Center" Keyboard="Numeric" Text="0" HorizontalOptions="EndAndExpand" WidthRequest="40" TextChanged="RemoveExtraCharacters"/>
+					</StackLayout>
+				</StackLayout>
+			</StackLayout>
+			<StackLayout Grid.Row="1" Orientation="Horizontal">
+				<StackLayout Orientation="Horizontal" Margin="20,5">
+					<Label Text="Использовать настройки" VerticalOptions="Center"/>
+					<Switch/>
+				</StackLayout>
+				<Button Text="Default" Margin="20,5" VerticalOptions="Center"/>
+			</StackLayout>
+		</Grid>
+	</ContentPage.Content>
+</ContentPage>

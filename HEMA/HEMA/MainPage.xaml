@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:HEMA"
-             x:Class="HEMA.MainPage">
+             x:Class="HEMA.MainPage"
+			 NavigationPage.HasNavigationBar="False">
 
 	<Grid BackgroundColor="Silver">
 		<Grid.RowDefinitions>
@@ -11,15 +12,15 @@
 		</Grid.RowDefinitions>
 		<StackLayout Margin ="0,0,0,-5" Grid.Row="0" Orientation="Horizontal">
 			<Grid BackgroundColor="LightSkyBlue" HorizontalOptions="FillAndExpand">
-				<Label Grid.Row ="0" Text="0" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontSize="72" x:Name="BlueScoreLbl"/>
+				<Label Grid.Row ="0" Text="{Binding Path=Fight.BlueScore}" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontSize="72"/>
 				<StackLayout Grid.Row="1" HorizontalOptions="Center" BackgroundColor="LightSkyBlue" Orientation="Horizontal" VerticalOptions="EndAndExpand">
-					<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="-" Clicked="DecreaseBlueViolations" x:Name="DecreaseBlueViolationsBtn"/>
-					<Label Text="0" HorizontalOptions="FillAndExpand" HorizontalTextAlignment="Start" FontSize="30" x:Name="BlueViolationsLbl"/>
-					<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="+" Clicked="IncreaseBlueViolations" x:Name="IncreaseBlueViolationsBtn"/>
+					<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="-" Clicked="DecreaseBlueViolations"/>
+					<Label Text="{Binding Path=Fight.BlueViolations}" HorizontalOptions="FillAndExpand" HorizontalTextAlignment="Start" FontSize="30"/>
+					<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="+" Clicked="IncreaseBlueViolations"/>
 				</StackLayout>
 				<Grid.GestureRecognizers>
-					<SwipeGestureRecognizer Direction="Up" Swiped="IncreaseBlueScore" />
-					<SwipeGestureRecognizer Direction="Down" Swiped="DecreaseBlueScore" />
+					<SwipeGestureRecognizer Direction="Up" Swiped="IncreaseBlueScore"/>
+					<SwipeGestureRecognizer Direction="Down" Swiped="DecreaseBlueScore"/>
 				</Grid.GestureRecognizers>
 				<Grid.RowDefinitions>
 					<RowDefinition Height="3*"/>
@@ -27,24 +28,24 @@
 				</Grid.RowDefinitions>
 			</Grid>
 			<StackLayout HorizontalOptions="FillAndExpand" Orientation="Vertical">
-				<Button Image="stop.png" BackgroundColor="WhiteSmoke" HorizontalOptions="Center" VerticalOptions="EndAndExpand" Clicked="ResetTimer"/>
-				<Label Text="00:00:00" HorizontalOptions="Center" FontSize="30" VerticalOptions="EndAndExpand" x:Name="TimerLbl"/>
-				<StackLayout HorizontalOptions="Center" Orientation="Horizontal" VerticalOptions="EndAndExpand">
-					<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="-" Clicked="DecreaseDoubleHits" x:Name="DecreaseDoubleHitsBtn" IsEnabled="False"/>
-					<Label Text="0" HorizontalOptions="CenterAndExpand" FontSize="30" x:Name="DoubleHitsLbl"/>
-					<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="+" Clicked="IncreaseDoubleHits" x:Name="IncreaseDoubleHitsBtn" IsEnabled="False"/>
+				<Button Padding="35,0" Image="stop.png" BackgroundColor="WhiteSmoke" HorizontalOptions="Center" VerticalOptions="EndAndExpand" Clicked="ResetTimer"/>
+				<Label Text="{Binding Path=Fight.Elapsed}" HorizontalOptions="Center" FontSize="30" VerticalOptions="EndAndExpand"/>
+				<StackLayout IsEnabled="{Binding Fight.IsTimerStarted}" HorizontalOptions="Center" Orientation="Horizontal" VerticalOptions="EndAndExpand">
+					<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="-" Clicked="DecreaseDoubleHits"  IsEnabled="False"/>
+					<Label Text="{Binding Path=Fight.DoubleHits}" HorizontalOptions="CenterAndExpand" FontSize="30"/>
+					<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="+" Clicked="IncreaseDoubleHits"  IsEnabled="False"/>
 				</StackLayout>
 			</StackLayout>
 			<Grid BackgroundColor="PaleVioletRed" HorizontalOptions="FillAndExpand">
-				<Label Grid.Row="0" Text="0" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontSize="72" x:Name="RedScoreLbl"/>
+				<Label Grid.Row="0" Text="{Binding Path=Fight.RedScore}" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontSize="72"/>
 				<StackLayout Grid.Row="1" HorizontalOptions="Center"  BackgroundColor="PaleVioletRed" Orientation="Horizontal" VerticalOptions="End">
-					<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="-" Clicked="DecreaseRedViolations" x:Name="DecreaseRedViolationsBtn"/>
-					<Label Text="0" HorizontalOptions="FillAndExpand" HorizontalTextAlignment="End" FontSize="30"  x:Name="RedViolationsLbl"/>
-					<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="+" Clicked="IncreaseRedViolations" x:Name="IncreaseRedViolationsBtn"/>
+					<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="-" Clicked="DecreaseRedViolations"/>
+					<Label Text="{Binding Path=Fight.RedViolations}" HorizontalOptions="FillAndExpand" HorizontalTextAlignment="End" FontSize="30" />
+					<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="+" Clicked="IncreaseRedViolations"/>
 				</StackLayout>
 				<Grid.GestureRecognizers>
-					<SwipeGestureRecognizer Direction="Up" Swiped="IncreaseRedScore" />
-					<SwipeGestureRecognizer Direction="Down" Swiped="DecreaseRedScore" />
+					<SwipeGestureRecognizer Direction="Up" Swiped="IncreaseRedScore"/>
+					<SwipeGestureRecognizer Direction="Down" Swiped="DecreaseRedScore"/>
 				</Grid.GestureRecognizers>
 				<Grid.RowDefinitions>
 					<RowDefinition Height="3*"/>
@@ -53,7 +54,7 @@
 			</Grid>
 		</StackLayout>
 		<StackLayout Grid.Row="1">
-			<Button Margin ="0" Image="start.png" BackgroundColor="WhiteSmoke" VerticalOptions ="FillAndExpand"  HorizontalOptions="FillAndExpand" Clicked="StartTimer" x:Name="StartBtn"/>
+			<Button x:Name="StartBtn" Image="start.png" Padding="310,0" BackgroundColor="WhiteSmoke" VerticalOptions ="FillAndExpand"  HorizontalOptions="FillAndExpand" Clicked="StartTimer"/>
 		</StackLayout>
 	</Grid>
 

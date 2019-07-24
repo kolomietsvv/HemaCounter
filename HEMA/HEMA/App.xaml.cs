@@ -11,7 +11,10 @@ namespace HEMA
 		{
 			InitializeComponent();
 
-			MainPage = new MainPage();
+			var mainPage = new MainPage();
+
+			MainPage = new NavigationPage(mainPage);
+			//MainPage.Navigation.PushAsync(new CommonSettingsPage());
 		}
 
 		protected override void OnStart()

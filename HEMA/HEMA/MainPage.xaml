@@ -12,50 +12,50 @@
 		</Grid.RowDefinitions>
 		<StackLayout Margin ="0,0,0,-5" Grid.Row="0" Orientation="Horizontal">
 			<Grid BackgroundColor="LightSkyBlue" HorizontalOptions="FillAndExpand">
-				<Label Grid.Row ="0" Text="{Binding Path=Fight.BlueScore}" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontSize="72"/>
-				<StackLayout Grid.Row="1" HorizontalOptions="Center" BackgroundColor="LightSkyBlue" Orientation="Horizontal" VerticalOptions="EndAndExpand">
-					<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="-" Clicked="DecreaseBlueViolations"/>
-					<Label Text="{Binding Path=Fight.BlueViolations}" HorizontalOptions="FillAndExpand" HorizontalTextAlignment="Start" FontSize="30"/>
-					<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="+" Clicked="IncreaseBlueViolations"/>
-				</StackLayout>
+				<Label Text="{Binding Fight.BlueScore}" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontSize="72"/>
 				<Grid.GestureRecognizers>
 					<SwipeGestureRecognizer Direction="Up" Swiped="IncreaseBlueScore"/>
 					<SwipeGestureRecognizer Direction="Down" Swiped="DecreaseBlueScore"/>
 				</Grid.GestureRecognizers>
-				<Grid.RowDefinitions>
-					<RowDefinition Height="3*"/>
-					<RowDefinition/>
-				</Grid.RowDefinitions>
 			</Grid>
-			<StackLayout HorizontalOptions="FillAndExpand" Orientation="Vertical">
-				<Button Padding="35,0" Image="stop.png" BackgroundColor="WhiteSmoke" HorizontalOptions="Center" VerticalOptions="EndAndExpand" Clicked="ResetTimer"/>
-				<Label Text="{Binding Path=Fight.Elapsed}" HorizontalOptions="Center" FontSize="30" VerticalOptions="EndAndExpand"/>
-				<StackLayout IsEnabled="{Binding Fight.IsTimerStarted}" HorizontalOptions="Center" Orientation="Horizontal" VerticalOptions="EndAndExpand">
-					<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="-" Clicked="DecreaseDoubleHits"  IsEnabled="False"/>
-					<Label Text="{Binding Path=Fight.DoubleHits}" HorizontalOptions="CenterAndExpand" FontSize="30"/>
-					<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="+" Clicked="IncreaseDoubleHits"  IsEnabled="False"/>
+			<StackLayout HorizontalOptions="Fill" Orientation="Vertical">
+				<StackLayout HorizontalOptions="End" Orientation="Horizontal" VerticalOptions="EndAndExpand" Margin ="55,0,0,-1">
+					<Button Padding="35,0" Image="stop.png" BackgroundColor="WhiteSmoke" HorizontalOptions="Center" VerticalOptions="EndAndExpand" Clicked="ResetTimer"/>
+					<Image Source="settings.png" Margin="25,0,0,0" VerticalOptions="Start" HorizontalOptions="End" WidthRequest="25" HeightRequest="25">
+						<Image.GestureRecognizers>
+							<TapGestureRecognizer Tapped="OpenSettingsTab"/>
+						</Image.GestureRecognizers>
+					</Image>
+				</StackLayout>
+				<StackLayout HorizontalOptions="Center" BackgroundColor="LightSkyBlue" Orientation="Horizontal" VerticalOptions="EndAndExpand" Margin ="0,0,0,-5">
+					<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="-" Clicked="DecreaseBlueViolations" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>
+					<Label Text="{Binding Fight.BlueViolations}" HorizontalOptions="FillAndExpand" HorizontalTextAlignment="Start" FontSize="30"/>
+					<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="+" Clicked="IncreaseBlueViolations" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>
+				</StackLayout>
+				<StackLayout HorizontalOptions="Center"  BackgroundColor="PaleVioletRed" Orientation="Horizontal" VerticalOptions="End" Margin ="0,0,0,-10">
+					<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="-" Clicked="DecreaseRedViolations" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>
+					<Label Text="{Binding Fight.RedViolations}" HorizontalOptions="FillAndExpand" HorizontalTextAlignment="End" FontSize="30" />
+					<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="+" Clicked="IncreaseRedViolations" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>
+				</StackLayout>
+				<StackLayout HorizontalOptions="Center" Orientation="Horizontal" VerticalOptions="EndAndExpand">
+					<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="-" Clicked="DecreaseDoubleHits" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>
+					<Label Text="{Binding Fight.DoubleHits}" HorizontalOptions="CenterAndExpand" FontSize="30" x:Name="DoubleHitlLbl"/>
+					<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="+" Clicked="IncreaseDoubleHits" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>
 				</StackLayout>
 			</StackLayout>
 			<Grid BackgroundColor="PaleVioletRed" HorizontalOptions="FillAndExpand">
-				<Label Grid.Row="0" Text="{Binding Path=Fight.RedScore}" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontSize="72"/>
-				<StackLayout Grid.Row="1" HorizontalOptions="Center"  BackgroundColor="PaleVioletRed" Orientation="Horizontal" VerticalOptions="End">
-					<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="-" Clicked="DecreaseRedViolations"/>
-					<Label Text="{Binding Path=Fight.RedViolations}" HorizontalOptions="FillAndExpand" HorizontalTextAlignment="End" FontSize="30" />
-					<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="+" Clicked="IncreaseRedViolations"/>
-				</StackLayout>
+				<Label Text="{Binding Fight.RedScore}" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontSize="72"/>
 				<Grid.GestureRecognizers>
 					<SwipeGestureRecognizer Direction="Up" Swiped="IncreaseRedScore"/>
 					<SwipeGestureRecognizer Direction="Down" Swiped="DecreaseRedScore"/>
 				</Grid.GestureRecognizers>
-				<Grid.RowDefinitions>
-					<RowDefinition Height="3*"/>
-					<RowDefinition/>
-				</Grid.RowDefinitions>
 			</Grid>
 		</StackLayout>
 		<StackLayout Grid.Row="1">
-			<Button x:Name="StartBtn" Image="start.png" Padding="310,0" BackgroundColor="WhiteSmoke" VerticalOptions ="FillAndExpand"  HorizontalOptions="FillAndExpand" Clicked="StartTimer"/>
+			<Button x:Name="StartBtn" Text="{Binding Fight.Elapsed, StringFormat='{0:mm\\:ss}'}" 
+					TextColor="LightSlateGray" Font="36" FontFamily="Courier" BackgroundColor="WhiteSmoke"
+					VerticalOptions ="FillAndExpand"  HorizontalOptions="FillAndExpand" 
+					Clicked="StartTimer"/>
 		</StackLayout>
 	</Grid>
-
 </ContentPage>

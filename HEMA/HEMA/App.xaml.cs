@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -10,21 +11,15 @@ namespace HEMA
 		public App()
 		{
 			InitializeComponent();
-
-			var mainPage = new MainPage();
-
-			MainPage = new NavigationPage(mainPage);
-			//MainPage.Navigation.PushAsync(new CommonSettingsPage());
+			MainPage = new NavigationPage(new MainPage());
 		}
 
 		protected override void OnStart()
 		{
-			// Handle when your app starts
 		}
 
 		protected override void OnSleep()
 		{
-			// Handle when your app sleeps
 		}
 
 		protected override void OnResume()

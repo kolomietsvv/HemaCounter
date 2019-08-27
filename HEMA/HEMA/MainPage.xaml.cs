@@ -11,7 +11,7 @@ namespace HEMA
 		private string settingsPath;
 		private CommonSettingsPage commonSettingsPage;
 
-		private UserDeclines UserDeclines { get; set; }
+		private UserDeclines userDeclines;
 
 		public Fight Fight { get; }
 
@@ -20,9 +20,9 @@ namespace HEMA
 		public MainPage()
 		{
 			InitializeComponent();
-			settingsPath =  Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "settings.json");
+			settingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "settings.json");
 			FightSettings settings = GetFightSettings();
-			UserDeclines = new UserDeclines();
+			userDeclines = new UserDeclines();
 			Fight = new Fight(settings);
 			Fight.IsOneDoubleHitLeft += isOneDoubleHitLeft => DoubleHitlLbl.TextColor = isOneDoubleHitLeft ? Color.Red : Color.Default;
 			Fight.MaxDoubleHitsReached += () => DisplayFinishFightDialog("Максимальное число обоюдных поражений", FinishCause.DoubleHits);
@@ -56,7 +56,7 @@ namespace HEMA
 		{
 			Fight.Reset();
 			StartBtn.TextColor = Color.LightSlateGray;
-			UserDeclines.Reset();
+			userDeclines.Reset();
 		}
 
 		private void DecreaseBlueScore(object sender, SwipedEventArgs e)
@@ -129,15 +129,15 @@ namespace HEMA
 			switch (finishCause)
 			{
 				case FinishCause.DoubleHits:
-					if (UserDeclines.UserDeclinedDoubleHitsFinish)
+					if (userDeclines.UserDeclinedDoubleHitsFinish)
 						return;
 					break;
 				case FinishCause.MaxScore:
-					if (UserDeclines.UserDeclinedMaxScoreFinish)
+					if (userDeclines.UserDeclinedMaxScoreFinish)
 						return;
 					break;
 				case FinishCause.Time:
-					if (UserDeclines.UserDeclinedTimeFinish)
+					if (userDeclines.UserDeclinedTimeFinish)
 						return;
 					break;
 			}
@@ -151,13 +151,13 @@ namespace HEMA
 				switch (finishCause)
 				{
 					case FinishCause.DoubleHits:
-						UserDeclines.UserDeclinedDoubleHitsFinish = true;
+						userDeclines.UserDeclinedDoubleHitsFinish = true;
 						break;
 					case FinishCause.MaxScore:
-						UserDeclines.UserDeclinedMaxScoreFinish = true;
+						userDeclines.UserDeclinedMaxScoreFinish = true;
 						break;
 					case FinishCause.Time:
-						UserDeclines.UserDeclinedTimeFinish = true;
+						userDeclines.UserDeclinedTimeFinish = true;
 						break;
 				}
 		}
@@ -186,13 +186,11 @@ namespace HEMA
 		}
 	}
 
-	class UserDeclines
+	struct UserDeclines
 	{
-		public bool UserDeclinedDoubleHitsFinish { get; set; }
-
-		public bool UserDeclinedMaxScoreFinish { get; set; }
-
-		public bool UserDeclinedTimeFinish { get; set; }
+		public bool UserDeclinedDoubleHitsFinish;
+		public bool UserDeclinedMaxScoreFinish;
+		public bool UserDeclinedTimeFinish;
 
 		public void Reset()
 		{

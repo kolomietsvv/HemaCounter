@@ -24,7 +24,7 @@ namespace HEMA
 			FightSettings settings = GetFightSettings();
 			userDeclines = new UserDeclines();
 			Fight = new Fight(settings);
-			Fight.IsOneDoubleHitLeft += isOneDoubleHitLeft => DoubleHitlLbl.TextColor = isOneDoubleHitLeft ? Color.Red : Color.Default;
+			Fight.OneDoubleHitLeft += isOneDoubleHitLeft => DoubleHitlLbl.TextColor = isOneDoubleHitLeft ? Color.Red : Color.Default;
 			Fight.MaxDoubleHitsReached += () => DisplayFinishFightDialog("Максимальное число обоюдных поражений", FinishCause.DoubleHits);
 			Fight.MaxScoreReached += () => DisplayFinishFightDialog("Максимальне число очков", FinishCause.MaxScore);
 			Fight.TimeAlert += () => DisplayFinishFightDialog("Время вышло", FinishCause.Time);

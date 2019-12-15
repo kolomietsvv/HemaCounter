@@ -14,11 +14,11 @@
 			<StackLayout Grid.Row="0" Orientation="Horizontal" >
 				<StackLayout>
 					<StackLayout Orientation="Horizontal" Margin="20,5" HorizontalOptions="FillAndExpand">
-						<Label Text="Число обоюдных поражений подряд" VerticalOptions="Center"/>
+						<Label Text="Максимальное число обоюдных поражений подряд" VerticalOptions="Center"/>
 						<Entry Text="{Binding Fight.Settings.DoubleHitsInARow}" HorizontalTextAlignment="Center" Keyboard="Numeric" HorizontalOptions="EndAndExpand" WidthRequest="40" TextChanged="RemoveExtraCharacters"/>
 					</StackLayout>
 					<StackLayout Orientation="Horizontal" Margin="20,5" HorizontalOptions="FillAndExpand">
-						<Label Text="Общее число обоюдных поражений" VerticalOptions="Center"/>
+						<Label Text="Максимальное число обоюдных поражений" VerticalOptions="Center"/>
 						<Entry Text="{Binding Fight.Settings.DoubleHitsCommon}" HorizontalTextAlignment="Center" Keyboard="Numeric"  HorizontalOptions="EndAndExpand" WidthRequest="40" TextChanged="RemoveExtraCharacters"/>
 					</StackLayout>
 					<StackLayout Orientation="Horizontal" Margin="20,5" HorizontalOptions="Fill">
@@ -28,7 +28,7 @@
 				</StackLayout>
 				<StackLayout>
 					<StackLayout Orientation="Horizontal" Margin="20,5" HorizontalOptions="FillAndExpand">
-						<Label Text="Число предпреждений для штрафа" VerticalOptions="Center"/>
+						<Label Text="Число предупреждений для штрафа" VerticalOptions="Center"/>
 						<Entry Text="{Binding Fight.Settings.ViolationsToStartPenalize}" HorizontalTextAlignment="Center" Keyboard="Numeric"  HorizontalOptions="EndAndExpand" WidthRequest="40" TextChanged="RemoveExtraCharacters"/>
 					</StackLayout>
 					<StackLayout Orientation="Horizontal" Margin="20,5" HorizontalOptions="Fill">

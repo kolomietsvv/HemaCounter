@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using Android.Media;
 using Xamarin.Forms;
 using Xamarin.Forms.Xaml;
 
@@ -8,10 +7,10 @@ namespace HEMA
 {
 	public partial class App : Application
 	{
-		public App()
+		public App(MediaPlayer mediaPlayer)
 		{
 			InitializeComponent();
-			MainPage = new NavigationPage(new MainPage());
+			MainPage = new NavigationPage(new MainPage(mediaPlayer));
 		}
 
 		protected override void OnStart()

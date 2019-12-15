@@ -142,7 +142,7 @@ namespace HEMA
 				timerElapsed += InvokeAlert;
 
 			var timerCallback = new TimerCallback(UpdateElapsedProperty);
-			timerCallback += s => TimerTick?.Invoke();
+			timerCallback += InvokeTimerTick;
 			timer = new Timer(timerCallback, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
 			timer.Change(0, Timeout.Infinite);
 
@@ -168,8 +168,8 @@ namespace HEMA
 
 		public void Reset()
 		{
-			StopTimer();
 			stopwatch.Reset();
+			StopTimer();
 			currentPhrase = new Phrase();
 			DoubleHits = 0;
 			BlueViolations = 0;
@@ -181,6 +181,12 @@ namespace HEMA
 		}
 
 		#region private
+
+		private void InvokeTimerTick(object state)
+		{
+			if (stopwatch.IsRunning && stopwatch.Elapsed.TotalSeconds >= 1)
+				TimerTick?.Invoke();
+		}
 
 		private struct Phrase
 		{

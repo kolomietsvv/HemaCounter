@@ -1,6 +1,6 @@
-﻿
-using Android.App;
+﻿using Android.App;
 using Android.Content.PM;
+using Android.Media;
 using Android.OS;
 
 namespace HEMA.Droid
@@ -15,7 +15,8 @@ namespace HEMA.Droid
 
 			base.OnCreate(savedInstanceState);
 			global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-			LoadApplication(new App());
+			var audioPlayer = MediaPlayer.Create(Application.Context, Resource.Raw.tick);
+			LoadApplication(new App(audioPlayer));
 		}
 	}
 }

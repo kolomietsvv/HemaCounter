@@ -1,7 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
 using System.Windows.Input;
+using Android.Media;
+using Newtonsoft.Json;
 using Xamarin.Forms;
 
 namespace HEMA
@@ -17,7 +18,7 @@ namespace HEMA
 
 		public ICommand ResetSettingsCmd { get => new Command(Fight.Settings.SetDefaults); }
 
-		public MainPage()
+		public MainPage(MediaPlayer mediaPlayer)
 		{
 			InitializeComponent();
 			settingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "settings.json");
@@ -31,6 +32,7 @@ namespace HEMA
 			BindingContext = this;
 			commonSettingsPage = new CommonSettingsPage();
 			commonSettingsPage.BindingContext = this;
+			Fight.TimerTick += mediaPlayer.Start;
 		}
 
 		public void OpenSettingsTab(object sender, EventArgs e)

@@ -24,6 +24,7 @@ namespace HEMA
 		public event Action MaxDoubleHitsReached;
 		public event Action MaxScoreReached;
 		public event Action TimeAlert;
+		public event Action TimerTick;
 		public event Action<bool> OneDoubleHitLeft;
 		public event PropertyChangedEventHandler PropertyChanged;
 
@@ -140,7 +141,9 @@ namespace HEMA
 			if (Settings.UseAlerts)
 				timerElapsed += InvokeAlert;
 
-			timer = new Timer(UpdateElapsedProperty, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
+			var timerCallback = new TimerCallback(UpdateElapsedProperty);
+			timerCallback += s => TimerTick?.Invoke();
+			timer = new Timer(timerCallback, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
 			timer.Change(0, Timeout.Infinite);
 
 			OneDoubleHitLeft += value => isOneDoubleHitLeft = value;
@@ -165,8 +168,8 @@ namespace HEMA
 
 		public void Reset()
 		{
+			StopTimer();
 			stopwatch.Reset();
-			IsTimerStarted = false;
 			currentPhrase = new Phrase();
 			DoubleHits = 0;
 			BlueViolations = 0;

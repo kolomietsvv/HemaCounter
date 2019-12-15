@@ -6,21 +6,24 @@ namespace HEMA
 {
 	public class FightSettings : INotifyPropertyChanged
 	{
-		public int doubleHitsCommon;
-		public int doubleHitsInARow;
-		public int violationsToStartPenalize;
-		public int penaltyPoints;
-		public int maxFightScore;
-		public bool useFightSettings;
-		public bool useAlerts;
+		private int doubleHitsCommon;
+		private int doubleHitsInARow;
+		private int violationsToStartPenalize;
+		private int penaltyPoints;
+		private int maxFightScore;
+		private bool useFightSettings;
+		private bool useAlerts;
 		private bool noBreak;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		public int DoubleHitsCommon
 		{
-			get => doubleHitsCommon; set
+			get => doubleHitsCommon;
+			set
 			{
+				if (value < DoubleHitsInARow)
+					throw new ArgumentException("Double hits common cannot be less than double hits in a row.", nameof(DoubleHitsCommon));
 				doubleHitsCommon = value;
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DoubleHitsCommon)));
 			}
@@ -31,6 +34,8 @@ namespace HEMA
 			get => doubleHitsInARow;
 			set
 			{
+				if (value > DoubleHitsCommon)
+					throw new ArgumentException("Double hits in a row cannot be greater than double hits common.", nameof(DoubleHitsInARow));
 				doubleHitsInARow = value;
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DoubleHitsInARow)));
 			}

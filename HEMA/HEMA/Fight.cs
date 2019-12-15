@@ -24,7 +24,7 @@ namespace HEMA
 		public event Action MaxDoubleHitsReached;
 		public event Action MaxScoreReached;
 		public event Action TimeAlert;
-		public event Action<bool> IsOneDoubleHitLeft;
+		public event Action<bool> OneDoubleHitLeft;
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		private int MaxDoubleHits => isDoubleHitsInRow ? Settings.DoubleHitsInARow : Settings.DoubleHitsCommon;
@@ -79,7 +79,7 @@ namespace HEMA
 			{
 				if (value < 0)
 					return;
-				BlueScore = CaclulateScore(value, blueViolations, BlueScore);
+				BlueScore = CalculateScore(value, blueViolations, BlueScore);
 				blueViolations = value;
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BlueViolations)));
 			}
@@ -92,7 +92,7 @@ namespace HEMA
 			{
 				if (value < 0)
 					return;
-				RedScore = CaclulateScore(value, redViolations, RedScore);
+				RedScore = CalculateScore(value, redViolations, RedScore);
 				redViolations = value;
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RedViolations)));
 			}
@@ -104,6 +104,8 @@ namespace HEMA
 			set
 			{
 				currentPhrase.RedScore = value;
+				if (Settings.NoBreak)
+					UpdateDoubleHitsInRowFlagAndFrase();
 				if (Settings.UseFightSettings && value >= Settings.MaxFightScore)
 					MaxScoreReached?.Invoke();
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RedScore)));
@@ -116,6 +118,8 @@ namespace HEMA
 			set
 			{
 				currentPhrase.BlueScore = value;
+				if (Settings.NoBreak)
+					UpdateDoubleHitsInRowFlagAndFrase();
 				if (Settings.UseFightSettings && value >= Settings.MaxFightScore)
 					MaxScoreReached?.Invoke();
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BlueScore)));
@@ -137,9 +141,9 @@ namespace HEMA
 				timerElapsed += InvokeAlert;
 
 			timer = new Timer(UpdateElapsedProperty, null, TimeSpan.Zero, TimeSpan.FromSeconds(1));
-			timer.Change(TimeSpan.Zero, TimeSpan.FromSeconds(1));
+			timer.Change(0, Timeout.Infinite);
 
-			IsOneDoubleHitLeft += value => isOneDoubleHitLeft = value;
+			OneDoubleHitLeft += value => isOneDoubleHitLeft = value;
 		}
 
 		public void StopTimer()
@@ -155,10 +159,7 @@ namespace HEMA
 			stopwatch.Start();
 			IsTimerStarted = true;
 
-			if (IsDoubleHitsInRow && currentPhrase > previousPhrase)
-				IsDoubleHitsInRow = false;
-
-			previousPhrase = currentPhrase;
+			UpdateDoubleHitsInRowFlagAndFrase();
 			UpdateElapsedProperty();
 		}
 
@@ -195,7 +196,7 @@ namespace HEMA
 			}
 		}
 
-		private int CaclulateScore(int value, int previousValue, int score)
+		private int CalculateScore(int value, int previousValue, int score)
 		{
 			var isIncreased = previousValue < value;
 			if (isIncreased && Settings.UseFightSettings && value >= Settings.ViolationsToStartPenalize)
@@ -219,11 +220,17 @@ namespace HEMA
 		private void NotificateAboutOneDoubleHitLeft()
 		{
 			if (doubleHits + 1 == MaxDoubleHits)
-				IsOneDoubleHitLeft?.Invoke(true);
+				OneDoubleHitLeft?.Invoke(true);
 			else if (isOneDoubleHitLeft && doubleHits + 1 < MaxDoubleHits)
-				IsOneDoubleHitLeft?.Invoke(false);
+				OneDoubleHitLeft?.Invoke(false);
 		}
 
+		private void UpdateDoubleHitsInRowFlagAndFrase()
+		{
+			if (DoubleHits != 0 && IsDoubleHitsInRow && currentPhrase > previousPhrase)
+				IsDoubleHitsInRow = false;
+			previousPhrase = currentPhrase;
+		}
 		#endregion
 	}
 }

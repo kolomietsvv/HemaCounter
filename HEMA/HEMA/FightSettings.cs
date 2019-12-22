@@ -22,13 +22,13 @@ namespace HEMA
 			get => doubleHitsCommon;
 			set
 			{
-				if (value < DoubleHitsInARow)
-				{
-					//throw new ArgumentException("Double hits common cannot be less than double hits in a row.", nameof(DoubleHitsCommon));
-					//TODO: find way to catch
-					PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DoubleHitsCommon)));
-					return;
-				}
+				//if (value < DoubleHitsInARow)
+				//{
+				//	//throw new ArgumentException("Double hits common cannot be less than double hits in a row.", nameof(DoubleHitsCommon));
+				//	//TODO: find way to catch
+				//	PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DoubleHitsCommon)));
+				//	return;
+				//}
 				doubleHitsCommon = value;
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DoubleHitsCommon)));
 			}
@@ -39,13 +39,13 @@ namespace HEMA
 			get => doubleHitsInARow;
 			set
 			{
-				if (value > DoubleHitsCommon)
-				{
-					// throw new ArgumentException("Double hits in a row cannot be greater than double hits common.", nameof(DoubleHitsInARow));
-					//TODO: find way to catch
-					PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DoubleHitsInARow)));
-					return;
-				}
+				//if (value > DoubleHitsCommon)
+				//{
+				//	// throw new ArgumentException("Double hits in a row cannot be greater than double hits common.", nameof(DoubleHitsInARow));
+				//	//TODO: find way to catch
+				//	PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DoubleHitsInARow)));
+				//	return;
+				//}
 				doubleHitsInARow = value;
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(DoubleHitsInARow)));
 			}

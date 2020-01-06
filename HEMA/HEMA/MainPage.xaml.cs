@@ -11,10 +11,25 @@ namespace HEMA
 	{
 		private string settingsPath;
 		private CommonSettingsPage commonSettingsPage;
+		private Color btnsColor;
 
 		private UserDeclines userDeclines;
 
 		public Fight Fight { get; }
+
+		public Color BtnsColor
+		{
+			get => btnsColor;
+			set
+			{
+				btnsColor = value;
+				OnPropertyChanged(nameof(BtnsColor));
+			}
+		}
+
+		public bool IsSettingsEnabled => !Fight.IsFightStarted;
+
+		public Color SettingsBtnColor => Fight.IsFightStarted ? Color.Gainsboro : Color.DarkSlateGray;
 
 		public ICommand ResetSettingsCmd { get => new Command(Fight.Settings.SetDefaults); }
 
@@ -35,9 +50,13 @@ namespace HEMA
 			Fight.TimerTick += mediaPlayer.Start;
 			if (Fight.Settings.NoBreak)
 			{
-				RedScoreLbl.TextColor = Color.White;
-				BlueScoreLbl.TextColor = Color.White;
+				BtnsColor = Color.WhiteSmoke;
 			}
+			else
+			{
+				BtnsColor = Color.LightSlateGray;
+			}
+			UpdateSettingsEnabled();
 		}
 
 		public void OpenSettingsTab(object sender, EventArgs e)
@@ -57,6 +76,13 @@ namespace HEMA
 				Fight.StartTimer();
 				SetColorsOnStart();
 			}
+			UpdateSettingsEnabled();
+		}
+
+		private void UpdateSettingsEnabled()
+		{
+			OnPropertyChanged(nameof(IsSettingsEnabled));
+			OnPropertyChanged(nameof(SettingsBtnColor));
 		}
 
 		private void ResetTimer(object sender, EventArgs e)
@@ -65,13 +91,13 @@ namespace HEMA
 			if (!Fight.Settings.NoBreak)
 			{
 				StartBtn.TextColor = Color.LightSlateGray;
-				RedScoreLbl.TextColor = Color.LightSlateGray;
-				BlueScoreLbl.TextColor = Color.LightSlateGray;
+				BtnsColor = Color.LightSlateGray;
 			}
 			userDeclines.Reset();
+			UpdateSettingsEnabled();
 		}
 
-		private void DecreaseBlueScore(object sender, SwipedEventArgs e)
+		private void DecreaseBlueScore(object sender, EventArgs e)
 		{
 			if (Fight.IsScoreChangeEnabled && Fight.BlueScore > 0)
 			{
@@ -79,7 +105,7 @@ namespace HEMA
 			}
 		}
 
-		private void DecreaseRedScore(object sender, SwipedEventArgs e)
+		private void DecreaseRedScore(object sender, EventArgs e)
 		{
 			if (Fight.IsScoreChangeEnabled && Fight.RedScore > 0)
 			{
@@ -87,7 +113,7 @@ namespace HEMA
 			}
 		}
 
-		private void IncreaseBlueScore(object sender, SwipedEventArgs e)
+		private void IncreaseBlueScore(object sender, EventArgs e)
 		{
 			if (Fight.IsScoreChangeEnabled)
 			{
@@ -95,7 +121,7 @@ namespace HEMA
 			}
 		}
 
-		private void IncreaseRedScore(object sender, SwipedEventArgs e)
+		private void IncreaseRedScore(object sender, EventArgs e)
 		{
 			if (Fight.IsScoreChangeEnabled)
 			{
@@ -202,8 +228,7 @@ namespace HEMA
 			StartBtn.TextColor = Color.LightSlateGray;
 			if (!Fight.Settings.NoBreak)
 			{
-				RedScoreLbl.TextColor = Color.White;
-				BlueScoreLbl.TextColor = Color.White;
+				BtnsColor = Color.WhiteSmoke;
 			}
 		}
 
@@ -212,8 +237,7 @@ namespace HEMA
 			StartBtn.TextColor = Color.Default;
 			if (!Fight.Settings.NoBreak)
 			{
-				RedScoreLbl.TextColor = Color.LightSlateGray;
-				BlueScoreLbl.TextColor = Color.LightSlateGray;
+				BtnsColor = Color.LightSlateGray;
 			}
 		}
 	}

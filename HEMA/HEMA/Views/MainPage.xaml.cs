@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows.Input;
 using Android.Media;
 using Newtonsoft.Json;
+using Xamarin.Essentials;
 using Xamarin.Forms;
 
 namespace HEMA
@@ -12,6 +13,7 @@ namespace HEMA
 		private string settingsPath;
 		private CommonSettingsPage commonSettingsPage;
 		private Color btnsColor;
+		private TimeSpan vibrationDuration = TimeSpan.FromSeconds(0.5);
 
 		private UserDeclines userDeclines;
 
@@ -48,6 +50,7 @@ namespace HEMA
 			commonSettingsPage = new CommonSettingsPage();
 			commonSettingsPage.BindingContext = this;
 			Fight.TimerTick += mediaPlayer.Start;
+			Fight.TimerTick += Vibrate;
 			if (Fight.Settings.NoBreak)
 			{
 				BtnsColor = Color.WhiteSmoke;
@@ -238,6 +241,17 @@ namespace HEMA
 			if (!Fight.Settings.NoBreak)
 			{
 				BtnsColor = Color.LightSlateGray;
+			}
+		}
+
+		private void Vibrate()
+		{
+			try
+			{
+				Vibration.Vibrate(vibrationDuration);
+			}
+			catch
+			{
 			}
 		}
 	}

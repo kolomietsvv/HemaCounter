@@ -22,13 +22,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="CommonSettingsPage.xaml">
+    <EmbeddedResource Update="Views\CommonSettingsPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Page1.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="TimeSettingsPage.xaml">
+    <EmbeddedResource Update="Views\TimeSettingsPage.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
     </EmbeddedResource>
   </ItemGroup>

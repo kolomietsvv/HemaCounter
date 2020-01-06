@@ -33,6 +33,11 @@ namespace HEMA
 			commonSettingsPage = new CommonSettingsPage();
 			commonSettingsPage.BindingContext = this;
 			Fight.TimerTick += mediaPlayer.Start;
+			if (Fight.Settings.NoBreak)
+			{
+				RedScoreLbl.TextColor = Color.White;
+				BlueScoreLbl.TextColor = Color.White;
+			}
 		}
 
 		public void OpenSettingsTab(object sender, EventArgs e)
@@ -44,20 +49,25 @@ namespace HEMA
 		{
 			if (Fight.IsTimerStarted)
 			{
-				Fight.StopTimer();
-				StartBtn.TextColor = Color.LightSlateGray;
+				Fight.PauseTimer();
+				SetColorsOnPause();
 			}
 			else
 			{
 				Fight.StartTimer();
-				StartBtn.TextColor = Color.Default;
+				SetColorsOnStart();
 			}
 		}
 
 		private void ResetTimer(object sender, EventArgs e)
 		{
 			Fight.Reset();
-			StartBtn.TextColor = Color.LightSlateGray;
+			if (!Fight.Settings.NoBreak)
+			{
+				StartBtn.TextColor = Color.LightSlateGray;
+				RedScoreLbl.TextColor = Color.LightSlateGray;
+				BlueScoreLbl.TextColor = Color.LightSlateGray;
+			}
 			userDeclines.Reset();
 		}
 
@@ -144,7 +154,7 @@ namespace HEMA
 					break;
 			}
 
-			Fight.StopTimer();
+			Fight.PauseTimer();
 			var userChoice = await DisplayAlert($"Бой окончен", cause, "Завершить", "Продолжить");
 			if (userChoice)
 				Fight.Reset();
@@ -185,6 +195,26 @@ namespace HEMA
 			var settingsString = JsonConvert.SerializeObject(Fight.Settings);
 			File.WriteAllText(settingsPath, settingsString);
 			base.OnAppearing();
+		}
+
+		private void SetColorsOnPause()
+		{
+			StartBtn.TextColor = Color.LightSlateGray;
+			if (!Fight.Settings.NoBreak)
+			{
+				RedScoreLbl.TextColor = Color.White;
+				BlueScoreLbl.TextColor = Color.White;
+			}
+		}
+
+		private void SetColorsOnStart()
+		{
+			StartBtn.TextColor = Color.Default;
+			if (!Fight.Settings.NoBreak)
+			{
+				RedScoreLbl.TextColor = Color.LightSlateGray;
+				BlueScoreLbl.TextColor = Color.LightSlateGray;
+			}
 		}
 	}
 

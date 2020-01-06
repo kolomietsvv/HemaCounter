@@ -12,7 +12,7 @@
 		</Grid.RowDefinitions>
 		<StackLayout Margin ="0,0,0,-5" Grid.Row="0" Orientation="Horizontal">
 			<Grid BackgroundColor="LightSkyBlue" HorizontalOptions="FillAndExpand">
-				<Label Text="{Binding Fight.BlueScore}" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontSize="72"/>
+				<Label x:Name="BlueScoreLbl" Text="{Binding Fight.BlueScore}" TextColor="LightSlateGray" HorizontalOptions="Center" VerticalOptions="Center" FontSize="72"/>
 				<Grid.GestureRecognizers>
 					<SwipeGestureRecognizer Direction="Up" Swiped="IncreaseBlueScore"/>
 					<SwipeGestureRecognizer Direction="Down" Swiped="DecreaseBlueScore"/>
@@ -20,12 +20,12 @@
 			</Grid>
 			<StackLayout HorizontalOptions="Fill" Orientation="Vertical">
 				<StackLayout HorizontalOptions="End" Orientation="Horizontal" VerticalOptions="EndAndExpand" Margin ="55,0,0,-1">
-					<Button Padding="35,0" Image="stop.png" BackgroundColor="WhiteSmoke" HorizontalOptions="Center" VerticalOptions="EndAndExpand" Clicked="ResetTimer"/>
-					<Image Source="settings.png" Margin="25,0,0,0" VerticalOptions="Start" HorizontalOptions="End" WidthRequest="25" HeightRequest="25">
-						<Image.GestureRecognizers>
+					<Button Text="■" TextColor="Silver" Padding="-10,2,-10,5" Font="30" BackgroundColor="WhiteSmoke" HorizontalOptions="Center" VerticalOptions="EndAndExpand" Clicked="ResetTimer" FontAttributes="Bold"/>
+					<Label Margin="20,-15,0,0" VerticalOptions="Start" Font="30" HorizontalOptions="End" Text="⚔" TextColor="DarkSlateGray">
+						<Label.GestureRecognizers>
 							<TapGestureRecognizer Tapped="OpenSettingsTab"/>
-						</Image.GestureRecognizers>
-					</Image>
+						</Label.GestureRecognizers>
+					</Label>
 				</StackLayout>
 				<StackLayout HorizontalOptions="Center" BackgroundColor="LightSkyBlue" Orientation="Horizontal" VerticalOptions="EndAndExpand" Margin ="0,0,0,-5">
 					<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="-" Clicked="DecreaseBlueViolations" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>
@@ -44,7 +44,7 @@
 				</StackLayout>
 			</StackLayout>
 			<Grid BackgroundColor="PaleVioletRed" HorizontalOptions="FillAndExpand">
-				<Label Text="{Binding Fight.RedScore}" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontSize="72"/>
+				<Label x:Name="RedScoreLbl" Text="{Binding Fight.RedScore}" TextColor="LightSlateGray" HorizontalOptions="Center" VerticalOptions="Center" FontSize="72"/>
 				<Grid.GestureRecognizers>
 					<SwipeGestureRecognizer Direction="Up" Swiped="IncreaseRedScore"/>
 					<SwipeGestureRecognizer Direction="Down" Swiped="DecreaseRedScore"/>

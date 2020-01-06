@@ -149,7 +149,7 @@ namespace HEMA
 			OneDoubleHitLeft += value => isOneDoubleHitLeft = value;
 		}
 
-		public void StopTimer()
+		public void PauseTimer()
 		{
 			timer.Change(0, Timeout.Infinite);
 			stopwatch.Stop();
@@ -169,7 +169,7 @@ namespace HEMA
 		public void Reset()
 		{
 			stopwatch.Reset();
-			StopTimer();
+			PauseTimer();
 			currentPhrase = new Phrase();
 			DoubleHits = 0;
 			BlueViolations = 0;

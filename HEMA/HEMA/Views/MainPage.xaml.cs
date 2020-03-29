@@ -14,10 +14,13 @@ namespace HEMA
 		private CommonSettingsPage commonSettingsPage;
 		private Color btnsColor;
 		private TimeSpan vibrationDuration = TimeSpan.FromSeconds(0.5);
+		MediaPlayer mediaPlayer;
 
 		private UserDeclines userDeclines;
 
 		public Fight Fight { get; }
+
+		public SoundSettings SoundSettings { get; }
 
 		public Color BtnsColor
 		{
@@ -40,6 +43,8 @@ namespace HEMA
 			InitializeComponent();
 			settingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "settings.json");
 			FightSettings settings = GetFightSettings();
+			SoundSettings = new SoundSettings();
+			this.mediaPlayer = mediaPlayer;
 			userDeclines = new UserDeclines();
 			Fight = new Fight(settings);
 			Fight.OneDoubleHitLeft += isOneDoubleHitLeft => DoubleHitlLbl.TextColor = isOneDoubleHitLeft ? Color.Red : Color.Default;
@@ -49,7 +54,7 @@ namespace HEMA
 			BindingContext = this;
 			commonSettingsPage = new CommonSettingsPage();
 			commonSettingsPage.BindingContext = this;
-			Fight.TimerTick += mediaPlayer.Start;
+			Fight.TimerTick += PlaySound;
 			Fight.TimerTick += Vibrate;
 			if (Fight.Settings.NoBreak)
 			{
@@ -248,10 +253,21 @@ namespace HEMA
 		{
 			try
 			{
-				Vibration.Vibrate(vibrationDuration);
+				if (SoundSettings.IsVibrationEnabled)
+				{
+					Vibration.Vibrate(vibrationDuration);
+				}
 			}
 			catch
 			{
+			}
+		}
+
+		private void PlaySound()
+		{
+			if (SoundSettings.IsSoundEnabled)
+			{
+				mediaPlayer.Start();
 			}
 		}
 	}

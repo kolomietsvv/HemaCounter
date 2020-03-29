@@ -14,39 +14,39 @@
 			<StackLayout Grid.Row="0" Orientation="Horizontal" >
 				<StackLayout>
 					<StackLayout Orientation="Horizontal" Margin="20,5" HorizontalOptions="FillAndExpand">
-						<Label Text="Максимальное число обоюдных поражений подряд" VerticalOptions="Center"/>
+						<Label Text="Max double hits in a row count" VerticalOptions="Center"/>
 						<Entry Text="{Binding Fight.Settings.DoubleHitsInARow}" HorizontalTextAlignment="Center" Keyboard="Numeric" HorizontalOptions="EndAndExpand" WidthRequest="40" TextChanged="RemoveExtraCharacters"/>
 					</StackLayout>
 					<StackLayout Orientation="Horizontal" Margin="20,5" HorizontalOptions="FillAndExpand">
-						<Label Text="Максимальное число обоюдных поражений" VerticalOptions="Center"/>
+						<Label Text="Max double hits common count" VerticalOptions="Center"/>
 						<Entry Text="{Binding Fight.Settings.DoubleHitsCommon}" HorizontalTextAlignment="Center" Keyboard="Numeric"  HorizontalOptions="EndAndExpand" WidthRequest="40" TextChanged="RemoveExtraCharacters"/>
 					</StackLayout>
 					<StackLayout Orientation="Horizontal" Margin="20,5" HorizontalOptions="Fill">
-						<Label Text="Максимальное число очков" VerticalOptions="Center"/>
+						<Label Text="Max score" VerticalOptions="Center"/>
 						<Entry Text="{Binding Fight.Settings.MaxFightScore}" HorizontalTextAlignment="Center" Keyboard="Numeric"  HorizontalOptions="EndAndExpand" WidthRequest="40" TextChanged="RemoveExtraCharacters"/>
 					</StackLayout>
 				</StackLayout>
 				<StackLayout>
 					<StackLayout Orientation="Horizontal" Margin="20,5" HorizontalOptions="FillAndExpand">
-						<Label Text="Число предупреждений для штрафа" VerticalOptions="Center"/>
+						<Label Text="Penalty starts from warnings" VerticalOptions="Center"/>
 						<Entry Text="{Binding Fight.Settings.ViolationsToStartPenalize}" HorizontalTextAlignment="Center" Keyboard="Numeric"  HorizontalOptions="EndAndExpand" WidthRequest="40" TextChanged="RemoveExtraCharacters"/>
 					</StackLayout>
 					<StackLayout Orientation="Horizontal" Margin="20,5" HorizontalOptions="Fill">
-						<Label Text="Штрафной бал" VerticalOptions="Center"/>
+						<Label Text="Penalty point" VerticalOptions="Center"/>
 						<Entry Text="{Binding Fight.Settings.PenaltyPoints}" HorizontalTextAlignment="Center" Keyboard="Numeric"  HorizontalOptions="EndAndExpand" WidthRequest="40" TextChanged="RemoveExtraCharacters"/>
 					</StackLayout>
 				</StackLayout>
 			</StackLayout>
 			<StackLayout Grid.Row="1" Orientation="Horizontal">
 				<StackLayout Orientation="Horizontal" Margin="20,5">
-					<Label Text="Использовать настройки" VerticalOptions="Center"/>
+					<Label Text="Use settings" VerticalOptions="Center"/>
 					<Switch IsToggled="{Binding Fight.Settings.UseFightSettings}"/>
 				</StackLayout>
 				<StackLayout Orientation="Horizontal" Margin="20,5">
-					<Label Text="Безразводной бой" VerticalOptions="Center"/>
+					<Label Text="Continuous fight" VerticalOptions="Center"/>
 					<Switch IsToggled="{Binding Fight.Settings.NoBreak}"/>
 				</StackLayout>
-				<Button Text="Default" Margin="20,5" VerticalOptions="Center" Command="{Binding ResetSettingsCmd}"/>
+				<Button Text="Default" Margin="20,5" VerticalOptions="Center" Command="{Binding ResetSettingsCmd}" CornerRadius="20" BackgroundColor="WhiteSmoke"/>
 			</StackLayout>
 		</Grid>
 	</ContentPage.Content>

@@ -19,6 +19,8 @@ namespace HEMA
 				isSoundEnabled = value;
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsSoundEnabled)));
 			}
+		}
+
 		public bool IsVibrationEnabled
 		{
 			get => isVibrationEnabled;

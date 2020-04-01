@@ -7,19 +7,8 @@
              x:Class="HEMA.TimeSettingsPage">
 	<ContentPage.Content>
 		<StackLayout BackgroundColor="LightSlateGray">
-			<StackLayout>
-			</StackLayout>
-			<StackLayout>
-
-			</StackLayout>
-			<StackLayout>
-
-			</StackLayout>
-			<StackLayout>
-
-			</StackLayout>
+			
 			<Button Text="+" CornerRadius="30" BackgroundColor="WhiteSmoke" FontSize="30" WidthRequest="60" HorizontalOptions="EndAndExpand" VerticalOptions="EndAndExpand" Margin="25"/>
-
 		</StackLayout>
 	</ContentPage.Content>
 </ContentPage>

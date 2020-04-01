@@ -34,7 +34,7 @@ namespace HEMA
 
 		public bool IsSettingsEnabled => !Fight.IsFightStarted;
 
-		public Color SettingsBtnColor => Fight.IsFightStarted ? Color.Gainsboro : Color.DarkSlateGray;
+		public Color SettingsBtnColor => Fight.IsFightStarted ? Color.LightSlateGray : Color.White;
 
 		public ICommand ResetSettingsCmd { get => new Command(Fight.Settings.SetDefaults); }
 
@@ -246,6 +246,10 @@ namespace HEMA
 			if (!Fight.Settings.NoBreak)
 			{
 				BtnsColor = Color.LightSlateGray;
+			}
+			else
+			{
+				BtnsColor = Color.WhiteSmoke;
 			}
 		}
 

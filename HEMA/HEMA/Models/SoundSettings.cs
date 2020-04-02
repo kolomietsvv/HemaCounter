@@ -7,7 +7,7 @@ namespace HEMA
 	public class SoundSettings : INotifyPropertyChanged
 	{
 		private bool isSoundEnabled = true;
-		private bool isVibrationEnabled = true;
+		private bool isVibrationEnabled = false;
 
 		public event PropertyChangedEventHandler PropertyChanged;
 

@@ -48,9 +48,9 @@ namespace HEMA
 			userDeclines = new UserDeclines();
 			Fight = new Fight(settings);
 			Fight.OneDoubleHitLeft += isOneDoubleHitLeft => DoubleHitlLbl.TextColor = isOneDoubleHitLeft ? Color.Red : Color.Default;
-			Fight.MaxDoubleHitsReached += () => DisplayFinishFightDialog("Максимальное число обоюдных поражений", FinishCause.DoubleHits);
-			Fight.MaxScoreReached += () => DisplayFinishFightDialog("Максимальне число очков", FinishCause.MaxScore);
-			Fight.TimeAlert += () => DisplayFinishFightDialog("Время вышло", FinishCause.Time);
+			Fight.MaxDoubleHitsReached += () => DisplayFinishFightDialog(TextCollection.MaxDoubleHits, FinishCause.DoubleHits);
+			Fight.MaxScoreReached += () => DisplayFinishFightDialog(TextCollection.MaxScore, FinishCause.MaxScore);
+			Fight.TimeAlert += () => DisplayFinishFightDialog(TextCollection.TimeIsOver, FinishCause.Time);
 			BindingContext = this;
 			commonSettingsPage = new CommonSettingsPage();
 			commonSettingsPage.BindingContext = this;
@@ -199,7 +199,7 @@ namespace HEMA
 			}
 
 			Fight.PauseTimer();
-			var userChoice = await DisplayAlert($"Бой окончен", cause, "Завершить", "Продолжить");
+			var userChoice = await DisplayAlert(TextCollection.FightIsOver, cause, TextCollection.Finish, TextCollection.Continue);
 			if (userChoice)
 				Fight.Reset();
 

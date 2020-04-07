@@ -170,6 +170,16 @@ namespace HEMA
 			Fight.BlueViolations++;
 		}
 
+		public void ChangeVibrationState(object sender, EventArgs e)
+		{
+			SoundSettings.IsVibrationEnabled = !SoundSettings.IsVibrationEnabled;
+		}
+
+		private void ChangeSoundState(object sender, EventArgs e)
+		{
+			SoundSettings.IsSoundEnabled = !SoundSettings.IsSoundEnabled;
+		}
+
 		private async void DisplayFinishFightDialog(string cause, FinishCause finishCause)
 		{
 			switch (finishCause)

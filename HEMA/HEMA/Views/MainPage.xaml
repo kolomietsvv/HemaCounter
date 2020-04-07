@@ -29,13 +29,20 @@
 				</Grid.GestureRecognizers>
 			</Grid>
 			<StackLayout HorizontalOptions="Fill" Orientation="Vertical">
-				<StackLayout HorizontalOptions="End" Orientation="Horizontal" VerticalOptions="EndAndExpand" Margin ="55,0,0,-1">
+				<StackLayout HorizontalOptions="Center" Orientation="Horizontal" VerticalOptions="Fill" Margin ="55,0,0,0">
 					<Button Text="■" TextColor="Silver" Padding="-10,2,-10,5" Font="30" BackgroundColor="WhiteSmoke" HorizontalOptions="Center" VerticalOptions="EndAndExpand" Clicked="ResetTimer" FontAttributes="Bold"/>
-					<Label Margin="20,-15,0,0" VerticalOptions="Start" Font="30" HorizontalOptions="End" Text="⚔" TextColor="{Binding SettingsBtnColor}" IsEnabled="{Binding IsSettingsEnabled}">
-						<Label.GestureRecognizers>
-							<TapGestureRecognizer Tapped="OpenSettingsTab"/>
-						</Label.GestureRecognizers>
-					</Label>
+					<StackLayout HorizontalOptions="End" Orientation="Vertical" VerticalOptions="Start" Margin="0,10,0,0">
+						<Label Margin="10,-10,0,0" VerticalOptions="Start" Font="30" HorizontalOptions="Center" Text="⚔" TextColor="{Binding SettingsBtnColor}" IsEnabled="{Binding IsSettingsEnabled}">
+							<Label.GestureRecognizers>
+								<TapGestureRecognizer Tapped="OpenSettingsTab"/>
+							</Label.GestureRecognizers>
+						</Label>
+						<Label Margin="10,-10,0,0" VerticalOptions="Start" Font="30" HorizontalOptions="Center" Text="📳" TextColor="{Binding SettingsBtnColor}" IsEnabled="{Binding IsSettingsEnabled}">
+							<Label.GestureRecognizers>
+								<TapGestureRecognizer Tapped="ChangeVibrationState"/>
+							</Label.GestureRecognizers>
+						</Label>
+					</StackLayout>
 				</StackLayout>
 				<StackLayout HorizontalOptions="Center" BackgroundColor="LightSkyBlue" Orientation="Horizontal" VerticalOptions="EndAndExpand" Margin ="0,0,0,-5">
 					<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="-" Clicked="DecreaseBlueViolations" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>

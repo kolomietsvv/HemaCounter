@@ -1,7 +1,10 @@
 ﻿using Android.Media;
+using HEMA.Models;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows.Input;
 using Xamarin.Forms;
 
@@ -14,14 +17,16 @@ namespace HEMA
         private TimerSettingsPage timerSettingsPage;
         private Color btnsColor;
         private bool alarmIsOn;
+        private bool pauseFight;
+        private bool checkAlarms;
         private MediaPlayer tickMediaPlayer;
         private MediaPlayer alarmMediaPlayer;
         private MediaPlayer currentMediaPlayer;
+        private List<TimerAlarmLight> alarmsInUse;
 
         private UserDeclines userDeclines;
 
         public Fight Fight { get; }
-
 
         public Color BtnsColor
         {
@@ -37,7 +42,7 @@ namespace HEMA
 
         public Color SettingsBtnColor => Fight.IsFightStarted ? Color.LightSlateGray : Color.White;
 
-        public ICommand ResetSettingsCmd { get => new Command(Fight.Settings.SetDefaults); }
+        public ICommand ResetSettingsCmd => new Command(Fight.Settings.SetDefaults);
 
         public MainPage(MediaPlayer tickMediaPlayer, MediaPlayer alarmMediaPlayer)
         {
@@ -55,11 +60,14 @@ namespace HEMA
             commonSettingsPage = new CommonSettingsPage();
             commonSettingsPage.BindingContext = this;
             timerSettingsPage = new TimerSettingsPage();
+            foreach (var alarm in Fight.Alarms)
+            {
+                timerSettingsPage.AddItem(null, null);
+            }
             timerSettingsPage.BindingContext = this;
             timerSettingsPage.ItemAdded += AddAlarmSettings;
             timerSettingsPage.ItemRemoved += RemoveAlarmSettings;
             Fight.TimerTick += PlaySound;
-            Fight.TimerTick += CheckAlarm;
             if (Fight.Settings.NoBreak)
             {
                 BtnsColor = Color.WhiteSmoke;
@@ -106,6 +114,16 @@ namespace HEMA
             }
             else
             {
+                alarmsInUse = Fight.Alarms
+                    .Where(alarm => alarm.IsOn && alarm.TotalSeconds > Fight.Elapsed.TotalSeconds)
+                    .Select(alarm => alarm.AlarmLight)
+                    .OrderByDescending(alarmLight => alarmLight.TotalSeconds)
+                    .ToList();
+                if (alarmsInUse.Count > 0 && !checkAlarms)
+                {
+                    Fight.TimerTick += CheckAlarm;
+                    checkAlarms = true;
+                }
                 Fight.StartTimer();
                 SetColorsOnStart();
             }
@@ -273,7 +291,7 @@ namespace HEMA
 
         private void CheckAlarm()
         {
-            var lastIndex = Fight.Alarms.Count - 1;
+            var lastIndex = alarmsInUse.Count - 1;
             if (lastIndex < 0)
             {
                 if (alarmIsOn)
@@ -281,19 +299,25 @@ namespace HEMA
                     currentMediaPlayer = tickMediaPlayer;
                     alarmIsOn = false;
                 }
+                if (pauseFight)
+                {
+                    Fight.PauseTimer();
+                }
+                checkAlarms = false;
                 Fight.TimerTick -= CheckAlarm;
                 return;
             }
 
             var alarmShouldBeTurnedOn = false;
-            var offset = Fight.Elapsed.TotalSeconds - Fight.Alarms[lastIndex].Seconds;
+            pauseFight = alarmsInUse[lastIndex].PauseFight;
+            var offset = Fight.Elapsed.TotalSeconds - alarmsInUse[lastIndex].TotalSeconds;
             alarmShouldBeTurnedOn = offset >= -1d && offset < 2d;
 
             if (!alarmIsOn && alarmShouldBeTurnedOn)
             {
                 currentMediaPlayer = alarmMediaPlayer;
                 alarmIsOn = true;
-                Fight.Alarms.RemoveAt(lastIndex);
+                alarmsInUse.RemoveAt(lastIndex);
                 return;
             }
 

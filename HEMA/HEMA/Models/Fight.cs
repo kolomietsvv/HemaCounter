@@ -2,6 +2,7 @@
 using HEMA.Views;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -33,7 +34,7 @@ namespace HEMA
 
 		public FightSettings Settings { get; }
 
-        public List<TimerAlarm> Alarms { get; } = new List<TimerAlarm>
+        public ObservableCollection<TimerAlarm> Alarms { get; } = new ObservableCollection<TimerAlarm>
         {
             new TimerAlarm
             {

@@ -8,6 +8,8 @@ namespace HEMA.Views
     [XamlCompilation(XamlCompilationOptions.Compile)]
     public partial class TimerPickerView : ContentView
     {
+        private const string StringFormat = "D2";
+
         public int Index { get; set; }
 
         public int Minutes
@@ -18,7 +20,7 @@ namespace HEMA.Views
         public static readonly BindableProperty MinutesProperty;
         public static void MinutesChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            ((TimerPickerView)bindable).MinutesEntry.Text = ((int)newValue).ToString("D2");
+            ((TimerPickerView)bindable).MinutesEntry.Text = ((int)newValue).ToString(StringFormat);
         }
 
         public int Seconds
@@ -26,10 +28,10 @@ namespace HEMA.Views
             get { return (int)GetValue(SecondsProperty); }
             set { SetValue(SecondsProperty, value); }
         }
-        public static BindableProperty SecondsProperty;
+        public static readonly BindableProperty SecondsProperty;
         public static void SecondsChanged(BindableObject bindable, object oldValue, object newValue)
         {
-            ((TimerPickerView)bindable).SecondsEntry.Text = ((int)newValue).ToString("D2");
+            ((TimerPickerView)bindable).SecondsEntry.Text = ((int)newValue).ToString(StringFormat);
         }
 
         public bool IsOn
@@ -37,7 +39,7 @@ namespace HEMA.Views
             get { return (bool)GetValue(IsOnProperty); }
             set { SetValue(IsOnProperty, value); }
         }
-        public static BindableProperty IsOnProperty;
+        public static readonly BindableProperty IsOnProperty;
         public static void IsOnChanged(BindableObject bindable, object oldValue, object newValue)
         {
             ((TimerPickerView)bindable).IsOnToggle.IsToggled = (bool)newValue;
@@ -48,7 +50,7 @@ namespace HEMA.Views
             get { return (bool)GetValue(PauseFightProperty); }
             set { SetValue(PauseFightProperty, value); }
         }
-        public static BindableProperty PauseFightProperty;
+        public static readonly BindableProperty PauseFightProperty;
         public static void PauseFightChanged(BindableObject bindable, object oldValue, object newValue)
         {
             ((TimerPickerView)bindable).PauseFightToggle.IsToggled = (bool)newValue;
@@ -57,19 +59,33 @@ namespace HEMA.Views
         static TimerPickerView()
         {
             SecondsProperty = BindableProperty.Create(nameof(SecondsProperty), typeof(int),
-            typeof(TimerPickerView), defaultValue: -1, propertyChanged: new BindingPropertyChangedDelegate(SecondsChanged));
+            typeof(TimerPickerView), defaultValue: -1, BindingMode.TwoWay, propertyChanged: new BindingPropertyChangedDelegate(SecondsChanged));
             MinutesProperty = BindableProperty.Create(nameof(MinutesProperty), typeof(int),
-            typeof(TimerPickerView), defaultValue: -1, propertyChanged: new BindingPropertyChangedDelegate(MinutesChanged));
+            typeof(TimerPickerView), defaultValue: -1, BindingMode.TwoWay, propertyChanged: new BindingPropertyChangedDelegate(MinutesChanged));
             IsOnProperty = BindableProperty.Create(nameof(IsOnProperty), typeof(bool),
-            typeof(TimerPickerView), propertyChanged: new BindingPropertyChangedDelegate(IsOnChanged));
+            typeof(TimerPickerView),defaultBindingMode: BindingMode.TwoWay, propertyChanged: new BindingPropertyChangedDelegate(IsOnChanged));
             PauseFightProperty = BindableProperty.Create(nameof(PauseFightProperty), typeof(bool),
-            typeof(TimerPickerView), propertyChanged: new BindingPropertyChangedDelegate(PauseFightChanged));
+            typeof(TimerPickerView), defaultBindingMode: BindingMode.TwoWay, propertyChanged: new BindingPropertyChangedDelegate(PauseFightChanged));
         }
 
         public TimerPickerView()
         {
             InitializeComponent();
         }
+
+        private void IsOnToggled(object sender, ToggledEventArgs e)
+            => IsOn = e.Value;
+
+        private void PuseFightToggled(object sender, ToggledEventArgs e)
+             => PauseFight = e.Value;
+
+        private void MinutesEntered(object sender, EventArgs e)
+        {
+            Minutes = int.Parse(MinutesEntry.Text);
+        }
+
+        private void SecondsEntered(object sender, EventArgs e)
+            => Seconds = int.Parse(SecondsEntry.Text);
 
         public void RemoveItem(object sender, EventArgs e)
         {
@@ -82,6 +98,6 @@ namespace HEMA.Views
         }
 
         private void RemoveExtraCharacters(object sender, TextChangedEventArgs e)
-            => TextHelper.RemoveExtraCharacters(sender, e);
+            => TextHelper.RemoveExtraCharacters(sender, e, 60, StringFormat);
     }
 }

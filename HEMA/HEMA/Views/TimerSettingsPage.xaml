@@ -10,21 +10,6 @@
         <StackLayout BackgroundColor="LightSlateGray">
             <ScrollView Orientation="Vertical" HorizontalOptions="FillAndExpand" VerticalOptions="StartAndExpand" Margin="20,0">
                 <StackLayout HorizontalOptions="FillAndExpand" x:Name="AlarmsList">
-                    <views:TimerPickerView Minutes="{Binding Fight.Alarms[0].Minutes}"
-                                           Seconds="{Binding Fight.Alarms[0].Seconds}"
-                                           IsOn="{Binding Fight.Alarms[0].IsOn}"
-                                           PauseFight="{Binding Fight.Alarms[0].PauseFight}"
-                                           Index="0"/>
-                    <views:TimerPickerView Minutes="{Binding Fight.Alarms[1].Minutes}"
-                                           Seconds="{Binding Fight.Alarms[1].Seconds}"
-                                           IsOn="{Binding Fight.Alarms[1].IsOn}"
-                                           PauseFight="{Binding Fight.Alarms[1].PauseFight}"
-                                           Index="1"/>
-                    <views:TimerPickerView Minutes="{Binding Fight.Alarms[2].Minutes}"
-                                           Seconds="{Binding Fight.Alarms[2].Seconds}"
-                                           IsOn="{Binding Fight.Alarms[2].IsOn}"
-                                           PauseFight="{Binding Fight.Alarms[2].PauseFight}"
-                                           Index="2"/>
                 </StackLayout>
             </ScrollView>
             <Frame HasShadow="true" Padding="0,1,0,0">

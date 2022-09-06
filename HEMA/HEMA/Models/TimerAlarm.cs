@@ -1,4 +1,6 @@
-﻿using System.ComponentModel;
+﻿using Android.OS;
+using Java.IO;
+using System.ComponentModel;
 
 namespace HEMA.Models
 {
@@ -50,5 +52,22 @@ namespace HEMA.Models
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PauseFight)));
             }
         }
+
+        public int TotalSeconds => minutes * 60 + seconds;
+
+        public TimerAlarmLight AlarmLight 
+        {
+            get => new TimerAlarmLight
+                { 
+                    TotalSeconds = TotalSeconds,
+                    PauseFight = PauseFight
+                }; 
+        }
+    }
+
+    public struct TimerAlarmLight
+    {
+        public int TotalSeconds;
+        public bool PauseFight;
     }
 }

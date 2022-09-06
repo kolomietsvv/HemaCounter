@@ -63,7 +63,8 @@ namespace HEMA
 
 		public int PenaltyPoints
 		{
-			get => penaltyPoints; set
+			get => penaltyPoints; 
+			set
 			{
 				penaltyPoints = value;
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PenaltyPoints)));

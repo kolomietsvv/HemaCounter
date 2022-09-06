@@ -7,17 +7,21 @@
     <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
         <Entry WidthRequest="50" HorizontalTextAlignment="End" 
                Keyboard="Numeric" FontSize="35" x:Name="MinutesEntry"
+               Completed="MinutesEntered"
                TextChanged="RemoveExtraCharacters"/>
         <Label WidthRequest="40" Text=":" Margin="-5,10,-40,0" FontSize="35"/>
         <Entry WidthRequest="50" Keyboard="Numeric" FontSize="35"
-               x:Name="SecondsEntry"  TextChanged="RemoveExtraCharacters"/>
+               Completed="SecondsEntered"
+               x:Name="SecondsEntry" TextChanged="RemoveExtraCharacters"/>
         <StackLayout Orientation="Horizontal" Margin="80,5,0,0">
             <Label Text="On/Off" VerticalOptions="Center"/>
-            <Switch x:Name="IsOnToggle"/>
+            <Switch x:Name="IsOnToggle"
+                    Toggled="IsOnToggled"/>
         </StackLayout>
         <StackLayout Orientation="Horizontal" Margin="80,5,25,0">
             <Label Text="Pause the fight" VerticalOptions="Center"/>
-            <Switch x:Name="PauseFightToggle"/>
+            <Switch x:Name="PauseFightToggle"
+                    Toggled="PuseFightToggled"/>
         </StackLayout>
         <Button Text="🗑" CornerRadius="30" BackgroundColor="PaleVioletRed"
                 FontSize="20" WidthRequest="50" HorizontalOptions="EndAndExpand" 

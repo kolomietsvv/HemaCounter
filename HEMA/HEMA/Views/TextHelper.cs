@@ -6,7 +6,7 @@ namespace HEMA.Views
     {
         private static readonly char[] charsToTrim = new[] { '0', '-' };
 
-        public static void RemoveExtraCharacters(object sender, TextChangedEventArgs e)
+        public static void RemoveExtraCharacters(object sender, TextChangedEventArgs e, int? maxValue = null, string stringFormat = null)
         {
             if (string.IsNullOrWhiteSpace(e.OldTextValue) || string.IsNullOrWhiteSpace(e.OldTextValue))
                 return;
@@ -17,6 +17,14 @@ namespace HEMA.Views
 
             if (string.IsNullOrWhiteSpace(resultText))
                 resultText = "0";
+
+            if (maxValue.HasValue && int.Parse(resultText) > maxValue)
+                resultText = e.OldTextValue;
+
+            if (!string.IsNullOrWhiteSpace(stringFormat))
+            {
+                resultText = int.Parse(resultText).ToString(stringFormat);
+            }
 
             ((Entry)sender).Text = resultText;
         }

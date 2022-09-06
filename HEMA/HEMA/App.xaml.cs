@@ -7,10 +7,10 @@ namespace HEMA
 {
 	public partial class App : Application
 	{
-		public App(MediaPlayer mediaPlayer)
+		public App(MediaPlayer tickMediaPlayer, MediaPlayer alarmMediaPlayer)
 		{
 			InitializeComponent();
-			MainPage = new NavigationPage(new MainPage(mediaPlayer));
+			MainPage = new NavigationPage(new MainPage(tickMediaPlayer, alarmMediaPlayer));
 		}
 
 		protected override void OnStart()

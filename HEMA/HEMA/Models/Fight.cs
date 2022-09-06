@@ -1,4 +1,7 @@
-﻿using System;
+﻿using HEMA.Models;
+using HEMA.Views;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -22,8 +25,6 @@ namespace HEMA
 		private int redViolations;
 
 		public event Action MaxDoubleHitsReached;
-		public event Action MaxScoreReached;
-		public event Action TimeAlert;
 		public event Action TimerTick;
 		public event Action<bool> OneDoubleHitLeft;
 		public event PropertyChangedEventHandler PropertyChanged;
@@ -32,7 +33,30 @@ namespace HEMA
 
 		public FightSettings Settings { get; }
 
-		public bool IsScoreChangeEnabled => !IsTimerStarted && IsFightStarted || IsFightStarted && Settings.NoBreak;
+        public List<TimerAlarm> Alarms { get; } = new List<TimerAlarm>
+        {
+            new TimerAlarm
+            {
+                Minutes = 1,
+                Seconds = 0,
+                IsOn = true,
+            },
+            new TimerAlarm
+            {
+                Minutes = 1,
+                Seconds = 30,
+                IsOn = true,
+            },
+            new TimerAlarm
+            {
+                Minutes = 2,
+                Seconds = 0,
+                IsOn = true,
+                PauseFight = true,
+            },
+        };
+
+        public bool IsScoreChangeEnabled => !IsTimerStarted && IsFightStarted || IsFightStarted && Settings.NoBreak;
 
 		public bool IsTimerStarted
 		{
@@ -107,8 +131,9 @@ namespace HEMA
 				currentPhrase.RedScore = value;
 				if (Settings.NoBreak)
 					UpdateDoubleHitsInRowFlagAndFrase();
-				if (Settings.UseFightSettings && value >= Settings.MaxFightScore)
-					MaxScoreReached?.Invoke();
+				//annoing pop-up
+				//if (Settings.UseFightSettings && value >= Settings.MaxFightScore)
+				//	MaxScoreReached?.Invoke();
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RedScore)));
 			}
 		}
@@ -121,9 +146,10 @@ namespace HEMA
 				currentPhrase.BlueScore = value;
 				if (Settings.NoBreak)
 					UpdateDoubleHitsInRowFlagAndFrase();
-				if (Settings.UseFightSettings && value >= Settings.MaxFightScore)
-					MaxScoreReached?.Invoke();
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BlueScore)));
+                //annoing pop-up
+                //if (Settings.UseFightSettings && value >= Settings.MaxFightScore)
+                //	MaxScoreReached?.Invoke();
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BlueScore)));
 			}
 		}
 
@@ -133,13 +159,9 @@ namespace HEMA
 
 		public Fight(FightSettings settings)
 		{
-			TimerCallback timerElapsed = null;
 			Settings = settings;
 			IsDoubleHitsInRow = true;
 			stopwatch = new Stopwatch();
-
-			if (Settings.UseAlerts)
-				timerElapsed += InvokeAlert;
 
 			var timerCallback = new TimerCallback(UpdateElapsedProperty);
 			timerCallback += InvokeTimerTick;
@@ -213,12 +235,6 @@ namespace HEMA
 			else if (!isIncreased && Settings.UseFightSettings && previousValue >= Settings.ViolationsToStartPenalize)
 				score += Settings.PenaltyPoints;
 			return score;
-		}
-
-		private void InvokeAlert(object state)
-		{
-			if (Settings.Alerts.Any(a => a.TotalSeconds == Elapsed.TotalSeconds))
-				TimeAlert?.Invoke();
 		}
 
 		private void UpdateElapsedProperty(object state = null)

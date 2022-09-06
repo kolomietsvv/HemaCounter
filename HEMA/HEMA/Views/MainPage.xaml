@@ -5,84 +5,88 @@
              x:Class="HEMA.MainPage"
 			 NavigationPage.HasNavigationBar="False">
 
-	<Grid BackgroundColor="Silver">
-		<Grid.RowDefinitions>
-			<RowDefinition Height="1.5*"/>
-			<RowDefinition/>
-		</Grid.RowDefinitions>
-		<StackLayout Margin ="0,0,0,-5" Grid.Row="0" Orientation="Horizontal">
-			<Grid BackgroundColor="LightSkyBlue" HorizontalOptions="FillAndExpand">
-				<Label Text="ˆ" HorizontalOptions="Center" VerticalOptions="Start" FontSize="72" VerticalTextAlignment="Start" Margin="-15" TextColor="{Binding BtnsColor}">
-					<Label.GestureRecognizers>
-						<TapGestureRecognizer Tapped="IncreaseBlueScore"/>
-					</Label.GestureRecognizers>
-				</Label>
-				<Label Text="{Binding Fight.BlueScore}" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontSize="72"/>
-				<Label Text="ˬ" HorizontalOptions="Center" VerticalOptions="End" FontSize="72" VerticalTextAlignment="End" TextColor="{Binding BtnsColor}">
-					<Label.GestureRecognizers>
-						<TapGestureRecognizer Tapped="DecreaseBlueScore"/>
-					</Label.GestureRecognizers>
-				</Label>
-				<Grid.GestureRecognizers>
-					<SwipeGestureRecognizer Direction="Up" Swiped="IncreaseBlueScore"/>
-					<SwipeGestureRecognizer Direction="Down" Swiped="DecreaseBlueScore"/>
-				</Grid.GestureRecognizers>
-			</Grid>
-			<StackLayout HorizontalOptions="Fill" Orientation="Vertical">
-				<StackLayout HorizontalOptions="Center" Orientation="Horizontal" VerticalOptions="Fill" Margin ="55,0,0,0">
-					<Button Text="■" TextColor="Silver" Padding="-10,2,-10,5" Font="30" BackgroundColor="WhiteSmoke" HorizontalOptions="Center" VerticalOptions="EndAndExpand" Clicked="ResetTimer" FontAttributes="Bold"/>
-					<StackLayout HorizontalOptions="End" Orientation="Vertical" VerticalOptions="Start" Margin="0,10,0,0">
-						<Label Margin="10,-10,0,0" VerticalOptions="Start" Font="30" HorizontalOptions="Center" Text="⚔" TextColor="{Binding SettingsBtnColor}" IsEnabled="{Binding IsSettingsEnabled}">
-							<Label.GestureRecognizers>
-								<TapGestureRecognizer Tapped="OpenSettingsTab"/>
-							</Label.GestureRecognizers>
-						</Label>
-						<Label Margin="10,-10,0,0" VerticalOptions="Start" Font="30" HorizontalOptions="Center" Text="📳" TextColor="{Binding SettingsBtnColor}" IsEnabled="{Binding IsSettingsEnabled}">
-							<Label.GestureRecognizers>
-								<TapGestureRecognizer Tapped="ChangeVibrationState"/>
-							</Label.GestureRecognizers>
-						</Label>
-					</StackLayout>
-				</StackLayout>
-				<StackLayout HorizontalOptions="Center" BackgroundColor="LightSkyBlue" Orientation="Horizontal" VerticalOptions="EndAndExpand" Margin ="0,0,0,-5">
-					<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="-" Clicked="DecreaseBlueViolations" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>
-					<Label Text="{Binding Fight.BlueViolations}" HorizontalOptions="FillAndExpand" HorizontalTextAlignment="Start" FontSize="30"/>
-					<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="+" Clicked="IncreaseBlueViolations" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>
-				</StackLayout>
-				<StackLayout HorizontalOptions="Center"  BackgroundColor="PaleVioletRed" Orientation="Horizontal" VerticalOptions="End" Margin ="0,0,0,-10">
-					<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="-" Clicked="DecreaseRedViolations" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>
-					<Label Text="{Binding Fight.RedViolations}" HorizontalOptions="FillAndExpand" HorizontalTextAlignment="End" FontSize="30" />
-					<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="+" Clicked="IncreaseRedViolations" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>
-				</StackLayout>
-				<StackLayout HorizontalOptions="Center" Orientation="Horizontal" VerticalOptions="EndAndExpand">
-					<Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="-" Clicked="DecreaseDoubleHits" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>
-					<Label Text="{Binding Fight.DoubleHits}" HorizontalOptions="CenterAndExpand" FontSize="30" x:Name="DoubleHitlLbl"/>
-					<Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="+" Clicked="IncreaseDoubleHits" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>
-				</StackLayout>
-			</StackLayout>
-			<Grid BackgroundColor="PaleVioletRed" HorizontalOptions="FillAndExpand">
-				<Label Text="ˆ" HorizontalOptions="Center" VerticalOptions="Start" FontSize="72" VerticalTextAlignment="Start" Margin="-15" TextColor="{Binding BtnsColor}">
-					<Label.GestureRecognizers>
-						<TapGestureRecognizer Tapped="IncreaseRedScore"/>
-					</Label.GestureRecognizers>
-				</Label>
-				<Label Text="{Binding Fight.RedScore}" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontSize="72" />
-				<Label Text="ˬ" HorizontalOptions="Center" VerticalOptions="End" FontSize="72" VerticalTextAlignment="End" TextColor="{Binding BtnsColor}">
-					<Label.GestureRecognizers>
-						<TapGestureRecognizer Tapped="DecreaseRedScore"/>
-					</Label.GestureRecognizers>
-				</Label>
-				<Grid.GestureRecognizers>
-					<SwipeGestureRecognizer Direction="Up" Swiped="IncreaseRedScore"/>
-					<SwipeGestureRecognizer Direction="Down" Swiped="DecreaseRedScore"/>
-				</Grid.GestureRecognizers>
-			</Grid>
-		</StackLayout>
-		<StackLayout Grid.Row="1">
-			<Button x:Name="StartBtn" Text="{Binding Fight.Elapsed, StringFormat='{0:mm\\:ss}'}" 
+    <Grid BackgroundColor="Silver">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="1.5*"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <StackLayout Margin ="0,0,0,-5" Grid.Row="0" Orientation="Horizontal">
+            <Grid BackgroundColor="LightSkyBlue" HorizontalOptions="FillAndExpand">
+                <Label Text="ˆ" HorizontalOptions="Center" VerticalOptions="Start" FontSize="72" VerticalTextAlignment="Start" Margin="-15" TextColor="{Binding BtnsColor}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="IncreaseBlueScore"/>
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label Text="{Binding Fight.BlueScore}" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontSize="72"/>
+                <Label Text="ˬ" HorizontalOptions="Center" VerticalOptions="End" FontSize="72" VerticalTextAlignment="End" TextColor="{Binding BtnsColor}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="DecreaseBlueScore"/>
+                    </Label.GestureRecognizers>
+                </Label>
+                <Grid.GestureRecognizers>
+                    <SwipeGestureRecognizer Direction="Up" Swiped="IncreaseBlueScore"/>
+                    <SwipeGestureRecognizer Direction="Down" Swiped="DecreaseBlueScore"/>
+                </Grid.GestureRecognizers>
+            </Grid>
+            <StackLayout HorizontalOptions="Fill" Orientation="Vertical">
+                <StackLayout HorizontalOptions="CenterAndExpand" Orientation="Horizontal" VerticalOptions="Start">
+                    <StackLayout HorizontalOptions="Start" Orientation="Vertical" VerticalOptions="Start">
+                        <Label VerticalOptions="Start" Font="30" HorizontalOptions="Center" Text="🕑" TextColor="White">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OpenAlarmTab"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </StackLayout>
+                    <StackLayout HorizontalOptions="End" Orientation="Vertical" VerticalOptions="Start" Margin ="115,0,0,0">
+                        <Label VerticalOptions="Start" Font="30" HorizontalOptions="Center" Text="⚔" TextColor="{Binding SettingsBtnColor}" IsEnabled="{Binding IsSettingsEnabled}">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OpenSettingsTab"/>
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </StackLayout>
+                </StackLayout>
+                <StackLayout HorizontalOptions="Center" Orientation="Horizontal" VerticalOptions="Fill" Margin ="0,-25,0,0">
+                    <Button Text="■" TextColor="Silver" Padding="-10,2,-10,5" Font="30" BackgroundColor="WhiteSmoke" HorizontalOptions="Center" VerticalOptions="EndAndExpand" Clicked="ResetTimer" FontAttributes="Bold"/>
+                </StackLayout>
+                <StackLayout HorizontalOptions="Center" BackgroundColor="LightSkyBlue" Orientation="Horizontal" VerticalOptions="EndAndExpand" Margin ="0,0,0,-5">
+                    <Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="-" Clicked="DecreaseBlueViolations" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>
+                    <Label Text="{Binding Fight.BlueViolations}" HorizontalOptions="FillAndExpand" HorizontalTextAlignment="Start" FontSize="30"/>
+                    <Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="+" Clicked="IncreaseBlueViolations" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>
+                </StackLayout>
+                <StackLayout HorizontalOptions="Center"  BackgroundColor="PaleVioletRed" Orientation="Horizontal" VerticalOptions="End" Margin ="0,0,0,-10">
+                    <Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="-" Clicked="DecreaseRedViolations" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>
+                    <Label Text="{Binding Fight.RedViolations}" HorizontalOptions="FillAndExpand" HorizontalTextAlignment="End" FontSize="30" />
+                    <Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="+" Clicked="IncreaseRedViolations" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>
+                </StackLayout>
+                <StackLayout HorizontalOptions="Center" Orientation="Horizontal" VerticalOptions="EndAndExpand">
+                    <Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="-" Clicked="DecreaseDoubleHits" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>
+                    <Label Text="{Binding Fight.DoubleHits}" HorizontalOptions="CenterAndExpand" FontSize="30" x:Name="DoubleHitlLbl"/>
+                    <Button WidthRequest="50" HorizontalOptions="End" Font="20" Text="+" Clicked="IncreaseDoubleHits" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>
+                </StackLayout>
+            </StackLayout>
+            <Grid BackgroundColor="PaleVioletRed" HorizontalOptions="FillAndExpand">
+                <Label Text="ˆ" HorizontalOptions="Center" VerticalOptions="Start" FontSize="72" VerticalTextAlignment="Start" Margin="-15" TextColor="{Binding BtnsColor}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="IncreaseRedScore"/>
+                    </Label.GestureRecognizers>
+                </Label>
+                <Label Text="{Binding Fight.RedScore}" TextColor="White" HorizontalOptions="Center" VerticalOptions="Center" FontSize="72" />
+                <Label Text="ˬ" HorizontalOptions="Center" VerticalOptions="End" FontSize="72" VerticalTextAlignment="End" TextColor="{Binding BtnsColor}">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="DecreaseRedScore"/>
+                    </Label.GestureRecognizers>
+                </Label>
+                <Grid.GestureRecognizers>
+                    <SwipeGestureRecognizer Direction="Up" Swiped="IncreaseRedScore"/>
+                    <SwipeGestureRecognizer Direction="Down" Swiped="DecreaseRedScore"/>
+                </Grid.GestureRecognizers>
+            </Grid>
+        </StackLayout>
+        <StackLayout Grid.Row="1">
+            <Button x:Name="StartBtn" Text="{Binding Fight.Elapsed, StringFormat='{0:mm\\:ss}'}" 
 					TextColor="LightSlateGray" Font="36" FontFamily="Courier" BackgroundColor="WhiteSmoke"
 					VerticalOptions ="FillAndExpand"  HorizontalOptions="FillAndExpand" 
 					Clicked="StartTimer"/>
-		</StackLayout>
-	</Grid>
+        </StackLayout>
+    </Grid>
 </ContentPage>

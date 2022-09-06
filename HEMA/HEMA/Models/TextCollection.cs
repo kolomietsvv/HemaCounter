@@ -8,10 +8,8 @@
 
 		public static string FightIsOver => "Fight is over";
 
-		public static string TimeIsOver => "Time is over";
-
-		public static string MaxScore => "Max score";
-
 		public static string MaxDoubleHits => "Maximum double hits";
-	}
+
+		public static string Ensure => "Are you sure?";
+    }
 }

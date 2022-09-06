@@ -15,8 +15,9 @@ namespace HEMA.Droid
 
 			base.OnCreate(savedInstanceState);
 			global::Xamarin.Forms.Forms.Init(this, savedInstanceState);
-			var audioPlayer = MediaPlayer.Create(Application.Context, Resource.Raw.tick);
-			LoadApplication(new App(audioPlayer));
+			var tickAudioPlayer = MediaPlayer.Create(Application.Context, Resource.Raw.tick);
+			var alarmAudioPlayer = MediaPlayer.Create(Application.Context, Resource.Raw.beep);
+			LoadApplication(new App(tickAudioPlayer, alarmAudioPlayer));
 		}
 	}
 }

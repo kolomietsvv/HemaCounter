@@ -17,23 +17,19 @@
 						<Label Text="Max double hits in a row count" VerticalOptions="Center"/>
 						<Entry Text="{Binding Fight.Settings.DoubleHitsInARow}" HorizontalTextAlignment="Center" Keyboard="Numeric" HorizontalOptions="EndAndExpand" WidthRequest="40" TextChanged="RemoveExtraCharacters"/>
 					</StackLayout>
-					<StackLayout Orientation="Horizontal" Margin="20,5" HorizontalOptions="FillAndExpand">
-						<Label Text="Max double hits common count" VerticalOptions="Center"/>
-						<Entry Text="{Binding Fight.Settings.DoubleHitsCommon}" HorizontalTextAlignment="Center" Keyboard="Numeric"  HorizontalOptions="EndAndExpand" WidthRequest="40" TextChanged="RemoveExtraCharacters"/>
-					</StackLayout>
-					<StackLayout Orientation="Horizontal" Margin="20,5" HorizontalOptions="Fill">
-						<Label Text="Max score" VerticalOptions="Center"/>
-						<Entry Text="{Binding Fight.Settings.MaxFightScore}" HorizontalTextAlignment="Center" Keyboard="Numeric"  HorizontalOptions="EndAndExpand" WidthRequest="40" TextChanged="RemoveExtraCharacters"/>
-					</StackLayout>
-				</StackLayout>
+                    <StackLayout Orientation="Horizontal" Margin="20,5" HorizontalOptions="FillAndExpand">
+                        <Label Text="Max double hits common count" VerticalOptions="Center"/>
+                        <Entry Text="{Binding Fight.Settings.DoubleHitsCommon}" HorizontalTextAlignment="Center" Keyboard="Numeric"  HorizontalOptions="EndAndExpand" WidthRequest="40" TextChanged="RemoveExtraCharacters"/>
+                    </StackLayout>
+                </StackLayout>
 				<StackLayout>
 					<StackLayout Orientation="Horizontal" Margin="20,5" HorizontalOptions="FillAndExpand">
 						<Label Text="Penalty starts from warnings" VerticalOptions="Center"/>
-						<Entry Text="{Binding Fight.Settings.ViolationsToStartPenalize}" HorizontalTextAlignment="Center" Keyboard="Numeric"  HorizontalOptions="EndAndExpand" WidthRequest="40" TextChanged="RemoveExtraCharacters"/>
+                        <Entry Text="{Binding Fight.Settings.ViolationsToStartPenalize}" HorizontalTextAlignment="Center" Keyboard="Numeric"  HorizontalOptions="EndAndExpand" WidthRequest="40" TextChanged="RemoveExtraCharacters"/>
 					</StackLayout>
 					<StackLayout Orientation="Horizontal" Margin="20,5" HorizontalOptions="Fill">
 						<Label Text="Penalty point" VerticalOptions="Center"/>
-						<Entry Text="{Binding Fight.Settings.PenaltyPoints}" HorizontalTextAlignment="Center" Keyboard="Numeric"  HorizontalOptions="EndAndExpand" WidthRequest="40" TextChanged="RemoveExtraCharacters"/>
+                        <Entry Text="{Binding Fight.Settings.PenaltyPoints}" HorizontalTextAlignment="Center" Keyboard="Numeric"  HorizontalOptions="EndAndExpand" WidthRequest="40" TextChanged="RemoveExtraCharacters"/>
 					</StackLayout>
 				</StackLayout>
 			</StackLayout>

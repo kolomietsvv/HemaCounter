@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<ContentView xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:HEMA.Views"
+             x:DataType="views:TimerPickerView"
+             x:Class="HEMA.Views.TimerPickerView">
+    <StackLayout Orientation="Horizontal" HorizontalOptions="FillAndExpand">
+        <Entry WidthRequest="50" HorizontalTextAlignment="End" 
+               Keyboard="Numeric" FontSize="35" x:Name="MinutesEntry"
+               TextChanged="RemoveExtraCharacters"/>
+        <Label WidthRequest="40" Text=":" Margin="-5,10,-40,0" FontSize="35"/>
+        <Entry WidthRequest="50" Keyboard="Numeric" FontSize="35"
+               x:Name="SecondsEntry"  TextChanged="RemoveExtraCharacters"/>
+        <StackLayout Orientation="Horizontal" Margin="80,5,0,0">
+            <Label Text="On/Off" VerticalOptions="Center"/>
+            <Switch x:Name="IsOnToggle"/>
+        </StackLayout>
+        <StackLayout Orientation="Horizontal" Margin="80,5,25,0">
+            <Label Text="Pause the fight" VerticalOptions="Center"/>
+            <Switch x:Name="PauseFightToggle"/>
+        </StackLayout>
+        <Button Text="🗑" CornerRadius="30" BackgroundColor="PaleVioletRed"
+                FontSize="20" WidthRequest="50" HorizontalOptions="EndAndExpand" 
+                VerticalOptions="End" Margin="0,0,25,10"
+                Clicked="RemoveItem"/>
+    </StackLayout>
+</ContentView>

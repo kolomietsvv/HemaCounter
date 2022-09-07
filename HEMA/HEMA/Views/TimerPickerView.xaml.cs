@@ -10,6 +10,11 @@ namespace HEMA.Views
     {
         private const string StringFormat = "D2";
 
+        public static event Action AnyIsOnTurnedOff;
+        public static event Action AnyPauseFightTurnedOff;
+
+        public static event Action<int> ItemRemoved;
+
         public int Index { get; set; }
 
         public int Minutes
@@ -63,7 +68,7 @@ namespace HEMA.Views
             MinutesProperty = BindableProperty.Create(nameof(MinutesProperty), typeof(int),
             typeof(TimerPickerView), defaultValue: -1, BindingMode.TwoWay, propertyChanged: new BindingPropertyChangedDelegate(MinutesChanged));
             IsOnProperty = BindableProperty.Create(nameof(IsOnProperty), typeof(bool),
-            typeof(TimerPickerView),defaultBindingMode: BindingMode.TwoWay, propertyChanged: new BindingPropertyChangedDelegate(IsOnChanged));
+            typeof(TimerPickerView), defaultBindingMode: BindingMode.TwoWay, propertyChanged: new BindingPropertyChangedDelegate(IsOnChanged));
             PauseFightProperty = BindableProperty.Create(nameof(PauseFightProperty), typeof(bool),
             typeof(TimerPickerView), defaultBindingMode: BindingMode.TwoWay, propertyChanged: new BindingPropertyChangedDelegate(PauseFightChanged));
         }
@@ -74,15 +79,19 @@ namespace HEMA.Views
         }
 
         private void IsOnToggled(object sender, ToggledEventArgs e)
-            => IsOn = e.Value;
+        {
+            IsOn = e.Value;
+            AnyIsOnTurnedOff?.Invoke();
+        }
 
         private void PuseFightToggled(object sender, ToggledEventArgs e)
-             => PauseFight = e.Value;
+        {
+            PauseFight = e.Value;
+            AnyPauseFightTurnedOff?.Invoke();
+        }
 
         private void MinutesEntered(object sender, EventArgs e)
-        {
-            Minutes = int.Parse(MinutesEntry.Text);
-        }
+            => Minutes = int.Parse(MinutesEntry.Text);
 
         private void SecondsEntered(object sender, EventArgs e)
             => Seconds = int.Parse(SecondsEntry.Text);
@@ -94,6 +103,7 @@ namespace HEMA.Views
             {
                 ((TimerPickerView)children[i]).Index--;
             }
+            ItemRemoved?.Invoke(Index);
             children.RemoveAt(Index);
         }
 

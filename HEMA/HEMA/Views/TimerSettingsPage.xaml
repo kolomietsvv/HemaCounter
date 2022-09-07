@@ -14,15 +14,15 @@
             </ScrollView>
             <Frame HasShadow="true" Padding="0,1,0,0">
                 <StackLayout BackgroundColor="LightSlateGray" VerticalOptions="EndAndExpand" Orientation="Horizontal">
-                    <Label Text="All" HorizontalTextAlignment="End" FontSize="35" Margin="35,15,0,0"/>
+                    <!--<Label Text="All" HorizontalTextAlignment="End" FontSize="35" Margin="35,15,0,0"/>
                     <StackLayout Orientation="Horizontal" Margin="130,5,0,0">
                         <Label Text="On/Off" VerticalOptions="Center"/>
-                        <Switch/>
+                        <Switch Toggled="SetAllIsOn" x:Name="AllIsOnToggle"/>
                     </StackLayout>
                     <StackLayout Orientation="Horizontal" Margin="80,5,25,0">
                         <Label Text="Pause the fight" VerticalOptions="Center"/>
-                        <Switch HeightRequest="30"/>
-                    </StackLayout>
+                        <Switch HeightRequest="30" Toggled="SetAllPauseFight" x:Name="AllPauseFightToggle"/>
+                    </StackLayout>-->
                     <Button Text="+" CornerRadius="30" BackgroundColor="WhiteSmoke" FontSize="30" WidthRequest="60" 
                             HorizontalOptions="EndAndExpand" VerticalOptions="EndAndExpand" Margin="0,5,25,10"
                             Clicked="AddItem"/>

@@ -34,28 +34,7 @@ namespace HEMA
 
 		public FightSettings Settings { get; }
 
-        public ObservableCollection<TimerAlarm> Alarms { get; } = new ObservableCollection<TimerAlarm>
-        {
-            new TimerAlarm
-            {
-                Minutes = 1,
-                Seconds = 0,
-                IsOn = true,
-            },
-            new TimerAlarm
-            {
-                Minutes = 1,
-                Seconds = 30,
-                IsOn = true,
-            },
-            new TimerAlarm
-            {
-                Minutes = 2,
-                Seconds = 0,
-                IsOn = true,
-                PauseFight = true,
-            },
-        };
+		public ObservableCollection<TimerAlarm> Alarms { get; }
 
         public bool IsScoreChangeEnabled => !IsTimerStarted && IsFightStarted || IsFightStarted && Settings.NoBreak;
 
@@ -158,10 +137,11 @@ namespace HEMA
 
 		public bool IsFightStarted => stopwatch.Elapsed != TimeSpan.Zero;
 
-		public Fight(FightSettings settings)
+		public Fight(FightSettings settings, List<TimerAlarm> alarms)
 		{
 			Settings = settings;
-			IsDoubleHitsInRow = true;
+			Alarms = new ObservableCollection<TimerAlarm>(alarms);
+            IsDoubleHitsInRow = true;
 			stopwatch = new Stopwatch();
 
 			var timerCallback = new TimerCallback(UpdateElapsedProperty);

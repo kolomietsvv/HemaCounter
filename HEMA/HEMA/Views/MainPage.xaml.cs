@@ -1,5 +1,6 @@
 ﻿using Android.Media;
 using HEMA.Models;
+using HEMA.Views;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ namespace HEMA
     public partial class MainPage : ContentPage
     {
         private string settingsPath;
+        private string alarmsPath;
         private CommonSettingsPage commonSettingsPage;
         private TimerSettingsPage timerSettingsPage;
         private Color btnsColor;
@@ -48,12 +50,14 @@ namespace HEMA
         {
             InitializeComponent();
             settingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "settings.json");
+            alarmsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "alarms.json");
             FightSettings settings = GetFightSettings();
+            List<TimerAlarm> alarms = GetAlarmSettings();
             this.tickMediaPlayer = tickMediaPlayer;
             this.alarmMediaPlayer = alarmMediaPlayer;
             currentMediaPlayer = tickMediaPlayer;
             userDeclines = new UserDeclines();
-            Fight = new Fight(settings);
+            Fight = new Fight(settings, alarms);
             Fight.OneDoubleHitLeft += isOneDoubleHitLeft => DoubleHitlLbl.TextColor = isOneDoubleHitLeft ? Color.Red : Color.Default;
             Fight.MaxDoubleHitsReached += () => DisplayFinishFightDialog(TextCollection.MaxDoubleHits, FinishCause.DoubleHits);
             BindingContext = this;
@@ -66,7 +70,7 @@ namespace HEMA
             }
             timerSettingsPage.BindingContext = this;
             timerSettingsPage.ItemAdded += AddAlarmSettings;
-            timerSettingsPage.ItemRemoved += RemoveAlarmSettings;
+            TimerPickerView.ItemRemoved += RemoveAlarmSettings;
             Fight.TimerTick += PlaySound;
             if (Fight.Settings.NoBreak)
             {
@@ -119,6 +123,10 @@ namespace HEMA
                     .Select(alarm => alarm.AlarmLight)
                     .OrderByDescending(alarmLight => alarmLight.TotalSeconds)
                     .ToList();
+                if (alarmsInUse.Count == 0)
+                {
+                    RemoveAlarmCheck();
+                }
                 if (alarmsInUse.Count > 0 && !checkAlarms)
                 {
                     Fight.TimerTick += CheckAlarm;
@@ -139,8 +147,6 @@ namespace HEMA
         private void ResetTimer(object sender, EventArgs e)
         {
             DisplayFinishFightDialog(TextCollection.Ensure, FinishCause.Manual);
-            userDeclines.Reset();
-            UpdateSettingsEnabled();
         }
 
         private void DecreaseBlueScore(object sender, EventArgs e)
@@ -225,7 +231,13 @@ namespace HEMA
             Fight.PauseTimer();
             var userChoice = await DisplayAlert(TextCollection.FightIsOver, cause, TextCollection.Finish, TextCollection.Continue);
             if (userChoice)
+            {
                 Fight.Reset();
+                userDeclines.Reset();
+                UpdateSettingsEnabled();
+                alarmIsOn = false;
+                pauseFight = false;
+            }
 
             else
                 switch (finishCause)
@@ -255,10 +267,28 @@ namespace HEMA
             return settings;
         }
 
+        private List<TimerAlarm> GetAlarmSettings()
+        {
+            List<TimerAlarm> alarms;
+            if (File.Exists(alarmsPath))
+            {
+                var alarmsString = File.ReadAllText(alarmsPath);
+                alarms = JsonConvert.DeserializeObject<List<TimerAlarm>>(alarmsString);
+            }
+            else
+            {
+                alarms = new List<TimerAlarm>();
+            }
+
+            return alarms;
+        }
+
         protected override void OnAppearing()
         {
             var settingsString = JsonConvert.SerializeObject(Fight.Settings);
             File.WriteAllText(settingsPath, settingsString);
+            var alarmsString = JsonConvert.SerializeObject(Fight.Alarms.ToList());
+            File.WriteAllText(alarmsPath, alarmsString);
             base.OnAppearing();
         }
 
@@ -303,20 +333,22 @@ namespace HEMA
                 {
                     Fight.PauseTimer();
                 }
-                checkAlarms = false;
-                Fight.TimerTick -= CheckAlarm;
+                RemoveAlarmCheck();
                 return;
             }
+            if (pauseFight)
+            {
+                Fight.PauseTimer();
+            }
 
-            var alarmShouldBeTurnedOn = false;
-            pauseFight = alarmsInUse[lastIndex].PauseFight;
             var offset = Fight.Elapsed.TotalSeconds - alarmsInUse[lastIndex].TotalSeconds;
-            alarmShouldBeTurnedOn = offset >= -1d && offset < 2d;
+            bool alarmShouldBeTurnedOn = offset >= 0 && offset < 2d;
 
             if (!alarmIsOn && alarmShouldBeTurnedOn)
             {
                 currentMediaPlayer = alarmMediaPlayer;
                 alarmIsOn = true;
+                pauseFight = alarmsInUse[lastIndex].PauseFight;
                 alarmsInUse.RemoveAt(lastIndex);
                 return;
             }
@@ -325,7 +357,15 @@ namespace HEMA
             {
                 currentMediaPlayer = tickMediaPlayer;
                 alarmIsOn = false;
+                pauseFight = false;
             }
+        }
+
+        private void RemoveAlarmCheck()
+        {
+            checkAlarms = false;
+            pauseFight = false;
+            Fight.TimerTick -= CheckAlarm;
         }
     }
 

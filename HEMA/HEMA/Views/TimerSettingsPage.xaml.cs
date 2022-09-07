@@ -9,13 +9,19 @@ namespace HEMA
     public partial class TimerSettingsPage : ContentPage
     {
         public event Action<int> ItemAdded;
-        public event Action<int> ItemRemoved;
+        private bool isManual = true;
 
         public TimerSettingsPage()
         {
             InitializeComponent();
             BindingContext = App.Current.MainPage;
-            AlarmsList.ChildRemoved += (s, e) => ItemRemoved?.Invoke(((TimerPickerView)e.Element).Index);
+            //AlarmsList.ChildRemoved += (s, e) => ItemRemoved?.Invoke(((TimerPickerView)e.Element).Index);
+            //TimerPickerView.AnyPauseFightTurnedOff += () =>
+            //{
+            //    isManual = false;
+            //    AllPauseFightToggle.IsToggled = false;
+            //};
+            //TimerPickerView.AnyIsOnTurnedOff += () => AllIsOnToggle.IsToggled = false;
         }
 
         public void AddItem(object sender, EventArgs args)
@@ -33,6 +39,30 @@ namespace HEMA
             item.SetBinding(TimerPickerView.IsOnProperty, isOnBinding);
             item.SetBinding(TimerPickerView.PauseFightProperty, pauseFightBinding);
             AlarmsList.Children.Add(item);
+        }
+
+        private void SetAllIsOn(object sender, ToggledEventArgs args)
+        {
+            if (isManual)
+            {
+                foreach (var child in AlarmsList.Children)
+                {
+                    ((TimerPickerView)child).IsOn = args.Value;
+                }
+            }
+            isManual = true;
+        }
+
+        private void SetAllPauseFight(object sender, ToggledEventArgs args)
+        {
+            if (isManual)
+            {
+                foreach (var child in AlarmsList.Children)
+                {
+                    ((TimerPickerView)child).PauseFight = args.Value;
+                }
+            }
+            isManual = true;
         }
     }
 }

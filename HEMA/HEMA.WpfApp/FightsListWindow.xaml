@@ -1,0 +1,118 @@
+﻿<Window x:Class="HEMA.WpfApp.FightsListWindow"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:local="clr-namespace:HEMA.WpfApp"
+		mc:Ignorable="d"
+        Title="Список боёв" Height="450" Width="1380">
+	<Window.Resources>
+		<local:InverseBoolConverter x:Key="InverseBoolConverter"/>
+		<local:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter"/>
+	</Window.Resources>
+	<ListView ItemsSource="{Binding Fights}" 
+			  HorizontalAlignment="Stretch" 
+			  FontSize="25" 
+			 AllowDrop="True"
+			 PreviewMouseLeftButtonDown="List_PreviewMouseLeftButtonDown"
+			 PreviewMouseMove="List_PreviewMouseMove"
+			 DragOver="List_DragOver"
+			 Drop="List_Drop"
+			 Cursor="SizeNS">
+		<ListView.View>
+			<GridView>
+				<GridViewColumn DisplayMemberBinding="{Binding OriginalIndex}" Width="40"/>
+				<GridViewColumn Width="300">
+					<GridViewColumn.CellTemplate>
+						<DataTemplate>
+							<Border Background ="PaleVioletRed">
+								<TextBlock Text="{Binding RedName}" />
+							</Border>
+						</DataTemplate>
+					</GridViewColumn.CellTemplate>
+				</GridViewColumn>
+				<GridViewColumn Width="50">
+					<GridViewColumn.CellTemplate>
+						<DataTemplate>
+							<Border Background ="PaleVioletRed">
+								<TextBlock Text="{Binding RedScore}" />
+							</Border>
+						</DataTemplate>
+					</GridViewColumn.CellTemplate>
+				</GridViewColumn>
+				<GridViewColumn Width="300">
+					<GridViewColumn.CellTemplate>
+						<DataTemplate>
+							<Border Padding="80,0">
+								<TextBlock Text="{Binding Elapsed, Converter={StaticResource TimeSpanToStringConverter}}" />
+							</Border>
+						</DataTemplate>
+					</GridViewColumn.CellTemplate>
+				</GridViewColumn>
+				<GridViewColumn Width="50">
+					<GridViewColumn.CellTemplate>
+						<DataTemplate>
+							<Border Background ="LightSkyBlue">
+								<TextBlock Text="{Binding BlueScore}" />
+							</Border>
+						</DataTemplate>
+					</GridViewColumn.CellTemplate>
+				</GridViewColumn>
+				<GridViewColumn Width="300">
+					<GridViewColumn.CellTemplate>
+						<DataTemplate>
+							<Border Background ="LightSkyBlue">
+								<TextBlock Text="{Binding BlueName}" />
+							</Border>
+						</DataTemplate>
+					</GridViewColumn.CellTemplate>
+				</GridViewColumn>
+				<GridViewColumn DisplayMemberBinding="{Binding DoubleHits}" Width="50"/>
+				<GridViewColumn Width="50">
+					<GridViewColumn.CellTemplate>
+						<DataTemplate>
+							<Border Background ="PaleVioletRed">
+								<TextBlock Text="{Binding RedViolations}" />
+							</Border>
+						</DataTemplate>
+					</GridViewColumn.CellTemplate>
+				</GridViewColumn>
+				<GridViewColumn Width="50">
+					<GridViewColumn.CellTemplate>
+						<DataTemplate>
+							<Border Background ="LightSkyBlue">
+								<TextBlock Text="{Binding BlueViolations}" />
+							</Border>
+						</DataTemplate>
+					</GridViewColumn.CellTemplate>
+				</GridViewColumn>
+				<GridViewColumn Width="130">
+					<GridViewColumn.CellTemplate>
+						<DataTemplate>
+							<Button 
+                                Content="Запустить" 
+                                Click="FightButton_Click" 
+                                CommandParameter="{Binding}"
+								IsEnabled="{Binding IsCompleted, Converter={StaticResource InverseBoolConverter}}"
+                                HorizontalAlignment="Stretch"
+								Cursor="Hand"/>
+						</DataTemplate>
+					</GridViewColumn.CellTemplate>
+				</GridViewColumn>
+			</GridView>
+		</ListView.View>
+		<ListView.ItemContainerStyle>
+			<Style TargetType="ListViewItem">
+				<Setter Property="ContextMenu">
+					<Setter.Value>
+						<ContextMenu>
+							<MenuItem Header="Редактировать"
+                                  Command="{Binding EditFightCommand}"
+                                  CommandParameter="{Binding}" />
+						</ContextMenu>
+					</Setter.Value>
+				</Setter>
+			</Style>
+		</ListView.ItemContainerStyle>
+	</ListView>
+</Window>

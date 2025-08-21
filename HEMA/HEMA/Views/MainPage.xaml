@@ -45,7 +45,7 @@
                         </Label>
                     </StackLayout>
                 </StackLayout>
-                <StackLayout HorizontalOptions="Center" Orientation="Horizontal" VerticalOptions="Fill" Margin ="0,-25,0,0">
+                <StackLayout HorizontalOptions="Center" Orientation="Horizontal" VerticalOptions="Fill" Margin ="0,-40,0,0">
                     <Button Text="■" TextColor="Silver" Padding="-10,2,-10,5" Font="30" BackgroundColor="WhiteSmoke" HorizontalOptions="Center" VerticalOptions="EndAndExpand" Clicked="ResetTimer" FontAttributes="Bold"/>
                 </StackLayout>
                 <StackLayout HorizontalOptions="Center" BackgroundColor="LightSkyBlue" Orientation="Horizontal" VerticalOptions="EndAndExpand" Margin ="0,0,0,-5">
@@ -82,11 +82,13 @@
                 </Grid.GestureRecognizers>
             </Grid>
         </StackLayout>
-        <StackLayout Grid.Row="1">
+        <StackLayout Grid.Row="1" Orientation="Horizontal">
+            <Button x:Name="EditProtocolItemBtn" Text="📝" Margin="-8.5, -6" Font="32" Clicked="ShowProtocolEditView" VerticalOptions ="FillAndExpand"/>
             <Button x:Name="StartBtn" Text="{Binding Fight.Elapsed, StringFormat='{0:mm\\:ss}'}" 
 					TextColor="LightSlateGray" Font="36" FontFamily="Courier" BackgroundColor="WhiteSmoke"
-					VerticalOptions ="FillAndExpand"  HorizontalOptions="FillAndExpand" 
-					Clicked="StartTimer"/>
+					VerticalOptions ="FillAndExpand" HorizontalOptions="FillAndExpand" 
+					Clicked="StartTimer" />
+            <Button x:Name="EditProtocolBtn" Text="📋" Margin="-8, -6" Font="32" VerticalOptions ="FillAndExpand"/>
         </StackLayout>
     </Grid>
 </ContentPage>

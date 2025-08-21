@@ -1,18 +1,18 @@
-﻿using HEMA.Models;
-using HEMA.Views;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading;
+using System.Windows.Input;
+
+using HEMA.Models;
 
 namespace HEMA
 {
-	public partial class Fight : INotifyPropertyChanged
+	public class Fight : INotifyPropertyChanged
 	{
-		private Stopwatch stopwatch;
+		private OffsetStopwatch stopwatch;
 		private Timer timer;
 		private Phrase previousPhrase;
 		private Phrase currentPhrase;
@@ -25,18 +25,66 @@ namespace HEMA
 		private int blueViolations;
 		private int redViolations;
 
+		private string redName;
+		private string blueName;
+		private int originalIndex;
+		private bool isCompleted;
+
 		public event Action MaxDoubleHitsReached;
 		public event Action TimerTick;
 		public event Action<bool> OneDoubleHitLeft;
 		public event PropertyChangedEventHandler PropertyChanged;
 
-		private int MaxDoubleHits => isDoubleHitsInRow ? Settings.DoubleHitsInARow : Settings.DoubleHitsCommon;
+		[JsonIgnore]
+		public ICommand EditFightCommand { get; set;  }
 
-		public FightSettings Settings { get; }
+		public int MaxDoubleHits => isDoubleHitsInRow ? Settings.DoubleHitsInARow : Settings.DoubleHitsCommon;
 
-		public ObservableCollection<TimerAlarm> Alarms { get; }
+		public FightSettings Settings { get; set; }
 
-        public bool IsScoreChangeEnabled => !IsTimerStarted && IsFightStarted || IsFightStarted && Settings.NoBreak;
+		public ObservableCollection<TimerAlarm> Alarms { get; set; }
+
+		public bool IsScoreChangeEnabled => !IsTimerStarted && IsFightStarted || IsFightStarted && Settings.NoBreak;
+
+		public int OriginalIndex
+		{
+			get => originalIndex;
+			set
+			{
+				originalIndex = value;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsCompleted)));
+			}
+		}
+
+		public bool IsCompleted
+		{
+			get => isCompleted;
+			set
+			{
+				isCompleted = value;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsCompleted)));
+			}
+		}
+
+		public string RedName
+		{
+			get => redName;
+			set
+			{
+				redName = value;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RedName)));
+			}
+		}
+
+		public string BlueName
+		{
+			get => blueName;
+			set
+			{
+				blueName = value;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BlueName)));
+			}
+		}
 
 		public bool IsTimerStarted
 		{
@@ -126,23 +174,38 @@ namespace HEMA
 				currentPhrase.BlueScore = value;
 				if (Settings.NoBreak)
 					UpdateDoubleHitsInRowFlagAndFrase();
-                //annoing pop-up
-                //if (Settings.UseFightSettings && value >= Settings.MaxFightScore)
-                //	MaxScoreReached?.Invoke();
-                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BlueScore)));
+				//annoing pop-up
+				//if (Settings.UseFightSettings && value >= Settings.MaxFightScore)
+				//	MaxScoreReached?.Invoke();
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BlueScore)));
 			}
 		}
 
-		public TimeSpan Elapsed => stopwatch.Elapsed;
+		public TimeSpan Elapsed
+		{
+			get => (stopwatch?.Elapsed).GetValueOrDefault();
+			set
+			{
+				stopwatch = new OffsetStopwatch(value);
+			}
+		}
 
-		public bool IsFightStarted => stopwatch.Elapsed != TimeSpan.Zero;
+		public bool IsFightStarted => stopwatch != null && stopwatch.Elapsed != TimeSpan.Zero;
 
-		public Fight(FightSettings settings, List<TimerAlarm> alarms)
+		public Fight(string redName, string blueName, FightSettings settings, List<TimerAlarm> alarms)
+			: this()
 		{
 			Settings = settings;
 			Alarms = new ObservableCollection<TimerAlarm>(alarms);
-            IsDoubleHitsInRow = true;
-			stopwatch = new Stopwatch();
+
+			RedName = redName;
+			BlueName = blueName;
+		}
+
+		[Obsolete("Только для сериализатора")]
+		public Fight()
+		{
+			stopwatch = new OffsetStopwatch();
 
 			var timerCallback = new TimerCallback(UpdateElapsedProperty);
 			timerCallback += InvokeTimerTick;

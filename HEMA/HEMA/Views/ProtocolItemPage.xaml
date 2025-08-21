@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="HEMA.Views.ProtocolItemPage">
+    <ContentPage.Content>
+        <StackLayout Orientation="Horizontal">
+            <StackLayout Orientation="Vertical" HorizontalOptions="FillAndExpand">
+                <RadioButton Value="♥" />
+                <RadioButton BackgroundColor="LightSkyBlue" />
+                <RadioButton BackgroundColor="PaleVioletRed" />
+                <RadioButton BackgroundColor="WhiteSmoke" />
+            </StackLayout>
+            <StackLayout Orientation="Vertical" HorizontalOptions="FillAndExpand"  BackgroundColor="PaleVioletRed">
+                <RadioButton BackgroundColor="PaleVioletRed" />
+                <RadioButton BackgroundColor="PaleVioletRed" />
+                <RadioButton BackgroundColor="PaleVioletRed" />
+                <RadioButton BackgroundColor="PaleVioletRed" />
+            </StackLayout>
+            <StackLayout Orientation="Vertical" HorizontalOptions="FillAndExpand"  BackgroundColor="LightSkyBlue">
+                <RadioButton BackgroundColor="LightSkyBlue" />
+                <RadioButton BackgroundColor="LightSkyBlue" />
+                <RadioButton BackgroundColor="LightSkyBlue" />
+                <RadioButton BackgroundColor="LightSkyBlue" />
+            </StackLayout>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

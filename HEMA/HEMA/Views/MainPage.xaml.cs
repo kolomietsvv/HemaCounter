@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Input;
 using Xamarin.Forms;
 
@@ -17,14 +18,19 @@ namespace HEMA
         private string alarmsPath;
         private CommonSettingsPage commonSettingsPage;
         private TimerSettingsPage timerSettingsPage;
+        private ProtocolItemPage protocolItemPage;
         private Color btnsColor;
         private bool alarmIsOn;
         private bool pauseFight;
-        private bool checkAlarms;
+        private bool checkAlarm;
         private MediaPlayer tickMediaPlayer;
         private MediaPlayer alarmMediaPlayer;
+        private MediaPlayer alarmPauseMediaPlayer;
         private MediaPlayer currentMediaPlayer;
         private List<TimerAlarmLight> alarmsInUse;
+
+        private List<Protocol> protocols;
+        private Protocol currentProtocol;
 
         private UserDeclines userDeclines;
 
@@ -46,7 +52,7 @@ namespace HEMA
 
         public ICommand ResetSettingsCmd => new Command(Fight.Settings.SetDefaults);
 
-        public MainPage(MediaPlayer tickMediaPlayer, MediaPlayer alarmMediaPlayer)
+        public MainPage(MediaPlayer tickMediaPlayer, MediaPlayer alarmMediaPlayer, MediaPlayer alarmPauseMediaPlayer)
         {
             InitializeComponent();
             settingsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "settings.json");
@@ -55,15 +61,19 @@ namespace HEMA
             List<TimerAlarm> alarms = GetAlarmSettings();
             this.tickMediaPlayer = tickMediaPlayer;
             this.alarmMediaPlayer = alarmMediaPlayer;
+            this.alarmPauseMediaPlayer = alarmPauseMediaPlayer;
             currentMediaPlayer = tickMediaPlayer;
             userDeclines = new UserDeclines();
-            Fight = new Fight(settings, alarms);
+            Fight = new Fight("", "", settings, alarms);
             Fight.OneDoubleHitLeft += isOneDoubleHitLeft => DoubleHitlLbl.TextColor = isOneDoubleHitLeft ? Color.Red : Color.Default;
             Fight.MaxDoubleHitsReached += () => DisplayFinishFightDialog(TextCollection.MaxDoubleHits, FinishCause.DoubleHits);
             BindingContext = this;
             commonSettingsPage = new CommonSettingsPage();
             commonSettingsPage.BindingContext = this;
             timerSettingsPage = new TimerSettingsPage();
+            protocolItemPage = new ProtocolItemPage();
+            commonSettingsPage.BindingContext = this;
+            protocols = new List<Protocol>();
             foreach (var alarm in Fight.Alarms)
             {
                 timerSettingsPage.AddItem(null, null);
@@ -81,9 +91,10 @@ namespace HEMA
                 BtnsColor = Color.LightSlateGray;
             }
             UpdateSettingsEnabled();
+            this.alarmPauseMediaPlayer = alarmPauseMediaPlayer;
         }
 
-        private void RemoveAlarmSettings(int index)
+		private void RemoveAlarmSettings(int index)
         {
             Fight.Alarms.RemoveAt(index);
         }
@@ -97,6 +108,11 @@ namespace HEMA
                     IsOn = true,
                 });
             }
+        }
+
+        private void ShowProtocolEditView(object sender, EventArgs e)
+        {
+            Navigation.PushAsync(protocolItemPage);
         }
 
         private void OpenSettingsTab(object sender, EventArgs e)
@@ -113,29 +129,41 @@ namespace HEMA
         {
             if (Fight.IsTimerStarted)
             {
+                if (!checkAlarm && currentMediaPlayer != tickMediaPlayer)
+                {
+                    currentMediaPlayer = tickMediaPlayer;
+                }
                 Fight.PauseTimer();
                 SetColorsOnPause();
+                currentProtocol.Exchanges.Add(new ProtocolItem
+                    {
+                        RedScore = Fight.RedScore,
+                        RedViolations = Fight.RedViolations,
+                        BlueScore = Fight.BlueScore,
+                        BlueViolations = Fight.BlueViolations,
+                        Time = Fight.Elapsed,
+                        DoubleHits = Fight.DoubleHits
+                    });
             }
             else
             {
-                alarmsInUse = Fight.Alarms
-                    .Where(alarm => alarm.IsOn && alarm.TotalSeconds > Fight.Elapsed.TotalSeconds)
-                    .Select(alarm => alarm.AlarmLight)
-                    .OrderByDescending(alarmLight => alarmLight.TotalSeconds)
-                    .ToList();
-                if (alarmsInUse.Count == 0)
-                {
-                    RemoveAlarmCheck();
-                }
-                if (alarmsInUse.Count > 0 && !checkAlarms)
-                {
-                    Fight.TimerTick += CheckAlarm;
-                    checkAlarms = true;
-                }
-                Fight.StartTimer();
+                FillAlarms();
                 SetColorsOnStart();
+                Fight.StartTimer();
+                currentProtocol = new Protocol();
+                protocols.Add(currentProtocol);
             }
             UpdateSettingsEnabled();
+        }
+
+        private void FillAlarms()
+        {
+            alarmsInUse = Fight.Alarms
+                .Where(alarm => alarm.IsOn && alarm.TotalSeconds > Fight.Elapsed.TotalSeconds)
+                .Select(alarm => alarm.AlarmLight)
+                .OrderByDescending(alarmLight => alarmLight.TotalSeconds)
+                .ToList();
+            checkAlarm = alarmsInUse.Count > 0;
         }
 
         private void UpdateSettingsEnabled()
@@ -235,8 +263,7 @@ namespace HEMA
                 Fight.Reset();
                 userDeclines.Reset();
                 UpdateSettingsEnabled();
-                alarmIsOn = false;
-                pauseFight = false;
+                checkAlarm = false;
             }
 
             else
@@ -316,76 +343,54 @@ namespace HEMA
 
         private void PlaySound()
         {
+            var lastIndex = alarmsInUse.Count - 1;
+
+            if (checkAlarm)
+            {
+                if (lastIndex >= 0)
+                {
+                    var offset = Fight.Elapsed.TotalSeconds - alarmsInUse[lastIndex].TotalSeconds;
+                    bool alarmShouldBeTurnedOn = offset >= 0 && offset < 1d;
+
+                    if (alarmShouldBeTurnedOn)
+                    {
+                        pauseFight = alarmsInUse[lastIndex].PauseFight;
+                        alarmsInUse.RemoveAt(lastIndex);
+                        if (!alarmIsOn)
+                        {
+                            if (!pauseFight)
+                            {
+                                currentMediaPlayer = alarmMediaPlayer;
+                            }
+                            else
+                            {
+                                currentMediaPlayer = alarmPauseMediaPlayer;
+                            }
+                            alarmIsOn = true;
+                        }
+                        if (pauseFight)
+                        {
+                            Fight.PauseTimer();
+                        }
+                    }
+                    else if (alarmIsOn)
+                    {
+                        alarmIsOn = false;
+                        currentMediaPlayer = tickMediaPlayer;
+                    }
+                }
+                else
+                {
+                    checkAlarm = false;
+                }
+            }
+            if (alarmIsOn)
+            {
+                alarmIsOn = false;
+                currentMediaPlayer = tickMediaPlayer;
+            }
+
             currentMediaPlayer.Start();
         }
-
-        private void CheckAlarm()
-        {
-            var lastIndex = alarmsInUse.Count - 1;
-            if (lastIndex < 0)
-            {
-                if (alarmIsOn)
-                {
-                    currentMediaPlayer = tickMediaPlayer;
-                    alarmIsOn = false;
-                }
-                if (pauseFight)
-                {
-                    Fight.PauseTimer();
-                }
-                RemoveAlarmCheck();
-                return;
-            }
-            if (pauseFight)
-            {
-                Fight.PauseTimer();
-            }
-
-            var offset = Fight.Elapsed.TotalSeconds - alarmsInUse[lastIndex].TotalSeconds;
-            bool alarmShouldBeTurnedOn = offset >= 0 && offset < 2d;
-
-            if (!alarmIsOn && alarmShouldBeTurnedOn)
-            {
-                currentMediaPlayer = alarmMediaPlayer;
-                alarmIsOn = true;
-                pauseFight = alarmsInUse[lastIndex].PauseFight;
-                alarmsInUse.RemoveAt(lastIndex);
-                return;
-            }
-
-            if (alarmIsOn && !alarmShouldBeTurnedOn)
-            {
-                currentMediaPlayer = tickMediaPlayer;
-                alarmIsOn = false;
-                pauseFight = false;
-            }
-        }
-
-        private void RemoveAlarmCheck()
-        {
-            checkAlarms = false;
-            pauseFight = false;
-            Fight.TimerTick -= CheckAlarm;
-        }
-    }
-
-    struct UserDeclines
-    {
-        public bool UserDeclinedDoubleHitsFinish;
-        public bool UserDeclinedTimeFinish;
-
-        public void Reset()
-        {
-            UserDeclinedDoubleHitsFinish = false;
-            UserDeclinedTimeFinish = false;
-        }
-    }
-
-    enum FinishCause
-    {
-        DoubleHits = 1,
-        MaxScore = 2,
-        Time = 3,
-        Manual = 4,
     }
 }

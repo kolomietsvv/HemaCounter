@@ -88,9 +88,10 @@
 			</Grid.RowDefinitions>
 			<Label Content="{Binding Fight.RedName}" Width="720"  Background="PaleVioletRed" Padding="150,0,50,0" BorderThickness="0" FontSize="50" HorizontalAlignment="Left" VerticalAlignment="Stretch" Grid.Row="0"/>
 			<StackPanel HorizontalAlignment="Center" Margin="0,5,0,5" Orientation="Horizontal">
-				<Button Content="📋" FontSize="40" Grid.Row="0" Margin="2" Width="120" Click="OpenFightsList"/>
-				<Button Content="⌚" FontSize="40" Grid.Row="0" Margin="2" Width="120"/>
-				<Button Content="📄" FontSize="40" Grid.Row="0" Margin="2" Width="120" Click="OpenFileButton_Click"/>
+				<Button Content="📋" FontSize="40" Grid.Row="0" Margin="2" Width="115" Click="OpenFightsList"/>
+				<Button Content="⌚" FontSize="40" Grid.Row="0" Margin="2" Width="115" Click="ShowPopupTime_Click"/>
+				<Button Content="📄" FontSize="40" Grid.Row="0" Margin="2" Width="115" Click="OpenFileButton_Click"/>
+				<Button Content="🥇" FontSize="40" Grid.Row="0" Margin="2" Width="115" Click="OpenFileButton_Click"/>
 			</StackPanel>
 			<Label x:Name="CurrentBlueLbl" Content="{Binding Fight.BlueName}" Width="720"  Background="LightSkyBlue" Padding="150,0,50,0" BorderThickness="0" FontSize="50" HorizontalAlignment="Right" VerticalAlignment="Stretch" Grid.Row="0"/>
 			<Button x:Name="StartBtn" Content="{Binding Fight.Elapsed, Converter={StaticResource TimeSpanToStringConverter}}" 

@@ -64,7 +64,7 @@ namespace HEMA
             this.alarmPauseMediaPlayer = alarmPauseMediaPlayer;
             currentMediaPlayer = tickMediaPlayer;
             userDeclines = new UserDeclines();
-            Fight = new Fight("", "", settings, alarms);
+            Fight = new Fight("", "", settings);
             Fight.OneDoubleHitLeft += isOneDoubleHitLeft => DoubleHitlLbl.TextColor = isOneDoubleHitLeft ? Color.Red : Color.Default;
             Fight.MaxDoubleHitsReached += () => DisplayFinishFightDialog(TextCollection.MaxDoubleHits, FinishCause.DoubleHits);
             BindingContext = this;
@@ -74,13 +74,7 @@ namespace HEMA
             protocolItemPage = new ProtocolItemPage();
             commonSettingsPage.BindingContext = this;
             protocols = new List<Protocol>();
-            foreach (var alarm in Fight.Alarms)
-            {
-                timerSettingsPage.AddItem(null, null);
-            }
             timerSettingsPage.BindingContext = this;
-            timerSettingsPage.ItemAdded += AddAlarmSettings;
-            TimerPickerView.ItemRemoved += RemoveAlarmSettings;
             Fight.TimerTick += PlaySound;
             if (Fight.Settings.NoBreak)
             {
@@ -92,22 +86,6 @@ namespace HEMA
             }
             UpdateSettingsEnabled();
             this.alarmPauseMediaPlayer = alarmPauseMediaPlayer;
-        }
-
-		private void RemoveAlarmSettings(int index)
-        {
-            Fight.Alarms.RemoveAt(index);
-        }
-
-        private void AddAlarmSettings(int index)
-        {
-            if (Fight.Alarms.Count < index + 1)
-            {
-                Fight.Alarms.Add(new Models.TimerAlarm
-                {
-                    IsOn = true,
-                });
-            }
         }
 
         private void ShowProtocolEditView(object sender, EventArgs e)
@@ -147,23 +125,12 @@ namespace HEMA
             }
             else
             {
-                FillAlarms();
                 SetColorsOnStart();
                 Fight.StartTimer();
                 currentProtocol = new Protocol();
                 protocols.Add(currentProtocol);
             }
             UpdateSettingsEnabled();
-        }
-
-        private void FillAlarms()
-        {
-            alarmsInUse = Fight.Alarms
-                .Where(alarm => alarm.IsOn && alarm.TotalSeconds > Fight.Elapsed.TotalSeconds)
-                .Select(alarm => alarm.AlarmLight)
-                .OrderByDescending(alarmLight => alarmLight.TotalSeconds)
-                .ToList();
-            checkAlarm = alarmsInUse.Count > 0;
         }
 
         private void UpdateSettingsEnabled()
@@ -314,8 +281,6 @@ namespace HEMA
         {
             var settingsString = JsonConvert.SerializeObject(Fight.Settings);
             File.WriteAllText(settingsPath, settingsString);
-            var alarmsString = JsonConvert.SerializeObject(Fight.Alarms.ToList());
-            File.WriteAllText(alarmsPath, alarmsString);
             base.OnAppearing();
         }
 

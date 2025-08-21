@@ -91,16 +91,6 @@ namespace HEMA
 			}
 		}
 
-		public bool UseAlerts
-		{
-			get => useAlerts; set
-			{
-				useAlerts = value;
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(UseAlerts)));
-			}
-		}
-
-
 		public bool NoBreak
 		{
 			get => noBreak;
@@ -110,8 +100,6 @@ namespace HEMA
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(NoBreak)));
 			}
 		}
-
-		public List<TimeSpan> Alerts { get; private set; }
 
 		public FightSettings()
 		{
@@ -125,10 +113,8 @@ namespace HEMA
 			PenaltyPoints = 1;
 			ViolationsToStartPenalize = 2;
 			MaxFightScore = 10;
-			UseAlerts = true;
 			UseFightSettings = true;
 			NoBreak = false;
-			Alerts = new List<TimeSpan> { new TimeSpan(0, 2, 0) };
 		}
 	}
 }

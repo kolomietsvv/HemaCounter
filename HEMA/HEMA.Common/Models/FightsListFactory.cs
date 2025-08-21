@@ -22,7 +22,7 @@ namespace HEMA
 				.Select(pair => new Fight(
 					pair.Item1,
 					pair.Item2,
-					settings, new List<TimerAlarm>())
+					settings)
 				{
 					EditFightCommand = EditFightCommand,
 					OriginalIndex = schedule.Count - i++

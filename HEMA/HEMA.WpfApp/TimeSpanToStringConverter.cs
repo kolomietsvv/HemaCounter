@@ -12,7 +12,27 @@ namespace HEMA.WpfApp
 			return string.Empty;
 		}
 
-		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) =>
-			Binding.DoNothing;
+		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+		{
+			var s = (value as string ?? "").Trim();
+
+			// форматы: mm:ss или просто число секунд
+			if (s.Contains(":"))
+			{
+				var parts = s.Split(':');
+				if (parts.Length == 2 &&
+					int.TryParse(parts[0], out var m) &&
+					int.TryParse(parts[1], out var sec))
+				{
+					return new TimeSpan(0, m, sec);
+				}
+			}
+			else if (int.TryParse(s, out var totalSec))
+			{
+				return TimeSpan.FromSeconds(totalSec);
+			}
+
+			return Binding.DoNothing;
+		}
 	}
 }

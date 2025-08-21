@@ -29,6 +29,7 @@ namespace HEMA
 		private string blueName;
 		private int originalIndex;
 		private bool isCompleted;
+		private int nextAlarmIndex;
 
 		public event Action MaxDoubleHitsReached;
 		public event Action TimerTick;
@@ -42,7 +43,15 @@ namespace HEMA
 
 		public FightSettings Settings { get; set; }
 
-		public ObservableCollection<TimerAlarm> Alarms { get; set; }
+		public TimerAlarmLight[] TimerAlarms { get; set; }
+
+		public int NextAlarmIndex
+		{
+			get => nextAlarmIndex;
+			set => nextAlarmIndex = TimerAlarms.Length > value ? value : -1;
+		}
+
+		public TimerAlarmLight? NextAlarm => NextAlarmIndex != -1 ? TimerAlarms[NextAlarmIndex] : (TimerAlarmLight?)null;
 
 		public bool IsScoreChangeEnabled => !IsTimerStarted && IsFightStarted || IsFightStarted && Settings.NoBreak;
 
@@ -187,17 +196,17 @@ namespace HEMA
 			set
 			{
 				stopwatch = new OffsetStopwatch(value);
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Elapsed)));
 			}
 		}
 
 		public bool IsFightStarted => stopwatch != null && stopwatch.Elapsed != TimeSpan.Zero;
 
-		public Fight(string redName, string blueName, FightSettings settings, List<TimerAlarm> alarms)
+		public Fight(string redName, string blueName, FightSettings settings)
 			: this()
 		{
 			Settings = settings;
 			MaxDoubleHits = isDoubleHitsInRow ? Settings?.DoubleHitsInARow : Settings?.DoubleHitsCommon;
-			Alarms = new ObservableCollection<TimerAlarm>(alarms);
 
 			RedName = redName;
 			BlueName = blueName;

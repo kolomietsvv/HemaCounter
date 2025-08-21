@@ -2,14 +2,12 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Net.Http.Json;
-using System.Runtime.CompilerServices;
+using System.Media;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Windows;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Media3D;
+
+using HEMA.Models;
 
 using Microsoft.Win32;
 
@@ -30,6 +28,12 @@ namespace HEMA.WpfApp
 		private FightsListWindow fightsListWindow;
 		private IEnumerator<Fight> enumerator;
 		private string currentFolder;
+		private MediaPlayer[] mediaPlayers;
+		private TimerAlarmLight[] ttmerAlarms =
+			[
+				new TimerAlarmLight { TotalSeconds = 105},
+				new TimerAlarmLight { TotalSeconds = 120, PauseFight = true }
+			];
 
 		public event PropertyChangedEventHandler? PropertyChanged;
 		public ObservableCollection<Fight> Fights { get; }
@@ -68,6 +72,8 @@ namespace HEMA.WpfApp
 		public MainWindow()
 		{
 			InitializeComponent();
+			mediaPlayers = [new MediaPlayer(), new MediaPlayer()];
+
 			Fights = new ObservableCollection<Fight>();
 			InitFights(["Боец 1", "Боец 2", "Боец 3"]);
 
@@ -75,44 +81,38 @@ namespace HEMA.WpfApp
 			fightsListWindow = new FightsListWindow(this);
 		}
 
-		private void InitFights(IEnumerable<string> names)
+		private async void ShowPopupTime_Click(object sender, RoutedEventArgs e)
 		{
-			var fights = FightsListFactory.CreateFights(
-				names.Select(name => new Fighter { Name = name }).ToList(),
-				new FightSettings()
+			Fight.PauseTimer();
+
+			var popup = new PopupTimeSpanWindow(Fight.Elapsed)
+			{
+				Owner = this // чтобы по Alt+Tab не терялся
+			};
+
+			// Небольшая анимация появления (опционально)
+			popup.Opacity = 0;
+			await Task.Delay(10);
+			var anim = new System.Windows.Media.Animation.DoubleAnimation(0, 0.98, new Duration(TimeSpan.FromMilliseconds(160)));
+			popup.BeginAnimation(OpacityProperty, anim);
+
+			if (popup.ShowDialog().GetValueOrDefault())
+			{
+				Fight.Elapsed = popup.Value;
+				if (popup.Value.TotalSeconds <= ttmerAlarms[0].TotalSeconds)
 				{
-					DoubleHitsInARow = 5,
-					DoubleHitsCommon = 5
-				},
-				new RelayCommand<Fight>(OnEditFight));
-			SetupFights(fights);
-		}
+					Fight.NextAlarmIndex = 0;
+					mediaPlayers[0].Stop();
+					mediaPlayers[0].Open(new Uri(@"C:\Vika\HemaCounter\HEMA\HEMA.Android\Resources\raw\beep.mp3", UriKind.Absolute));
+				}
+				else if (popup.Value.TotalSeconds <= ttmerAlarms[0].TotalSeconds)
+				{
+					Fight.NextAlarmIndex = 1;
+					mediaPlayers[1].Stop();
+					mediaPlayers[1].Open(new Uri(@"C:\Vika\HemaCounter\HEMA\HEMA.Android\Resources\raw\longBeep.mp3", UriKind.Absolute));
+				}
 
-		private void SetupFights(IEnumerable<Fight> fights)
-		{
-			Fights.Clear();
-			foreach (var fight in fights)
-			{
-				fight.OneDoubleHitLeft += isOneDoubleHitLeft => DoubleHitlLbl.Foreground = isOneDoubleHitLeft ? Brushes.Red : Brushes.Black;
-				fight.MaxDoubleHitsReached += () => DisplayFinishFightDialog(TextCollection.MaxDoubleHits, FinishCause.DoubleHits);
-				Fights.Add(fight);
 			}
-
-			enumerator = Fights.GetEnumerator();
-			enumerator.MoveNext();
-			SetCurrentAndNextFights();
-		}
-
-		public void SetEnumerator(string redName, string blueName)
-		{
-			enumerator = Fights.GetEnumerator();
-			do
-			{
-				enumerator.MoveNext();
-			}
-			while (enumerator.Current.RedName != redName || enumerator.Current.BlueName != blueName);
-
-			SetCurrentAndNextFights();
 		}
 
 		private async void OpenFileButton_Click(object sender, RoutedEventArgs e)
@@ -149,17 +149,6 @@ namespace HEMA.WpfApp
 					currentFolder = folderDialog.FolderName;
 					await TrySaveStateAsync(init: true);
 				}
-			}
-		}
-
-		private async Task TrySaveStateAsync(bool init = false)
-		{
-			if (!string.IsNullOrWhiteSpace(currentFolder))
-			{
-				var fights = Fights.ToList();
-				var json = JsonSerializer.Serialize(fights);
-				await File.WriteAllTextAsync(Path.Combine(currentFolder, "Fights.json"), json);
-				await ExecuteGitCmdAsync(currentFolder, init);
 			}
 		}
 
@@ -249,6 +238,20 @@ namespace HEMA.WpfApp
 			Fight.BlueViolations++;
 		}
 
+		private void OpenFightsList(object sender, RoutedEventArgs e)
+		{
+			if (!fightsListWindow.IsLoaded)
+			{
+				fightsListWindow = new(this);
+				fightsListWindow.Show();
+			}
+			else
+			{
+				fightsListWindow.WindowState = WindowState.Normal;
+				fightsListWindow.Focus();
+			}
+		}
+
 		private async void DisplayFinishFightDialog(string cause, FinishCause finishCause)
 		{
 			await TrySaveStateAsync();
@@ -289,43 +292,6 @@ namespace HEMA.WpfApp
 				}
 		}
 
-		private void SetCurrentAndNextFights()
-		{
-			if (enumerator.Current != null)
-			{
-				Fight = enumerator.Current;
-				DoubleHitlLbl.Foreground = Brushes.Black;
-			}
-
-			do
-			{
-				enumerator.MoveNext();
-			} while ((enumerator.Current?.IsCompleted).GetValueOrDefault());
-
-			if (enumerator.Current != null && !enumerator.Current.IsCompleted)
-			{
-				NextFight = enumerator.Current;
-			}
-			else
-			{
-				NextFight = new(string.Empty, string.Empty, Fight.Settings, new());
-			}
-		}
-
-		private void OpenFightsList(object sender, RoutedEventArgs e)
-		{
-			if (!fightsListWindow.IsLoaded)
-			{
-				fightsListWindow = new(this);
-				fightsListWindow.Show();
-			}
-			else
-			{
-				fightsListWindow.WindowState = WindowState.Normal;
-				fightsListWindow.Focus();
-			}
-		}
-
 		private void OnEditFight(Fight? fight)
 		{
 			if (fight == null) return;
@@ -352,5 +318,100 @@ namespace HEMA.WpfApp
 			string output = await process.StandardOutput.ReadToEndAsync();
 			await process.WaitForExitAsync();
 		}
+
+		private void InitFights(IEnumerable<string> names)
+		{
+			var fights = FightsListFactory.CreateFights(
+				names.Select(name => new Fighter { Name = name }).ToList(),
+				new FightSettings()
+				{
+					DoubleHitsInARow = 5,
+					DoubleHitsCommon = 5
+				},
+				new RelayCommand<Fight>(OnEditFight));
+			SetupFights(fights);
+		}
+
+		private void SetupFights(IEnumerable<Fight> fights)
+		{
+			Fights.Clear();
+			foreach (var fight in fights)
+			{
+				fight.OneDoubleHitLeft += isOneDoubleHitLeft => DoubleHitlLbl.Foreground = isOneDoubleHitLeft ? Brushes.Red : Brushes.Black;
+				fight.MaxDoubleHitsReached += () => DisplayFinishFightDialog(TextCollection.MaxDoubleHits, FinishCause.DoubleHits);
+				fight.TimerTick += PlaySound;
+				fight.TimerAlarms = ttmerAlarms;
+				Fights.Add(fight);
+			}
+
+			enumerator = Fights.GetEnumerator();
+			enumerator.MoveNext();
+			SetCurrentAndNextFights();
+		}
+
+		public void SetEnumerator(string redName, string blueName)
+		{
+			enumerator = Fights.GetEnumerator();
+			do
+			{
+				enumerator.MoveNext();
+			}
+			while (enumerator.Current.RedName != redName || enumerator.Current.BlueName != blueName);
+
+			SetCurrentAndNextFights();
+		}
+
+		private async Task TrySaveStateAsync(bool init = false)
+		{
+			if (!string.IsNullOrWhiteSpace(currentFolder))
+			{
+				var fights = Fights.ToList();
+				var json = JsonSerializer.Serialize(fights);
+				await File.WriteAllTextAsync(Path.Combine(currentFolder, "Fights.json"), json);
+				await ExecuteGitCmdAsync(currentFolder, init);
+			}
+		}
+
+		private void SetCurrentAndNextFights()
+		{
+			mediaPlayers[0].Stop();
+			mediaPlayers[1].Stop();
+			mediaPlayers[0].Open(new Uri(@"C:\Vika\HemaCounter\HEMA\HEMA.Android\Resources\raw\beep.mp3", UriKind.Absolute));
+			mediaPlayers[1].Open(new Uri(@"C:\Vika\HemaCounter\HEMA\HEMA.Android\Resources\raw\longBeep.mp3", UriKind.Absolute));
+
+			if (enumerator.Current != null)
+			{
+				Fight = enumerator.Current;
+				DoubleHitlLbl.Foreground = Brushes.Black;
+			}
+
+			do
+			{
+				enumerator.MoveNext();
+			} while ((enumerator.Current?.IsCompleted).GetValueOrDefault());
+
+			if (enumerator.Current != null && !enumerator.Current.IsCompleted)
+			{
+				NextFight = enumerator.Current;
+			}
+			else
+			{
+				NextFight = new(string.Empty, string.Empty, Fight.Settings);
+			}
+		}
+
+		private void PlaySound()
+		{
+			if (fight.NextAlarm.HasValue && fight.Elapsed.TotalSeconds >= fight.NextAlarm.Value.TotalSeconds)
+			{
+				if (fight.NextAlarm.Value.PauseFight)
+				{
+					Fight.PauseTimer();
+				}
+				Application.Current.Dispatcher.Invoke(mediaPlayers[fight.NextAlarmIndex].Play);
+				fight.NextAlarmIndex++;
+			}
+		}
+
 	}
 }

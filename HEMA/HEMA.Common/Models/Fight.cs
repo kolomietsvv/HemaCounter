@@ -36,9 +36,9 @@ namespace HEMA
 		public event PropertyChangedEventHandler PropertyChanged;
 
 		[JsonIgnore]
-		public ICommand EditFightCommand { get; set;  }
+		public ICommand EditFightCommand { get; set; }
 
-		public int MaxDoubleHits => isDoubleHitsInRow ? Settings.DoubleHitsInARow : Settings.DoubleHitsCommon;
+		public int? MaxDoubleHits { get; set; }
 
 		public FightSettings Settings { get; set; }
 
@@ -196,6 +196,7 @@ namespace HEMA
 			: this()
 		{
 			Settings = settings;
+			MaxDoubleHits = isDoubleHitsInRow ? Settings?.DoubleHitsInARow : Settings?.DoubleHitsCommon;
 			Alarms = new ObservableCollection<TimerAlarm>(alarms);
 
 			RedName = redName;

@@ -93,8 +93,11 @@ namespace HEMA.WpfApp
 			Fights.Clear();
 			foreach (var fight in fights)
 			{
+				fight.OneDoubleHitLeft += isOneDoubleHitLeft => DoubleHitlLbl.Foreground = isOneDoubleHitLeft ? Brushes.Red : Brushes.Black;
+				fight.MaxDoubleHitsReached += () => DisplayFinishFightDialog(TextCollection.MaxDoubleHits, FinishCause.DoubleHits);
 				Fights.Add(fight);
 			}
+
 			enumerator = Fights.GetEnumerator();
 			enumerator.MoveNext();
 			SetCurrentAndNextFights();
@@ -143,22 +146,20 @@ namespace HEMA.WpfApp
 					string filePath = fileDialog.FileName;
 					var names = await File.ReadAllLinesAsync(filePath);
 					InitFights(names);
-
 					currentFolder = folderDialog.FolderName;
-
-					await ExecuteGitCmd(currentFolder, init: true);
+					await TrySaveStateAsync(init: true);
 				}
 			}
 		}
 
-		private async Task TrySaveStateAsync()
+		private async Task TrySaveStateAsync(bool init = false)
 		{
 			if (!string.IsNullOrWhiteSpace(currentFolder))
 			{
 				var fights = Fights.ToList();
 				var json = JsonSerializer.Serialize(fights);
 				await File.WriteAllTextAsync(Path.Combine(currentFolder, "Fights.json"), json);
-				await ExecuteGitCmd(currentFolder);
+				await ExecuteGitCmdAsync(currentFolder, init);
 			}
 		}
 
@@ -250,6 +251,7 @@ namespace HEMA.WpfApp
 
 		private async void DisplayFinishFightDialog(string cause, FinishCause finishCause)
 		{
+			await TrySaveStateAsync();
 			switch (finishCause)
 			{
 				case FinishCause.DoubleHits:
@@ -292,7 +294,7 @@ namespace HEMA.WpfApp
 			if (enumerator.Current != null)
 			{
 				Fight = enumerator.Current;
-				DoubleHitlLbl.Foreground = Fight.DoubleHits < Fight.MaxDoubleHits - 1 ? Brushes.Black : Brushes.Red;
+				DoubleHitlLbl.Foreground = Brushes.Black;
 			}
 
 			do
@@ -333,7 +335,7 @@ namespace HEMA.WpfApp
 			SetEnumerator(fight.RedName, fight.BlueName);
 		}
 
-		private async Task ExecuteGitCmd(string folderPath, bool init = false)
+		private async Task ExecuteGitCmdAsync(string folderPath, bool init = false)
 		{
 			string gitInint = init ? " && git init" : string.Empty;
 			string command = $"cd /d \"{folderPath}\"{gitInint} && git add -A && git commit -m \"%date:~6,4%-%date:~3,2%-%date:~0,2% %time:~0,8%\"\r\n";

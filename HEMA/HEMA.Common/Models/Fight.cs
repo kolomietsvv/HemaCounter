@@ -53,7 +53,7 @@ namespace HEMA
 
 		public TimerAlarmLight? NextAlarm => NextAlarmIndex != -1 ? TimerAlarms[NextAlarmIndex] : (TimerAlarmLight?)null;
 
-		public bool IsScoreChangeEnabled => !IsTimerStarted && IsFightStarted || IsFightStarted && Settings.NoBreak;
+		public bool IsScoreChangeEnabled => !IsTimerStarted || Settings.NoBreak;
 
 		public int OriginalIndex
 		{

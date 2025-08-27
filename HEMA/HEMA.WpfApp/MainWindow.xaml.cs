@@ -23,7 +23,6 @@ namespace HEMA.WpfApp
 	{
 		private Fight fight;
 		private Fight nextFight;
-		private Color btnsColor;
 		private UserDeclines userDeclines;
 		private FightsListWindow fightsListWindow;
 		private RaitingWindow raitingWindow;
@@ -59,17 +58,6 @@ namespace HEMA.WpfApp
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(NextFight)));
 			}
 		}
-
-		public Color BtnsColor
-		{
-			get => btnsColor;
-			set
-			{
-				btnsColor = value;
-			}
-		}
-
-		public bool IsSettingsEnabled => !Fight.IsFightStarted;
 
 		public MainWindow()
 		{
@@ -163,12 +151,10 @@ namespace HEMA.WpfApp
 			if (Fight.IsTimerStarted)
 			{
 				Fight.PauseTimer();
-				BtnsColor = Color.DimGray;
 			}
 			else
 			{
 				Fight.StartTimer();
-				BtnsColor = Color.Black;
 			}
 		}
 

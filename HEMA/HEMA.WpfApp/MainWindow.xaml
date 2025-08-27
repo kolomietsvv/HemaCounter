@@ -8,6 +8,50 @@
  Title="MainWindow" Height="450" Width="800">
 	<Window.Resources>
 		<local:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter"/>
+		<FontFamily x:Key="UiFont">Segoe UI</FontFamily>
+		<SolidColorBrush x:Key="TextPrimary" Color="#111827"/>
+
+		<!-- Кнопки: базовый стиль -->
+		<Style TargetType="Button">
+			<Setter Property="FontFamily" Value="{StaticResource UiFont}"/>
+			<Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+			<Setter Property="Background" Value="#FFFFFF"/>
+			<Setter Property="BorderBrush" Value="#E5E7EB"/>
+			<Setter Property="BorderThickness" Value="1"/>
+			<Setter Property="Padding" Value="12,8"/>
+			<Setter Property="Cursor" Value="Hand"/>
+			<Setter Property="SnapsToDevicePixels" Value="True"/>
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="Button">
+						<Border x:Name="root" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="10">
+							<ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" Margin="{TemplateBinding Padding}"/>
+						</Border>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Setter TargetName="root" Property="BorderBrush" Value="#D1D5DB"/>
+								<Setter TargetName="root" Property="Background" Value="#FAFAFA"/>
+							</Trigger>
+							<Trigger Property="IsPressed" Value="True">
+								<Setter TargetName="root" Property="Background" Value="#F3F4F6"/>
+							</Trigger>
+							<Trigger Property="IsEnabled" Value="False">
+								<Setter Property="Opacity" Value="0.4"/>
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
+
+		<!-- Текст -->
+		<Style TargetType="Label">
+			<Setter Property="FontFamily" Value="{StaticResource UiFont}"/>
+			<Setter Property="Foreground" Value="{StaticResource TextPrimary}"/>
+			<Setter Property="Padding" Value="0"/>
+			<Setter Property="BorderThickness" Value="0"/>
+			<Setter Property="Background" Value="{x:Null}"/>
+		</Style>
 	</Window.Resources>
 	<Grid Background="Silver">
 		<Grid.RowDefinitions>
@@ -26,9 +70,17 @@
 					<RowDefinition/>
 					<RowDefinition/>
 				</Grid.RowDefinitions>
-				<Button Content="ˆ" Margin="0,-100,0,0" Padding="0,-50,0,0" Height="100" FontSize="250" Background="Transparent" BorderThickness="0"  Foreground="{Binding BtnsColor}" Cursor="Hand" Click="IncreaseRedScore" Grid.Row="0"/>
-				<Label Content="{Binding Fight.RedScore}" Margin="0,-100" Padding="-500" Foreground="White" FontSize="450" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1"/>
-				<Button Content="ˬ" Margin="0,80,0,0" Padding="0,-230,0,0" Height="100" FontSize="250" Background="Transparent" BorderThickness="0"  Foreground="{Binding BtnsColor}" Cursor="Hand" Click="DecreaseRedScore" Grid.Row="2"/>
+				<Button IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Panel.ZIndex="1" Content="⮝" Margin="0,-105,0,0" Height="200" FontSize="110" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="IncreaseRedScore" Grid.Row="0">
+					<Button.LayoutTransform>
+						<ScaleTransform ScaleX="1.5" ScaleY="0.5"/>
+					</Button.LayoutTransform>
+				</Button>
+				<Label Content="{Binding Fight.RedScore}" Margin="0,-280,0,-120" Foreground="White" FontSize="550" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1"/>
+				<Button IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Panel.ZIndex="1" Content="⮟" Margin="0,120,0,-30" Height="200" FontSize="110" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="DecreaseRedScore" Grid.Row="2">
+					<Button.LayoutTransform>
+						<ScaleTransform ScaleX="1.5" ScaleY="0.5"/>
+					</Button.LayoutTransform>
+				</Button>
 			</Grid>
 			<Grid Grid.Column="1" >
 				<Grid.RowDefinitions>
@@ -37,36 +89,36 @@
 					<RowDefinition/>
 					<RowDefinition/>
 				</Grid.RowDefinitions>
-				<Button Content="■" Width="350" Margin="0,20,0,0" Foreground="Silver" FontSize="70" Background="WhiteSmoke" Click="ResetTimer" FontWeight="Bold"/>
-				<Grid Background="LightSkyBlue" Grid.Row="1" Margin="10">
+				<Button Content="■" Width="350" Margin="0,15,0 10" FontSize="70" Background="WhiteSmoke" Click="ResetTimer" FontWeight="Bold"/>
+				<Grid Background="LightSkyBlue" Grid.Row="1" Margin="2">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition/>
 						<ColumnDefinition/>
 						<ColumnDefinition/>
 					</Grid.ColumnDefinitions>
-					<Button Width="150" FontSize="50" Content="-" Click="DecreaseBlueViolations" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="0"/>
-					<Label Content="{Binding Fight.BlueViolations}" FontSize="100" Grid.Column="1" HorizontalAlignment="Center"  VerticalAlignment="Center"/>
-					<Button Width="150" FontSize="50" Content="+" Click="IncreaseBlueViolations"  Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="2"/>
+					<Button Width="150" FontSize="70" Content="-" Click="DecreaseBlueViolations" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="0"/>
+					<Label Content="{Binding Fight.BlueViolations}" VerticalContentAlignment="Top" FontSize="100" Grid.Column="1" HorizontalAlignment="Center"  VerticalAlignment="Center"/>
+					<Button Width="150" FontSize="70" Content="+" Click="IncreaseBlueViolations"  Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="2"/>
 				</Grid>
-				<Grid Background="PaleVioletRed" Grid.Row="2" Margin="10" >
+				<Grid Background="PaleVioletRed" Grid.Row="2" Margin="2" >
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition/>
 						<ColumnDefinition/>
 						<ColumnDefinition/>
 					</Grid.ColumnDefinitions>
-					<Button Width="150" FontSize="50" Content="-" Click="DecreaseRedViolations" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="0"/>
+					<Button Width="150" FontSize="70" Content="-" Click="DecreaseRedViolations" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="0"/>
 					<Label Content="{Binding Fight.RedViolations}" FontSize="100" Grid.Column="1" HorizontalAlignment="Center"  VerticalAlignment="Center"/>
-					<Button Width="150" FontSize="50" Content="+" Click="IncreaseRedViolations" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="2"/>
+					<Button Width="150" FontSize="70" Content="+" Click="IncreaseRedViolations" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="2"/>
 				</Grid>
-				<Grid Grid.Row="3" Margin="10">
+				<Grid Grid.Row="3" Margin="2">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition/>
 						<ColumnDefinition/>
 						<ColumnDefinition/>
 					</Grid.ColumnDefinitions>
-					<Button Width="150" FontSize="50" Content="-" Click="DecreaseDoubleHits" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="0"/>
+					<Button Width="150" FontSize="70" Content="-" Click="DecreaseDoubleHits" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="0"/>
 					<Label Content="{Binding Fight.DoubleHits}" FontSize="100" x:Name="DoubleHitlLbl" Grid.Column="1" HorizontalAlignment="Center"  VerticalAlignment="Center"/>
-					<Button Width="150" FontSize="50" Content="+" Click="IncreaseDoubleHits" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="2"/>
+					<Button Width="150" FontSize="70" Content="+" Click="IncreaseDoubleHits" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="2"/>
 				</Grid>
 			</Grid>
 			<Grid Background="LightSkyBlue" Grid.Column="2">
@@ -75,30 +127,38 @@
 					<RowDefinition/>
 					<RowDefinition/>
 				</Grid.RowDefinitions>
-				<Button Content="ˆ" Margin="0,-100,0,0" Padding="0,-50,0,0" Height="100" FontSize="250" Background="Transparent" BorderThickness="0" Foreground="{Binding BtnsColor}" Cursor="Hand" Click="IncreaseBlueScore" Grid.Row="0"/>
-				<Label Content="{Binding Fight.BlueScore}" Margin="-250" Foreground="White" FontSize="450" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1"/>
-				<Button Content="ˬ" Margin="0,85,0,0" Padding="0,-230,0,0" Height="100" FontSize="250" Background="Transparent" BorderThickness="0" Foreground="{Binding BtnsColor}" Cursor="Hand" Click="DecreaseBlueScore" Grid.Row="2"/>
+				<Button IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Panel.ZIndex="1" Content="⮝" Margin="0,-105,0,0" Height="200" FontSize="110" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="IncreaseBlueScore" Grid.Row="0">
+					<Button.LayoutTransform>
+						<ScaleTransform ScaleX="1.5" ScaleY="0.5"/>
+					</Button.LayoutTransform>
+				</Button>
+				<Label Content="{Binding Fight.BlueScore}" Margin="0,-280,0,-120" Foreground="White" FontSize="550" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1"/>
+				<Button IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Panel.ZIndex="1" Content="⮟" Margin="0,120,0,-30" Height="200" FontSize="110" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="DecreaseBlueScore" Grid.Row="2">
+					<Button.LayoutTransform>
+						<ScaleTransform ScaleX="1.5" ScaleY="0.5"/>
+					</Button.LayoutTransform>
+				</Button>
 			</Grid>
 		</Grid>
-		<Grid Grid.Row="1">
+		<Grid Grid.Row="1" Panel.ZIndex="-1">
 			<Grid.RowDefinitions>
 				<RowDefinition/>
 				<RowDefinition Height="2.9*"/>
 				<RowDefinition/>
 			</Grid.RowDefinitions>
-			<Label Content="{Binding Fight.RedName}" Width="720" HorizontalContentAlignment="Right" Background="PaleVioletRed" Padding="150,0,55,0" BorderThickness="0" FontSize="50" HorizontalAlignment="Left" VerticalAlignment="Stretch" Grid.Row="0"/>
-			<StackPanel HorizontalAlignment="Center" Margin="0,5,0,5" Orientation="Horizontal">
-				<Button Content="📋" FontSize="40" Grid.Row="0" Margin="2" Width="115" Click="OpenFightsList"/>
-				<Button Content="⌚" FontSize="40" Grid.Row="0" Margin="2" Width="115" Click="ShowPopupTime_Click"/>
-				<Button Content="📄" FontSize="40" Grid.Row="0" Margin="2" Width="115" Click="OpenFileButton_Click"/>
-				<Button Content="🥇" FontSize="40" Grid.Row="0" Margin="2" Width="115" Click="OpenRaitingButton_Click"/>
+			<Label Content="{Binding Fight.RedName}" Width="720" HorizontalContentAlignment="Right" Background="PaleVioletRed" Padding="0,15,20,0" BorderThickness="0" FontSize="50" HorizontalAlignment="Left" VerticalAlignment="Stretch" Grid.Row="0"/>
+			<StackPanel HorizontalAlignment="Center" Margin="0,5" Orientation="Horizontal">
+				<Button Content="📋" FontSize="40" Grid.Row="0" Margin="2,1" Width="115" Click="OpenFightsList"/>
+				<Button Content="⌚" FontSize="40" Grid.Row="0" Margin="2,1" Width="115" Click="ShowPopupTime_Click"/>
+				<Button Content="📄" FontSize="40" Grid.Row="0" Margin="2,1" Width="115" Click="OpenFileButton_Click"/>
+				<Button Content="🥇" FontSize="40" Grid.Row="0" Margin="2,1" Width="115" Click="OpenRaitingButton_Click"/>
 			</StackPanel>
-			<Label x:Name="CurrentBlueLbl" Content="{Binding Fight.BlueName}" HorizontalContentAlignment="Left" Width="720" Background="LightSkyBlue" Padding="50,0,50,0" BorderThickness="0" FontSize="50" HorizontalAlignment="Right" VerticalAlignment="Stretch" Grid.Row="0"/>
+			<Label x:Name="CurrentBlueLbl" Content="{Binding Fight.BlueName}" HorizontalContentAlignment="Left" Width="720" Background="LightSkyBlue" Padding="20,15,0,0" BorderThickness="0" FontSize="50" HorizontalAlignment="Right" VerticalAlignment="Stretch" Grid.Row="0" Panel.ZIndex="-1"/>
 			<Button x:Name="StartBtn" Content="{Binding Fight.Elapsed, Converter={StaticResource TimeSpanToStringConverter}}" 
 					Foreground="Black" FontSize="250" FontFamily="Courier" Background="WhiteSmoke"
 					VerticalAlignment ="Stretch" 
 					Click="StartTimer" Grid.Row="1"
-					Padding="0,-15,0,0"
+					Padding="0,-1,0,0"
 					BorderThickness="0"
 					Cursor="Hand"/>
 			<Label Content="{Binding NextFight.RedName}" Width="720" Background="WhiteSmoke" Padding="50,0" BorderThickness="0" FontSize="50" HorizontalAlignment="Left" VerticalAlignment="Stretch" Grid.Row="2"/>

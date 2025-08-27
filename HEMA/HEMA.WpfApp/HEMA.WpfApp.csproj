@@ -12,4 +12,10 @@
    <ProjectReference Include="..\HEMA.Common\HEMA.Common.csproj" />
  </ItemGroup>
 
+ <ItemGroup>
+   <Compile Update="RaitingWindow.xaml.cs">
+     <SubType>Code</SubType>
+   </Compile>
+ </ItemGroup>
+
 </Project>

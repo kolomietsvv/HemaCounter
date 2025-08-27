@@ -26,6 +26,7 @@ namespace HEMA.WpfApp
 		private Color btnsColor;
 		private UserDeclines userDeclines;
 		private FightsListWindow fightsListWindow;
+		private RaitingWindow raitingWindow;
 		private IEnumerator<Fight> enumerator;
 		private string currentFolder;
 		private MediaPlayer[] mediaPlayers;
@@ -37,6 +38,7 @@ namespace HEMA.WpfApp
 
 		public event PropertyChangedEventHandler? PropertyChanged;
 		public ObservableCollection<Fight> Fights { get; }
+		public ObservableCollection<Fighter> Raiting { get; }
 
 		public Fight Fight
 		{
@@ -75,10 +77,12 @@ namespace HEMA.WpfApp
 			mediaPlayers = [new MediaPlayer(), new MediaPlayer()];
 
 			Fights = new ObservableCollection<Fight>();
+			Raiting = new ObservableCollection<Fighter>();
 			InitFights(["Боец 1", "Боец 2", "Боец 3"]);
 
 			DataContext = this;
 			fightsListWindow = new FightsListWindow(this);
+			raitingWindow = new RaitingWindow(this);
 		}
 
 		private async void ShowPopupTime_Click(object sender, RoutedEventArgs e)
@@ -252,6 +256,71 @@ namespace HEMA.WpfApp
 			}
 		}
 
+		private void OpenRaitingButton_Click(object sender, RoutedEventArgs e)
+		{
+			var fighters = Fights
+				.SelectMany<Fight, string>(fight => [fight.RedName, fight.BlueName])
+				.Distinct()
+				.Select(fighterName => new Fighter { Name = fighterName })
+				.ToDictionary(fighter => fighter.Name);
+
+			foreach (var fight in Fights)
+			{
+				if (fight.DoubleHits >= fight.MaxDoubleHits)
+				{
+					fighters[fight.RedName].WinsCoefficient -= 2;
+					fighters[fight.BlueName].WinsCoefficient -= 2;
+				}
+				else if (fight.RedScore > fight.BlueScore)
+				{
+					fighters[fight.RedName].WinsCoefficient += 1;
+					fighters[fight.BlueName].WinsCoefficient -= 1;
+				}
+				else if (fight.BlueScore > fight.RedScore)
+				{
+					fighters[fight.BlueName].WinsCoefficient += 1;
+					fighters[fight.RedName].WinsCoefficient -= 1;
+				}
+			}
+
+			foreach (var fighter in fighters)
+			{
+				var fightsAsBlue = Fights.Where(fight => fight.BlueName == fighter.Key);
+				var givenAsBlue = fightsAsBlue.Sum(fight => fight.BlueScore);
+				var takenAsBlue = fightsAsBlue.Sum(fight => fight.RedScore);
+				var fightsAsRed = Fights.Where(fight => fight.RedName == fighter.Key);
+				var givenAsRed = fightsAsRed.Sum(fight => fight.RedScore);
+				var takenAsRed = fightsAsRed.Sum(fight => fight.BlueScore);
+
+				fighter.Value.GivenScore = givenAsBlue + givenAsRed;
+				fighter.Value.TakenScore = takenAsBlue + takenAsRed;
+			}
+
+			Raiting.Clear();
+			foreach (var fighter in fighters
+				.Values
+				.OrderByDescending(fighter => fighter.WinsCoefficient)
+				.ThenByDescending(fighter => fighter.GivenTakenCoefficient)
+				.ThenByDescending(fighter => fighter.GivenScore))
+			{
+				Raiting.Add(fighter);
+			}
+
+			if (sender != null)
+			{
+				if (!raitingWindow.IsLoaded)
+				{
+					raitingWindow = new(this);
+					raitingWindow.Show();
+				}
+				else
+				{
+					raitingWindow.WindowState = WindowState.Normal;
+					raitingWindow.Focus();
+				}
+			}
+		}
+
 		private async void DisplayFinishFightDialog(string cause, FinishCause finishCause)
 		{
 			await TrySaveStateAsync();
@@ -277,6 +346,7 @@ namespace HEMA.WpfApp
 				Fight.IsCompleted = true;
 				await TrySaveStateAsync();
 				SetCurrentAndNextFights();
+				OpenRaitingButton_Click(null, null);
 				userDeclines.Reset();
 			}
 
@@ -412,6 +482,5 @@ namespace HEMA.WpfApp
 				fight.NextAlarmIndex++;
 			}
 		}
-
 	}
 }

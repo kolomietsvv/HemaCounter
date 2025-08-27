@@ -12,6 +12,14 @@ namespace HEMA
 {
 	public class Fighter
 	{
-		public string Name { get; set; }	
+		public string Name { get; set; }
+
+		public int WinsCoefficient { get; set; }
+
+		public int GivenTakenCoefficient => GivenScore - TakenScore;
+
+		public int GivenScore { get; set; }
+
+		public int TakenScore { get; set; }
 	}
 }

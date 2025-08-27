@@ -5,7 +5,7 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:local="clr-namespace:HEMA.WpfApp"
 		mc:Ignorable="d"
-        Title="Список боёв" Height="450" Width="1380">
+        Title="Список боёв" Height="450" Width="1500">
 	<Window.Resources>
 		<local:InverseBoolConverter x:Key="InverseBoolConverter"/>
 		<local:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter"/>
@@ -22,16 +22,16 @@
 		<ListView.View>
 			<GridView>
 				<GridViewColumn DisplayMemberBinding="{Binding OriginalIndex}" Width="40"/>
-				<GridViewColumn Width="300">
+				<GridViewColumn Header ="Имя" Width="300">
 					<GridViewColumn.CellTemplate>
 						<DataTemplate>
 							<Border Background ="PaleVioletRed">
-								<TextBlock Text="{Binding RedName}" />
+								<TextBlock TextAlignment="Left" Text="{Binding RedName}" />
 							</Border>
 						</DataTemplate>
 					</GridViewColumn.CellTemplate>
 				</GridViewColumn>
-				<GridViewColumn Width="50">
+				<GridViewColumn Header ="Нанес." Width="100">
 					<GridViewColumn.CellTemplate>
 						<DataTemplate>
 							<Border Background ="PaleVioletRed">
@@ -40,25 +40,25 @@
 						</DataTemplate>
 					</GridViewColumn.CellTemplate>
 				</GridViewColumn>
-				<GridViewColumn Width="300">
+				<GridViewColumn Header ="Время" Width="150">
 					<GridViewColumn.CellTemplate>
 						<DataTemplate>
-							<Border Padding="80,0">
-								<TextBlock Text="{Binding Elapsed, Converter={StaticResource TimeSpanToStringConverter}}" />
+							<Border>
+								<TextBlock TextAlignment="Center" Text="{Binding Elapsed, Converter={StaticResource TimeSpanToStringConverter}}" />
 							</Border>
 						</DataTemplate>
 					</GridViewColumn.CellTemplate>
 				</GridViewColumn>
-				<GridViewColumn Width="50">
+				<GridViewColumn Header ="Нанес." Width="100">
 					<GridViewColumn.CellTemplate>
 						<DataTemplate>
-							<Border Background ="LightSkyBlue">
-								<TextBlock Text="{Binding BlueScore}" />
+							<Border HorizontalAlignment="Right" Background ="LightSkyBlue">
+								<TextBlock TextAlignment="Right" Text="{Binding BlueScore}" />
 							</Border>
 						</DataTemplate>
 					</GridViewColumn.CellTemplate>
 				</GridViewColumn>
-				<GridViewColumn Width="300">
+				<GridViewColumn Header ="Имя" Width="300">
 					<GridViewColumn.CellTemplate>
 						<DataTemplate>
 							<Border Background ="LightSkyBlue">
@@ -67,8 +67,8 @@
 						</DataTemplate>
 					</GridViewColumn.CellTemplate>
 				</GridViewColumn>
-				<GridViewColumn DisplayMemberBinding="{Binding DoubleHits}" Width="50"/>
-				<GridViewColumn Width="50">
+				<GridViewColumn DisplayMemberBinding="{Binding DoubleHits}" Header ="Обоюдн." Width="100"/>
+				<GridViewColumn Header ="Предупр." Width="120">
 					<GridViewColumn.CellTemplate>
 						<DataTemplate>
 							<Border Background ="PaleVioletRed">
@@ -77,7 +77,7 @@
 						</DataTemplate>
 					</GridViewColumn.CellTemplate>
 				</GridViewColumn>
-				<GridViewColumn Width="50">
+				<GridViewColumn Header ="Предупр." Width="120">
 					<GridViewColumn.CellTemplate>
 						<DataTemplate>
 							<Border Background ="LightSkyBlue">

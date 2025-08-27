@@ -1,0 +1,25 @@
+﻿<Window x:Class="HEMA.WpfApp.RaitingWindow"
+		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+		xmlns:local="clr-namespace:HEMA.WpfApp"
+		mc:Ignorable="d"
+        Title="Рейтинг" Height="450" Width="850">
+	<Window.Resources>
+		<local:InverseBoolConverter x:Key="InverseBoolConverter"/>
+		<local:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter"/>
+	</Window.Resources>
+	<ListView ItemsSource="{Binding Raiting}" 
+			  HorizontalAlignment="Stretch" 
+			  FontSize="25">
+		<ListView.View>
+			<GridView>
+				<GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Имя" Width="250"/>
+				<GridViewColumn DisplayMemberBinding="{Binding WinsCoefficient}" Header="Коэф. побед" Width="200"/>
+				<GridViewColumn DisplayMemberBinding="{Binding GivenTakenCoefficient}" Header="Нанес. - пропущ." Width="250"/>
+				<GridViewColumn DisplayMemberBinding="{Binding GivenScore}" Header="Нанес." Width="150"/>
+			</GridView>
+		</ListView.View>
+	</ListView>
+</Window>

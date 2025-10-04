@@ -20,6 +20,14 @@ namespace HEMA
 
 		public int GivenScore { get; set; }
 
+		public int DoubleHits { get; set; }
+
+		public int Violations { get; set; }
+
+		public double Elapsed { get; set; }
+
+		public TimeSpan Time => TimeSpan.FromMilliseconds(Elapsed);
+
 		public int TakenScore { get; set; }
 	}
 }

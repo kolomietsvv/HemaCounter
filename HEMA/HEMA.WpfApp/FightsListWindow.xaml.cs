@@ -1,8 +1,13 @@
-﻿using System.Windows;
+﻿using System.IO;
+using System.Text.Json;
+using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+
+using Microsoft.Win32;
 
 namespace HEMA.WpfApp
 {
@@ -29,6 +34,8 @@ namespace HEMA.WpfApp
 			{
 				MainWindow.SetEnumerator(fight.RedName, fight.BlueName);
 			}
+			MainWindow.RaitingWindow.Close();
+			Close();
 		}
 
 		private void List_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -97,6 +104,120 @@ namespace HEMA.WpfApp
 				current = VisualTreeHelper.GetParent(current);
 
 			return (current as ListViewItem)?.DataContext;
+		}
+
+		private async void AddFightsButton_Click(object sender, RoutedEventArgs e)
+		{
+			var fileDialog = new OpenFileDialog
+			{
+				Title = "Выберите файл",
+				Filter = "JSON файлы(*.json)|*.json"
+			};
+
+			if (fileDialog.ShowDialog().GetValueOrDefault())
+			{
+				var extension = Path.GetExtension(fileDialog.FileName);
+				var json = await File.ReadAllTextAsync(fileDialog.FileName);
+				var fights = JsonSerializer.Deserialize<List<Fight>>(json);
+				foreach (var fight in fights!)
+				{
+					MainWindow.Fights.Add(fight);
+					MainWindow.OpenRaitingButton_Click(null!, null!);
+				}
+			}
+		}
+
+		private void Window_KeyDown(object sender, KeyEventArgs e)
+		{
+			switch (e.Key)
+			{
+				case Key.Escape:
+					if (FilterPopup.IsOpen)
+					{
+						FilterPopup.IsOpen = false;
+					}
+					else
+					{
+						Close();
+					}
+					return;
+				case Key.Enter:
+					ApplyFilter_Click(null!, null!);
+					return;
+				case Key.F:
+					if (!FilterPopup.IsOpen)
+					{
+						Filter_Click(null!, null!);
+						e.Handled = true;
+					}
+					return;
+				case Key.OemPlus:
+					AddFightsButton_Click(null!, null!);
+					return;
+				case Key.F7:
+					ResetFilter_Click(null!, null!);
+					return;
+			}
+		}
+
+		/// <summary>
+		/// Не работает, написано нейронкой
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ExportButton_Click(object sender, RoutedEventArgs e)
+		{
+			ExcelExporter.ExportListViewToExcel(FightsListView, "Бои");
+		}
+
+		private void Filter_Click(object sender, RoutedEventArgs e)
+		{
+			if (!FilterPopup.IsOpen)
+			{
+				FilterPopup.IsOpen = true;
+				FilterNameBox.Focus();
+			}
+		}
+
+		private void ApplyFilter_Click(object sender, RoutedEventArgs e)
+		{
+			if (!FilterPopup.IsOpen)
+			{
+				return;
+			}
+			string nameFilter = FilterNameBox.Text.Trim().ToLower();
+
+			var view = CollectionViewSource.GetDefaultView(FightsListView.ItemsSource);
+			view.Filter = fightObj =>
+			{
+				if (fightObj is Fight fight)
+				{
+					bool nameMatch = string.IsNullOrEmpty(nameFilter)
+									 || fight.RedName.ToLower().Contains(nameFilter)
+									 || fight.BlueName.ToLower().Contains(nameFilter);
+					return nameMatch;
+				}
+				return false;
+			};
+
+			view.Refresh();
+			FilterPopup.IsOpen = false;
+		}
+
+		private void ResetFilter_Click(object sender, RoutedEventArgs e)
+		{
+			if (!FilterPopup.IsOpen)
+			{
+				return;
+			}
+
+			FilterNameBox.Text = string.Empty;
+
+			var view = CollectionViewSource.GetDefaultView(FightsListView.ItemsSource);
+			view.Filter = null;
+			view.Refresh();
+
+			FilterPopup.IsOpen = false;
 		}
 	}
 }

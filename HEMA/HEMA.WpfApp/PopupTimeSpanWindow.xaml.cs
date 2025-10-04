@@ -1,7 +1,6 @@
 ﻿using System.ComponentModel;
-using System.Globalization;
 using System.Windows;
-using System.Windows.Data;
+using System.Windows.Input;
 
 namespace HEMA.WpfApp
 {
@@ -34,10 +33,12 @@ namespace HEMA.WpfApp
 			InitializeComponent();
 			DataContext = this;
 			if (initial.HasValue) Value = initial.Value;
+			TimeBox.Focus();
 		}
 
 		private void Window_Loaded(object sender, RoutedEventArgs e)
 		{
+			this.Focus();
 			var wa = SystemParameters.WorkArea;
 			Left = wa.Right - Width - 16;
 			Top = wa.Bottom - Height - 16;
@@ -89,5 +90,28 @@ namespace HEMA.WpfApp
 
 		public event PropertyChangedEventHandler PropertyChanged;
 		private void OnPropertyChanged(string n) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(n));
+
+		private void Window_KeyDown(object sender, KeyEventArgs e)
+		{
+			switch (e.Key)
+			{
+				case Key.Escape:
+					Cancel_Click(sender, e);
+					return;
+				case Key.Enter:
+					Ok_Click(sender, e);
+					return;
+				case Key.OemPlus:
+				case Key.Add:
+					Plus10s_Click(sender, e);
+					e.Handled = true;
+					return;
+				case Key.OemMinus:
+				case Key.Subtract:
+					Minus10s_Click(sender, e);
+					e.Handled = true;
+					return;
+			}
+		}
 	}
 }

@@ -3,8 +3,11 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Media;
+using System.Security.Policy;
 using System.Text.Json;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 
 using HEMA.Models;
@@ -25,7 +28,6 @@ namespace HEMA.WpfApp
 		private Fight nextFight;
 		private UserDeclines userDeclines;
 		private FightsListWindow fightsListWindow;
-		private RaitingWindow raitingWindow;
 		private IEnumerator<Fight> enumerator;
 		private string currentFolder;
 		private MediaPlayer[] mediaPlayers;
@@ -34,8 +36,10 @@ namespace HEMA.WpfApp
 				new TimerAlarmLight { TotalSeconds = 105},
 				new TimerAlarmLight { TotalSeconds = 120, PauseFight = true }
 			];
+		private const int MinAvailableScore = -2;
 
 		public event PropertyChangedEventHandler? PropertyChanged;
+		public RaitingWindow RaitingWindow { get; private set; }
 		public ObservableCollection<Fight> Fights { get; }
 		public ObservableCollection<Fighter> Raiting { get; }
 
@@ -66,11 +70,11 @@ namespace HEMA.WpfApp
 
 			Fights = new ObservableCollection<Fight>();
 			Raiting = new ObservableCollection<Fighter>();
-			InitFights(["Боец 1", "Боец 2", "Боец 3"]);
+			InitFights(["Боец 1", "Боец 2", "Боец 3"], 3);
 
 			DataContext = this;
 			fightsListWindow = new FightsListWindow(this);
-			raitingWindow = new RaitingWindow(this);
+			RaitingWindow = new RaitingWindow(this);
 		}
 
 		private async void ShowPopupTime_Click(object sender, RoutedEventArgs e)
@@ -130,14 +134,14 @@ namespace HEMA.WpfApp
 					currentFolder = Path.GetDirectoryName(fileDialog.FileName);
 					var json = await File.ReadAllTextAsync(fileDialog.FileName);
 					var fights = JsonSerializer.Deserialize<List<Fight>>(json);
-					SetupFights(fights);
+					SetupFights(fights, new RelayCommand<Fight>(OnEditFight));
 					return;
 				}
 				if (folderDialog.ShowDialog().GetValueOrDefault())
 				{
 					string filePath = fileDialog.FileName;
 					var names = await File.ReadAllLinesAsync(filePath);
-					InitFights(names);
+					InitFights(names, 3);
 					currentFolder = folderDialog.FolderName;
 					await TrySaveStateAsync(init: true);
 				}
@@ -168,6 +172,11 @@ namespace HEMA.WpfApp
 			if (Fight.IsScoreChangeEnabled)
 			{
 				Fight.BlueScore--;
+				if (Fight.BlueScore <= MinAvailableScore)
+				{
+					BlueScoreLbl.Foreground = Brushes.Red;
+					DisplayFinishFightDialog(TextCollection.Ensure, FinishCause.Manual);
+				}
 			}
 		}
 
@@ -176,6 +185,11 @@ namespace HEMA.WpfApp
 			if (Fight.IsScoreChangeEnabled)
 			{
 				Fight.RedScore--;
+				if (Fight.RedScore <= MinAvailableScore)
+				{
+					RedScoreLbl.Foreground = Brushes.Red;
+					DisplayFinishFightDialog(TextCollection.Ensure, FinishCause.Manual);
+				}
 			}
 		}
 
@@ -184,6 +198,10 @@ namespace HEMA.WpfApp
 			if (Fight.IsScoreChangeEnabled)
 			{
 				Fight.BlueScore++;
+				if (Fight.BlueScore > MinAvailableScore && BlueScoreLbl.Foreground == Brushes.Red)
+				{
+					BlueScoreLbl.Foreground = Brushes.White;
+				}
 			}
 		}
 
@@ -192,6 +210,10 @@ namespace HEMA.WpfApp
 			if (Fight.IsScoreChangeEnabled)
 			{
 				Fight.RedScore++;
+				if (Fight.RedScore > MinAvailableScore && RedScoreLbl.Foreground == Brushes.Red)
+				{
+					RedScoreLbl.Foreground = Brushes.White;
+				}
 			}
 		}
 
@@ -211,27 +233,47 @@ namespace HEMA.WpfApp
 		private void DecreaseRedViolations(object sender, EventArgs e)
 		{
 			Fight.RedViolations--;
+			if (Fight.RedScore > MinAvailableScore && RedScoreLbl.Foreground == Brushes.Red)
+			{
+				RedScoreLbl.Foreground = Brushes.White;
+			}
+
 		}
 
 		private void IncreaseRedViolations(object sender, EventArgs e)
 		{
 			Fight.RedViolations++;
+			if (Fight.RedScore <= MinAvailableScore)
+			{
+				RedScoreLbl.Foreground = Brushes.Red;
+				DisplayFinishFightDialog(TextCollection.Ensure, FinishCause.Manual);
+			}
 		}
 
 		private void DecreaseBlueViolations(object sender, EventArgs e)
 		{
 			Fight.BlueViolations--;
+			if (Fight.BlueScore > MinAvailableScore && BlueScoreLbl.Foreground == Brushes.Red)
+			{
+				BlueScoreLbl.Foreground = Brushes.White;
+			}
 		}
 
 		private void IncreaseBlueViolations(object sender, EventArgs e)
 		{
 			Fight.BlueViolations++;
+			if (Fight.BlueScore <= MinAvailableScore)
+			{
+				BlueScoreLbl.Foreground = Brushes.Red;
+				DisplayFinishFightDialog(TextCollection.Ensure, FinishCause.Manual);
+			}
 		}
 
 		private void OpenFightsList(object sender, RoutedEventArgs e)
 		{
 			if (!fightsListWindow.IsLoaded)
 			{
+				OpenRaitingButton_Click(null!, null!);
 				fightsListWindow = new(this);
 				fightsListWindow.Show();
 			}
@@ -242,7 +284,7 @@ namespace HEMA.WpfApp
 			}
 		}
 
-		private void OpenRaitingButton_Click(object sender, RoutedEventArgs e)
+		public void OpenRaitingButton_Click(object sender, RoutedEventArgs e)
 		{
 			var fighters = Fights
 				.SelectMany<Fight, string>(fight => [fight.RedName, fight.BlueName])
@@ -252,20 +294,80 @@ namespace HEMA.WpfApp
 
 			foreach (var fight in Fights)
 			{
+				fight.RedRaitingChange = "0";
+				fight.BlueRaitingChange = "0";
+
+				if (fight.RedScore <= MinAvailableScore)
+				{
+					fighters[fight.RedName].WinsCoefficient -= 2;
+					fight.RedRaitingChange = "-2";
+					if (fight.BlueScore > MinAvailableScore)
+					{
+						fighters[fight.BlueName].WinsCoefficient += 1;
+						fight.BlueRaitingChange = "+1";
+					}
+					else
+					{
+						fighters[fight.BlueName].WinsCoefficient -= 2;
+						fight.BlueRaitingChange = "-2";
+					}
+					continue;
+				}
+				if (fight.BlueScore <= MinAvailableScore)
+				{
+					fighters[fight.BlueName].WinsCoefficient -= 2;
+					fight.BlueRaitingChange = "-2";
+					if (fight.RedScore > MinAvailableScore)
+					{
+						fighters[fight.RedName].WinsCoefficient += 1;
+						fight.RedRaitingChange = "+1";
+					}
+					else
+					{
+						fighters[fight.RedName].WinsCoefficient -= 2;
+						fight.RedRaitingChange = "-2";
+					}
+					continue;
+				}
 				if (fight.DoubleHits >= fight.MaxDoubleHits)
 				{
 					fighters[fight.RedName].WinsCoefficient -= 2;
 					fighters[fight.BlueName].WinsCoefficient -= 2;
+					fight.RedRaitingChange = "-2";
+					fight.BlueRaitingChange = "-2";
+					continue;
 				}
-				else if (fight.RedScore > fight.BlueScore)
+				if (fight.RedScore == 10 && fight.BlueScore == 0)
+				{
+					fighters[fight.RedName].WinsCoefficient += 2;
+					fighters[fight.BlueName].WinsCoefficient -= 1;
+					fight.RedRaitingChange = "+2";
+					fight.BlueRaitingChange = "-1";
+					continue;
+				}
+				if (fight.BlueScore == 10 && fight.RedScore == 0)
+				{
+					fighters[fight.BlueName].WinsCoefficient += 2;
+					fighters[fight.RedName].WinsCoefficient -= 1;
+					fight.BlueRaitingChange = "+2";
+					fight.RedRaitingChange = "-1";
+					continue;
+				}
+				if (fight.RedScore > fight.BlueScore)
 				{
 					fighters[fight.RedName].WinsCoefficient += 1;
 					fighters[fight.BlueName].WinsCoefficient -= 1;
+					fight.RedRaitingChange = "+1";
+					fight.BlueRaitingChange = "-1";
+					continue;
 				}
-				else if (fight.BlueScore > fight.RedScore)
+				if (fight.BlueScore > fight.RedScore)
 				{
 					fighters[fight.BlueName].WinsCoefficient += 1;
 					fighters[fight.RedName].WinsCoefficient -= 1;
+					fight.BlueRaitingChange = "+1";
+					fight.RedRaitingChange = "-1";
+					continue;
 				}
 			}
 
@@ -277,9 +379,18 @@ namespace HEMA.WpfApp
 				var fightsAsRed = Fights.Where(fight => fight.RedName == fighter.Key);
 				var givenAsRed = fightsAsRed.Sum(fight => fight.RedScore);
 				var takenAsRed = fightsAsRed.Sum(fight => fight.BlueScore);
+				var doubleHitsAsBlue = fightsAsBlue.Sum(fight => fight.DoubleHits);
+				var doubleHistAsRed = fightsAsRed.Sum(fight => fight.DoubleHits);
+				var violationsAsBlue = fightsAsBlue.Sum(fight => fight.BlueViolations);
+				var violationsAsRed = fightsAsRed.Sum(fight => fight.RedViolations);
+				var elapsedAsBlue = fightsAsBlue.Sum(fight => fight.Elapsed.TotalMilliseconds);
+				var elapsedAsRed = fightsAsRed.Sum(fight => fight.Elapsed.TotalMilliseconds);
 
 				fighter.Value.GivenScore = givenAsBlue + givenAsRed;
 				fighter.Value.TakenScore = takenAsBlue + takenAsRed;
+				fighter.Value.DoubleHits = doubleHitsAsBlue + doubleHistAsRed;
+				fighter.Value.Violations = violationsAsBlue + violationsAsRed;
+				fighter.Value.Elapsed = elapsedAsBlue + elapsedAsRed;
 			}
 
 			Raiting.Clear();
@@ -287,22 +398,25 @@ namespace HEMA.WpfApp
 				.Values
 				.OrderByDescending(fighter => fighter.WinsCoefficient)
 				.ThenByDescending(fighter => fighter.GivenTakenCoefficient)
-				.ThenByDescending(fighter => fighter.GivenScore))
+				.ThenByDescending(fighter => fighter.GivenScore)
+				.ThenBy(fighter => fighter.DoubleHits)
+				.ThenBy(fighter => fighter.Violations)
+				.ThenBy(fighter => fighter.Elapsed))
 			{
 				Raiting.Add(fighter);
 			}
 
 			if (sender != null)
 			{
-				if (!raitingWindow.IsLoaded)
+				if (!RaitingWindow.IsLoaded)
 				{
-					raitingWindow = new(this);
-					raitingWindow.Show();
+					RaitingWindow = new(this);
+					RaitingWindow.Show();
 				}
 				else
 				{
-					raitingWindow.WindowState = WindowState.Normal;
-					raitingWindow.Focus();
+					RaitingWindow.WindowState = WindowState.Normal;
+					RaitingWindow.Focus();
 				}
 			}
 		}
@@ -332,7 +446,7 @@ namespace HEMA.WpfApp
 				Fight.IsCompleted = true;
 				await TrySaveStateAsync();
 				SetCurrentAndNextFights();
-				OpenRaitingButton_Click(null, null);
+				OpenRaitingButton_Click(null!, null!);
 				userDeclines.Reset();
 			}
 
@@ -355,6 +469,8 @@ namespace HEMA.WpfApp
 			fight.IsCompleted = false;
 			Fight = fight;
 			SetEnumerator(fight.RedName, fight.BlueName);
+			fightsListWindow.Close();
+			Focus();
 		}
 
 		private async Task ExecuteGitCmdAsync(string folderPath, bool init = false)
@@ -375,20 +491,19 @@ namespace HEMA.WpfApp
 			await process.WaitForExitAsync();
 		}
 
-		private void InitFights(IEnumerable<string> names)
+		private void InitFights(IEnumerable<string> names, int maxDoubleHits)
 		{
 			var fights = FightsListFactory.CreateFights(
 				names.Select(name => new Fighter { Name = name }).ToList(),
 				new FightSettings()
 				{
-					DoubleHitsInARow = 5,
-					DoubleHitsCommon = 5
-				},
-				new RelayCommand<Fight>(OnEditFight));
-			SetupFights(fights);
+					DoubleHitsInARow = maxDoubleHits,
+					DoubleHitsCommon = maxDoubleHits
+				});
+			SetupFights(fights, new RelayCommand<Fight>(OnEditFight));
 		}
 
-		private void SetupFights(IEnumerable<Fight> fights)
+		private void SetupFights(IEnumerable<Fight> fights, ICommand editFightCommand)
 		{
 			Fights.Clear();
 			foreach (var fight in fights)
@@ -397,6 +512,7 @@ namespace HEMA.WpfApp
 				fight.MaxDoubleHitsReached += () => DisplayFinishFightDialog(TextCollection.MaxDoubleHits, FinishCause.DoubleHits);
 				fight.TimerTick += PlaySound;
 				fight.TimerAlarms = ttmerAlarms;
+				fight.EditFightCommand = editFightCommand;
 				Fights.Add(fight);
 			}
 
@@ -439,20 +555,29 @@ namespace HEMA.WpfApp
 			{
 				Fight = enumerator.Current;
 				DoubleHitlLbl.Foreground = Brushes.Black;
+				BlueScoreLbl.Foreground = Brushes.White;
+				RedScoreLbl.Foreground = Brushes.White;
 			}
 
-			do
+			try
 			{
-				enumerator.MoveNext();
-			} while ((enumerator.Current?.IsCompleted).GetValueOrDefault());
+				do
+				{
+					enumerator.MoveNext();
+				} while ((enumerator.Current?.IsCompleted).GetValueOrDefault());
 
-			if (enumerator.Current != null && !enumerator.Current.IsCompleted)
-			{
-				NextFight = enumerator.Current;
+				if (enumerator.Current != null && !enumerator.Current.IsCompleted)
+				{
+					NextFight = enumerator.Current;
+				}
+				else
+				{
+					NextFight = new(string.Empty, string.Empty, Fight.Settings);
+				}
 			}
-			else
+			catch (Exception ex)
 			{
-				NextFight = new(string.Empty, string.Empty, Fight.Settings);
+				Console.WriteLine(ex);
 			}
 		}
 
@@ -466,6 +591,66 @@ namespace HEMA.WpfApp
 				}
 				Application.Current.Dispatcher.Invoke(mediaPlayers[fight.NextAlarmIndex].Play);
 				fight.NextAlarmIndex++;
+			}
+		}
+
+		private void Window_KeyDown(object sender, KeyEventArgs e)
+		{
+			switch (e.Key)
+			{
+				case Key.Q:
+					IncreaseRedScore(sender, e);
+					return;
+				case Key.A:
+					DecreaseRedScore(sender, e);
+					return;
+				case Key.OemCloseBrackets:
+					IncreaseBlueScore(sender, e);
+					return;
+				case Key.OemQuotes:
+					DecreaseBlueScore(sender, e);
+					return;
+				case Key.W:
+					DecreaseBlueViolations(sender, e);
+					return;
+				case Key.S:
+					DecreaseRedViolations(sender, e);
+					return;
+				case Key.X:
+					DecreaseDoubleHits(sender, e);
+					return;
+				case Key.OemOpenBrackets:
+					IncreaseBlueViolations(sender, e);
+					return;
+				case Key.OemSemicolon:
+					IncreaseRedViolations(sender, e);
+					return;
+				case Key.OemPeriod:
+					IncreaseDoubleHits(sender, e);
+					return;
+				case Key.Enter:
+					DisplayFinishFightDialog(TextCollection.Ensure, FinishCause.Manual);
+					return;
+				case Key.Space:
+					StartTimer(sender, e);
+					return;
+				case Key.T:
+				case Key.N:
+					ShowPopupTime_Click(sender, e);
+					e.Handled = true;
+					return;
+				case Key.O:
+				case Key.J:
+					OpenFileButton_Click(sender, e);
+					return;
+				case Key.L:
+					OpenRaitingButton_Click(sender, e);
+					return;
+				case Key.D:
+				case Key.B:
+					OpenFightsList(sender, e);
+					return;
+
 			}
 		}
 	}

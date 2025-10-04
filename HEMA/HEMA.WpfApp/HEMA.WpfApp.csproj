@@ -9,6 +9,10 @@
  </PropertyGroup>
 
  <ItemGroup>
+   <PackageReference Include="ClosedXML" Version="0.105.0" />
+ </ItemGroup>
+
+ <ItemGroup>
    <ProjectReference Include="..\HEMA.Common\HEMA.Common.csproj" />
  </ItemGroup>
 

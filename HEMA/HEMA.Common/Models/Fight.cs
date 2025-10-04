@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text.Json.Serialization;
 using System.Threading;
@@ -27,6 +25,8 @@ namespace HEMA
 
 		private string redName;
 		private string blueName;
+		private string redRaitingChange;
+		private string blueRaitingChange;
 		private int originalIndex;
 		private bool isCompleted;
 		private int nextAlarmIndex;
@@ -92,6 +92,26 @@ namespace HEMA
 			{
 				blueName = value;
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BlueName)));
+			}
+		}
+
+		public string RedRaitingChange
+		{
+			get => redRaitingChange;
+			set
+			{
+				redRaitingChange = value;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(RedRaitingChange)));
+			}
+		}
+
+		public string BlueRaitingChange
+		{
+			get => blueRaitingChange;
+			set
+			{
+				blueRaitingChange = value;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(BlueRaitingChange)));
 			}
 		}
 

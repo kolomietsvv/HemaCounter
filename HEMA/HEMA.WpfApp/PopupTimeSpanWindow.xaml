@@ -8,7 +8,8 @@
         Topmost="True" ShowInTaskbar="False"
         AllowsTransparency="True" Opacity="0.98"
         ShowActivated="False"
-        Loaded="Window_Loaded">
+        Loaded="Window_Loaded"
+		KeyDown="Window_KeyDown">
 	<Window.Resources>
 		<local:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter" />
 		<Style TargetType="TextBox">
@@ -18,6 +19,7 @@
 			<Setter Property="HorizontalContentAlignment" Value="Center"/>
 		</Style>
 		<Style TargetType="Button">
+			<Setter Property="Focusable" Value="False"/>
 			<Setter Property="FontSize" Value="16"/>
 			<Setter Property="Padding" Value="12,8"/>
 			<Setter Property="Margin" Value="0,0,10,0"/>
@@ -29,7 +31,8 @@
 			<TextBlock Text="Введите время (мм:сс)" Opacity="0.85" FontSize="18" HorizontalAlignment="Center"/>
 			<TextBox x:Name="TimeBox" Width="120">
 				<TextBox.Text>
-					<Binding  Path="Value"
+					<Binding 
+						Path="Value"
 						Mode="TwoWay"
 						UpdateSourceTrigger="Explicit"
 						ValidatesOnDataErrors="True"

@@ -19,5 +19,13 @@ namespace HEMA.WpfApp
 			MainWindow = mainWindow;
 			DataContext = mainWindow;
 		}
+
+		private void Window_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Escape)
+			{
+				this.Close();
+			}
+		}
 	}
 }

@@ -5,114 +5,351 @@
 		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 		xmlns:local="clr-namespace:HEMA.WpfApp"
 		mc:Ignorable="d"
-        Title="Список боёв" Height="450" Width="1500">
+		Title="Список боёв"
+		Height="450" Width="1535"
+		KeyDown="Window_KeyDown"
+		UseLayoutRounding="True"
+		SnapsToDevicePixels="True">
+
 	<Window.Resources>
 		<local:InverseBoolConverter x:Key="InverseBoolConverter"/>
 		<local:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter"/>
+
+		<!-- Заголовки -->
+		<DataTemplate x:Key="HeaderNeutral">
+			<Border Background="#EEE" Padding="6,3">
+				<TextBlock Text="{Binding}" FontWeight="Bold"/>
+			</Border>
+		</DataTemplate>
+
+		<DataTemplate x:Key="HeaderRed">
+			<Border Background="PaleVioletRed" Padding="6,3">
+				<TextBlock Text="{Binding}" FontWeight="Bold"/>
+			</Border>
+		</DataTemplate>
+
+		<DataTemplate x:Key="HeaderBlue">
+			<Border Background="LightSkyBlue" Padding="6,3">
+				<TextBlock Text="{Binding}" FontWeight="Bold"/>
+			</Border>
+		</DataTemplate>
+		<Style TargetType="Button">
+			<Setter Property="Focusable" Value="False"/>
+			<Setter Property="FontFamily" Value="{StaticResource UiFont}" />
+			<Setter Property="Cursor" Value="Hand" />
+			<Setter Property="SnapsToDevicePixels" Value="True" />
+			<Setter Property="Template">
+				<Setter.Value>
+					<ControlTemplate TargetType="Button">
+						<Border x:Name="root"
+                        Background="{TemplateBinding Background}"
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        CornerRadius="5">
+							<Grid>
+								<!-- Основное содержимое кнопки -->
+								<ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Margin="{TemplateBinding Padding}" />
+								<!-- Маленькая буква в левом нижнем углу -->
+								<TextBlock Text="{TemplateBinding Tag}"
+                                   FontSize="12"
+                                   Foreground="{TemplateBinding Foreground}"
+                                   VerticalAlignment="Bottom"
+                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                   Margin="5"/>
+							</Grid>
+						</Border>
+						<ControlTemplate.Triggers>
+							<Trigger Property="IsMouseOver" Value="True">
+								<Setter TargetName="root" Property="BorderBrush" Value="#D1D5DB" />
+								<Setter TargetName="root" Property="Background" Value="#FAFAFA" />
+							</Trigger>
+							<Trigger Property="IsPressed" Value="True">
+								<Setter TargetName="root" Property="Background" Value="#F3F4F6" />
+							</Trigger>
+							<Trigger Property="IsEnabled" Value="False">
+								<Setter Property="Opacity" Value="0.4" />
+							</Trigger>
+						</ControlTemplate.Triggers>
+					</ControlTemplate>
+				</Setter.Value>
+			</Setter>
+		</Style>
 	</Window.Resources>
-	<ListView ItemsSource="{Binding Fights}" 
-			  HorizontalAlignment="Stretch" 
-			  FontSize="25" 
-			 AllowDrop="True"
-			 PreviewMouseLeftButtonDown="List_PreviewMouseLeftButtonDown"
-			 PreviewMouseMove="List_PreviewMouseMove"
-			 DragOver="List_DragOver"
-			 Drop="List_Drop"
-			 Cursor="SizeNS">
-		<ListView.View>
-			<GridView>
-				<GridViewColumn DisplayMemberBinding="{Binding OriginalIndex}" Width="40"/>
-				<GridViewColumn Header ="Имя" Width="300">
-					<GridViewColumn.CellTemplate>
-						<DataTemplate>
-							<Border Background ="PaleVioletRed">
-								<TextBlock TextAlignment="Left" Text="{Binding RedName}" />
-							</Border>
-						</DataTemplate>
-					</GridViewColumn.CellTemplate>
-				</GridViewColumn>
-				<GridViewColumn Header ="Нанес." Width="100">
-					<GridViewColumn.CellTemplate>
-						<DataTemplate>
-							<Border Background ="PaleVioletRed">
-								<TextBlock Text="{Binding RedScore}" />
-							</Border>
-						</DataTemplate>
-					</GridViewColumn.CellTemplate>
-				</GridViewColumn>
-				<GridViewColumn Header ="Время" Width="150">
-					<GridViewColumn.CellTemplate>
-						<DataTemplate>
-							<Border>
-								<TextBlock TextAlignment="Center" Text="{Binding Elapsed, Converter={StaticResource TimeSpanToStringConverter}}" />
-							</Border>
-						</DataTemplate>
-					</GridViewColumn.CellTemplate>
-				</GridViewColumn>
-				<GridViewColumn Header ="Нанес." Width="100">
-					<GridViewColumn.CellTemplate>
-						<DataTemplate>
-							<Border HorizontalAlignment="Right" Background ="LightSkyBlue">
-								<TextBlock TextAlignment="Right" Text="{Binding BlueScore}" />
-							</Border>
-						</DataTemplate>
-					</GridViewColumn.CellTemplate>
-				</GridViewColumn>
-				<GridViewColumn Header ="Имя" Width="300">
-					<GridViewColumn.CellTemplate>
-						<DataTemplate>
-							<Border Background ="LightSkyBlue">
-								<TextBlock Text="{Binding BlueName}" />
-							</Border>
-						</DataTemplate>
-					</GridViewColumn.CellTemplate>
-				</GridViewColumn>
-				<GridViewColumn DisplayMemberBinding="{Binding DoubleHits}" Header ="Обоюдн." Width="100"/>
-				<GridViewColumn Header ="Предупр." Width="120">
-					<GridViewColumn.CellTemplate>
-						<DataTemplate>
-							<Border Background ="PaleVioletRed">
-								<TextBlock Text="{Binding RedViolations}" />
-							</Border>
-						</DataTemplate>
-					</GridViewColumn.CellTemplate>
-				</GridViewColumn>
-				<GridViewColumn Header ="Предупр." Width="120">
-					<GridViewColumn.CellTemplate>
-						<DataTemplate>
-							<Border Background ="LightSkyBlue">
-								<TextBlock Text="{Binding BlueViolations}" />
-							</Border>
-						</DataTemplate>
-					</GridViewColumn.CellTemplate>
-				</GridViewColumn>
-				<GridViewColumn Width="130">
-					<GridViewColumn.CellTemplate>
-						<DataTemplate>
-							<Button 
-                                Content="Запустить" 
-                                Click="FightButton_Click" 
-                                CommandParameter="{Binding}"
-								IsEnabled="{Binding IsCompleted, Converter={StaticResource InverseBoolConverter}}"
-                                HorizontalAlignment="Stretch"
-								Cursor="Hand"/>
-						</DataTemplate>
-					</GridViewColumn.CellTemplate>
-				</GridViewColumn>
-			</GridView>
-		</ListView.View>
-		<ListView.ItemContainerStyle>
-			<Style TargetType="ListViewItem">
-				<Setter Property="ContextMenu">
-					<Setter.Value>
-						<ContextMenu>
-							<MenuItem Header="Редактировать"
-                                  Command="{Binding EditFightCommand}"
-                                  CommandParameter="{Binding}" />
-						</ContextMenu>
-					</Setter.Value>
-				</Setter>
-			</Style>
-		</ListView.ItemContainerStyle>
-	</ListView>
+
+	<Grid>
+		<!-- Список боёв -->
+		<ListView ItemsSource="{Binding Fights}"
+				  HorizontalAlignment="Stretch"
+				  FontSize="25"
+				  AllowDrop="True"
+				  PreviewMouseLeftButtonDown="List_PreviewMouseLeftButtonDown"
+				  PreviewMouseMove="List_PreviewMouseMove"
+				  DragOver="List_DragOver"
+				  Drop="List_Drop"
+				  Cursor="SizeNS"
+				  x:Name="FightsListView">
+
+			<ListView.View>
+				<GridView>
+
+					<GridViewColumn DisplayMemberBinding="{Binding OriginalIndex}"
+									Width="45"
+									Header="№"
+									HeaderTemplate="{StaticResource HeaderNeutral}"/>
+
+					<!-- Имя (Red) -->
+					<GridViewColumn Header="Имя" Width="300"
+									HeaderTemplate="{StaticResource HeaderRed}">
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<Grid HorizontalAlignment="Stretch">
+									<TextBlock Text="{Binding RedName}"
+											   TextTrimming="CharacterEllipsis"
+											   TextAlignment="Right"
+											   HorizontalAlignment="Right"
+											   Margin="0,3,6,18"/>
+									<TextBlock Text="{Binding RedRaitingChange}"
+											   HorizontalAlignment="Right"
+											   VerticalAlignment="Bottom"
+											   Margin="0,0,6,3"
+											   FontSize="14"
+											   Opacity="0.6"/>
+								</Grid>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<GridViewColumn Header="Нанес." Width="95"
+									HeaderTemplate="{StaticResource HeaderRed}">
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding RedScore}"
+										   TextAlignment="Right"
+										   HorizontalAlignment="Right"
+										   Margin="6,0,6,0"/>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<GridViewColumn Header="Время" Width="150"
+									HeaderTemplate="{StaticResource HeaderNeutral}">
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBlock TextAlignment="Center"
+										   Text="{Binding Elapsed, Converter={StaticResource TimeSpanToStringConverter}}"/>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<GridViewColumn Header="Нанес." Width="95"
+									HeaderTemplate="{StaticResource HeaderBlue}">
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBlock TextAlignment="Right"
+										   HorizontalAlignment="Right"
+										   Text="{Binding BlueScore}"
+										   Margin="6,0,6,0"/>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<!-- Имя (Blue) -->
+					<GridViewColumn Header="Имя" Width="300"
+									HeaderTemplate="{StaticResource HeaderBlue}">
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<Grid HorizontalAlignment="Stretch">
+									<TextBlock Text="{Binding BlueName}"
+											   TextTrimming="CharacterEllipsis"
+											   TextAlignment="Left"
+											   HorizontalAlignment="Left"
+											   Margin="6,3,6,18"/>
+									<TextBlock Text="{Binding BlueRaitingChange}"
+											   HorizontalAlignment="Left"
+											   VerticalAlignment="Bottom"
+											   Margin="6,0,0,3"
+											   FontSize="14"
+											   Opacity="0.6"/>
+								</Grid>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<GridViewColumn Header="Обоюдн." Width="130"
+									HeaderTemplate="{StaticResource HeaderNeutral}">
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding DoubleHits}"
+										   HorizontalAlignment="Center"
+										   Margin="6,0,6,0"/>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<GridViewColumn Header="Предупр." Width="130"
+									HeaderTemplate="{StaticResource HeaderRed}">
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding RedViolations}"
+										   HorizontalAlignment="Center"
+										   Margin="6,0,6,0"/>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<GridViewColumn Header="Предупр." Width="130"
+									HeaderTemplate="{StaticResource HeaderBlue}">
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding BlueViolations}"
+										   HorizontalAlignment="Center"
+										   Margin="6,0,6,0"/>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<GridViewColumn Width="130" Header=""
+									HeaderTemplate="{StaticResource HeaderNeutral}">
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<Button Content="Запустить"
+										Click="FightButton_Click"
+										CommandParameter="{Binding}"
+										IsEnabled="{Binding IsCompleted, Converter={StaticResource InverseBoolConverter}}"
+										HorizontalAlignment="Stretch"
+										Cursor="Hand"/>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+				</GridView>
+			</ListView.View>
+
+			<!-- Контейнеры элементов -->
+			<ListView.ItemContainerStyle>
+				<Style TargetType="ListViewItem">
+					<!-- Ключевая правка: растягиваем содержимое ячеек -->
+					<Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+					<Setter Property="VerticalContentAlignment" Value="Stretch"/>
+					<Setter Property="Padding" Value="0"/>
+					<Setter Property="ContextMenu">
+						<Setter.Value>
+							<ContextMenu>
+								<MenuItem Header="Редактировать"
+										  Command="{Binding EditFightCommand}"
+										  CommandParameter="{Binding}" />
+							</ContextMenu>
+						</Setter.Value>
+					</Setter>
+				</Style>
+			</ListView.ItemContainerStyle>
+		</ListView>
+
+		<StackPanel Orientation="Horizontal">
+			<!-- Кнопка + -->
+			<Button Content="+" 
+				Tag="+"
+				HorizontalContentAlignment="Right" 
+				Width="60" Height="60" 
+				FontSize="27" 
+				HorizontalAlignment="Left" 
+				VerticalAlignment="Bottom" 
+				Margin="20"
+				Background="LightGreen"
+				Foreground="White"
+				BorderBrush="DarkGreen"
+				Cursor="Hand"
+				Click="AddFightsButton_Click"/>
+			<!-- Кнопка 🔎 -->
+			<Button Content="🔎" 
+				Tag="F"
+				HorizontalContentAlignment="Right"
+				Width="60" Height="60" 
+				FontSize="27" 
+				HorizontalAlignment="Left" 
+				VerticalAlignment="Bottom" 
+				Margin="20"
+				Background="LightGreen"
+				Foreground="White"
+				BorderBrush="DarkGreen"
+				Cursor="Hand"
+				Click="Filter_Click"/>
+		</StackPanel>
+
+		<Popup x:Name="FilterPopup"
+			StaysOpen="False"
+			AllowsTransparency="True"
+			PopupAnimation="Fade"
+			Placement="Center">
+
+			<Grid HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,0">
+				<Border Background="White"
+					BorderBrush="#CCC"
+					BorderThickness="1"
+					CornerRadius="8"
+					Padding="20"
+					Width="400"
+					Opacity="0">
+					<Border.Triggers>
+						<!-- Анимация плавного появления и движения вниз -->
+						<EventTrigger RoutedEvent="Loaded">
+							<BeginStoryboard>
+								<Storyboard>
+									<DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+												 From="-30" To="0"
+												 Duration="0:0:0.25"
+												 DecelerationRatio="0.8"/>
+									<DoubleAnimation Storyboard.TargetProperty="Opacity"
+												 From="0" To="1"
+												 Duration="0:0:0.25"/>
+								</Storyboard>
+							</BeginStoryboard>
+						</EventTrigger>
+					</Border.Triggers>
+					<Border.RenderTransform>
+						<TranslateTransform Y="0"/>
+					</Border.RenderTransform>
+
+					<StackPanel>
+						<TextBlock Text="Фильтр боёв"
+							   FontSize="20"
+							   FontWeight="Bold"
+							   Margin="0,0,0,10"
+							   HorizontalAlignment="Center"/>
+
+						<!-- Поле поиска по имени -->
+						<StackPanel Orientation="Horizontal" Margin="0,5">
+							<TextBlock Text="Имя:" Width="90" VerticalAlignment="Center"/>
+							<TextBox x:Name="FilterNameBox"
+								 Width="250"
+								 Height="30"
+								 VerticalContentAlignment="Center"
+								 Padding="5"/>
+						</StackPanel>
+
+						<!-- Кнопки действий -->
+						<StackPanel Orientation="Horizontal"
+								HorizontalAlignment="Right"
+								Margin="0,15,0,0">
+							<Button Content="Применить"
+								Width="120"
+								Margin="0,0,10,0"
+								Background="LightGreen"
+								Click="ApplyFilter_Click"
+								HorizontalContentAlignment="Right"
+								Tag="↵"/>
+							<Button Content="Сбросить"
+								Width="100"
+								Background="LightGray"
+								Click="ResetFilter_Click"
+								HorizontalContentAlignment="Right"
+								Tag="f7"/>
+						</StackPanel>
+					</StackPanel>
+				</Border>
+			</Grid>
+		</Popup>
+	</Grid>
 </Window>

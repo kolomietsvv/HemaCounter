@@ -3,7 +3,42 @@
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  xmlns:local="clr-namespace:HEMA.WpfApp"
  StartupUri="MainWindow.xaml">
- <Application.Resources>
- 
- </Application.Resources>
+	<Application.Resources>
+		<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+			<SolidColorBrush x:Key="WindowBackgroundBrush" Color="#1E1E1E"/>
+			<SolidColorBrush x:Key="TitleBarBrush" Color="#2D2D2D"/>
+			<SolidColorBrush x:Key="TitleForegroundBrush" Color="#FFFFFF"/>
+			<Style x:Key="TitleBarButtonStyle" TargetType="Button">
+				<Setter Property="Width" Value="40"/>
+				<Setter Property="Height" Value="32"/>
+				<Setter Property="Foreground" Value="{DynamicResource TitleForegroundBrush}"/>
+				<Setter Property="Background" Value="Transparent"/>
+				<Setter Property="BorderThickness" Value="0"/>
+				<Setter Property="FontSize" Value="16"/>
+				<Setter Property="FontWeight" Value="Bold"/>
+				<Setter Property="Cursor" Value="Hand"/>
+				<Setter Property="Template">
+					<Setter.Value>
+						<ControlTemplate TargetType="Button">
+							<Border Background="{TemplateBinding Background}">
+								<ContentPresenter
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                RecognizesAccessKey="True"/>
+							</Border>
+							<ControlTemplate.Triggers>
+								<Trigger Property="IsMouseOver" Value="True">
+									<Setter Property="Background" Value="#333333"/>
+									<Setter Property="Foreground" Value="#FFFFFF"/>
+								</Trigger>
+								<Trigger Property="IsPressed" Value="True">
+									<Setter Property="Background" Value="#555555"/>
+								</Trigger>
+							</ControlTemplate.Triggers>
+						</ControlTemplate>
+					</Setter.Value>
+				</Setter>
+			</Style>
+		</ResourceDictionary>
+	</Application.Resources>
 </Application>

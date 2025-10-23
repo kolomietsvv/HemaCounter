@@ -34,7 +34,7 @@ namespace HEMA
 		/// Если N нечётное — добавит фиктивного "BYE".
 		/// Возвращает список туров; внутри тура каждый боец дерётся не более одного раза.
 		/// </summary>
-		public static List<List<(string A, string B)>> BuildRounds(IList<string> fighters)
+		private static List<List<(string A, string B)>> BuildRounds(IList<string> fighters)
 		{
 			var F = fighters.ToList();
 			var hadBye = false;
@@ -81,7 +81,7 @@ namespace HEMA
 		/// Преобразует туры в плоский список боёв, стараясь избежать стыков «подряд» между турами.
 		/// Внутри тура порядок пар может быть переупорядочен.
 		/// </summary>
-		public static List<(string A, string B)> FlattenRoundsAvoidBackToBack(List<List<(string A, string B)>> rounds)
+		private static List<(string A, string B)> FlattenRoundsAvoidBackToBack(List<List<(string A, string B)>> rounds)
 		{
 			var schedule = new List<(string A, string B)>();
 			var lastFight = new HashSet<string>();

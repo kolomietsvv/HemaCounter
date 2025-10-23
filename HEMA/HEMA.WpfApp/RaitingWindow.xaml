@@ -17,10 +17,10 @@
 		<ListView.View>
 			<GridView>
 				<GridViewColumn DisplayMemberBinding="{Binding Name}" Header="Имя" Width="250"/>
-				<GridViewColumn DisplayMemberBinding="{Binding WinsCoefficient}" Header="Коэф. побед" Width="200"/>
+				<GridViewColumn DisplayMemberBinding="{Binding WinsCoefficientDisplay}" Header="Коэф. побед" Width="200"/>
 				<GridViewColumn DisplayMemberBinding="{Binding GivenTakenCoefficient}" Header="Нанес. - пропущ." Width="250"/>
-				<GridViewColumn DisplayMemberBinding="{Binding GivenScore}" Header="Нанес." Width="150"/>
-				<GridViewColumn DisplayMemberBinding="{Binding DoubleHits}" Header="Обоюд." Width="150"/>
+				<GridViewColumn DisplayMemberBinding="{Binding GivenScoreDisplay}" Header="Нанес." Width="150"/>
+				<GridViewColumn DisplayMemberBinding="{Binding DoubleHitsDisplay}" Header="Обоюд." Width="150"/>
 				<GridViewColumn DisplayMemberBinding="{Binding Violations}" Header="Предупр." Width="150"/>
 				<GridViewColumn DisplayMemberBinding="{Binding Time}" Header="Время." Width="150"/>
 			</GridView>

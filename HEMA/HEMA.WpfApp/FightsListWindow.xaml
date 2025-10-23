@@ -224,6 +224,28 @@
 						</GridViewColumn.CellTemplate>
 					</GridViewColumn>
 
+					<GridViewColumn Header="Номинация" Width="130"
+									HeaderTemplate="{StaticResource HeaderNeutral}">
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding NominationName}"
+										   HorizontalAlignment="Center"
+										   Margin="6,0,6,0"/>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
+					<GridViewColumn Header="Подгруппа" Width="130"
+									HeaderTemplate="{StaticResource HeaderNeutral}">
+						<GridViewColumn.CellTemplate>
+							<DataTemplate>
+								<TextBlock Text="{Binding SubgroupName}"
+										   HorizontalAlignment="Center"
+										   Margin="6,0,6,0"/>
+							</DataTemplate>
+						</GridViewColumn.CellTemplate>
+					</GridViewColumn>
+
 				</GridView>
 			</ListView.View>
 

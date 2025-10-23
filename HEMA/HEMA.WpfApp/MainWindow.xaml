@@ -1,15 +1,23 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
-<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
-		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
-		xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-		xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-		xmlns:local="clr-namespace:HEMA.WpfApp" 
-		x:Class="HEMA.WpfApp.MainWindow" 
-		mc:Ignorable="d" 
-		Title="Турнир" 
-		Height="450"
-		Width="800"
-		KeyDown="Window_KeyDown">
+﻿<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:local="clr-namespace:HEMA.WpfApp" 
+	x:Class="HEMA.WpfApp.MainWindow" 
+    WindowStyle="None"
+    AllowsTransparency="False"
+    ResizeMode="CanResize"
+    Background="{DynamicResource WindowBackgroundBrush}"
+    Title="Турнир"
+    Height="600" Width="900"
+	KeyDown="Window_KeyDown">
+	<WindowChrome.WindowChrome>
+		<WindowChrome
+        CaptionHeight="32"
+        CornerRadius="8"
+        GlassFrameThickness="0"
+        ResizeBorderThickness="5"
+        UseAeroCaptionButtons="False"/>
+	</WindowChrome.WindowChrome>
 	<Window.Resources>
 		<local:TimeSpanToStringConverter x:Key="TimeSpanToStringConverter" />
 		<FontFamily x:Key="UiFont">Segoe UI</FontFamily>
@@ -39,7 +47,7 @@
                                           Margin="{TemplateBinding Padding}" />
 								<!-- Маленькая буква в левом нижнем углу -->
 								<TextBlock Text="{TemplateBinding Tag}"
-                                   FontSize="16"
+                                   FontSize="20"
                                    Foreground="{TemplateBinding Foreground}"
                                    VerticalAlignment="Bottom"
                                    HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
@@ -62,7 +70,6 @@
 				</Setter.Value>
 			</Setter>
 		</Style>
-
 		<Style TargetType="Label">
 			<Setter Property="FontFamily" Value="{StaticResource UiFont}" />
 			<Setter Property="Foreground" Value="{StaticResource TextPrimary}" />
@@ -71,126 +78,160 @@
 			<Setter Property="Background" Value="{x:Null}" />
 		</Style>
 	</Window.Resources>
-	<Grid Background="Silver">
-		<Grid.RowDefinitions>
-			<RowDefinition Height="1.5*" />
-			<RowDefinition />
-		</Grid.RowDefinitions>
-		<Grid Margin="0,0,0,400" Grid.Row="0" Grid.RowSpan="2">
-			<Grid.ColumnDefinitions>
-				<ColumnDefinition Width="1.5*" />
-				<ColumnDefinition />
-				<ColumnDefinition Width="1.5*" />
-			</Grid.ColumnDefinitions>
-			<!-- ТАБЛО КРАСНОГО -->
-			<Grid Background="PaleVioletRed" Grid.Column="0">
+	<Border 
+        BorderBrush="{DynamicResource TitleBarBrush}"
+        BorderThickness="1"
+        Padding="8,0,5,35"
+        Background="{DynamicResource WindowBackgroundBrush}">
+		<DockPanel LastChildFill="True">
+			<!-- Заголовок -->
+			<Border DockPanel.Dock="Top" 
+                    Background="{DynamicResource TitleBarBrush}" 
+                    Height="32">
+				<DockPanel>
+					<TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType=Window}}"
+                               Foreground="{DynamicResource TitleForegroundBrush}"
+                               VerticalAlignment="Center"
+                               Margin="10,0,0,0"/>
+					<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+						<Button Content="🗕"
+                                Command="{x:Static SystemCommands.MinimizeWindowCommand}"
+                                CommandTarget="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                                Style="{StaticResource TitleBarButtonStyle}"/>
+						<Button Content="🗖"
+                                Command="{x:Static SystemCommands.MaximizeWindowCommand}"
+                                CommandTarget="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                                Style="{StaticResource TitleBarButtonStyle}"/>
+						<Button Content="✕"
+                                Command="{x:Static SystemCommands.CloseWindowCommand}"
+                                CommandTarget="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                                Style="{StaticResource TitleBarButtonStyle}"/>
+					</StackPanel>
+				</DockPanel>
+			</Border>
+			<!-- Основное содержимое -->
+			<Grid Background="Silver">
 				<Grid.RowDefinitions>
-					<RowDefinition />
-					<RowDefinition />
+					<RowDefinition Height="1.5*" />
 					<RowDefinition />
 				</Grid.RowDefinitions>
-				<Button IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Panel.ZIndex="1" Content="⮝" Tag="Й" HorizontalContentAlignment="Right"  Margin="0,-105,0,0" Height="200" FontSize="110" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="IncreaseRedScore" Grid.Row="0">
-					<Button.LayoutTransform>
-						<ScaleTransform ScaleX="1.5" ScaleY="0.5" />
-					</Button.LayoutTransform>
-				</Button>
-				<Label Content="{Binding Fight.RedScore}" Margin="0,-280,0,-120" Foreground="White" FontSize="550" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1" x:Name="RedScoreLbl"/>
-				<Button IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Panel.ZIndex="1" Content="⮟" Tag="Ф" HorizontalContentAlignment="Right" Margin="0,120,0,-30" Height="200" FontSize="110" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="DecreaseRedScore" Grid.Row="2">
-					<Button.LayoutTransform>
-						<ScaleTransform ScaleX="1.5" ScaleY="0.5" />
-					</Button.LayoutTransform>
-				</Button>
-			</Grid>
-			<!-- ЦЕНТРАЛЬНЫЙ БЛОК -->
-			<Grid Grid.Column="1">
-				<Grid.RowDefinitions>
-					<RowDefinition />
-					<RowDefinition />
-					<RowDefinition />
-					<RowDefinition />
-				</Grid.RowDefinitions>
-				<Button Content="■" Tag="↵" HorizontalContentAlignment="Center" Width="350" Margin="0,15,0 10" FontSize="70" Background="WhiteSmoke" Click="ResetTimer" FontWeight="Bold" />
-				<!-- ПРЕДУПРЕЖДЕНИЯ СИНЕГО -->
-				<Grid Background="LightSkyBlue" Grid.Row="1" Margin="2">
+				<Grid Margin="0,0,0,400" Grid.Row="0" Grid.RowSpan="2">
 					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="1.5*" />
 						<ColumnDefinition />
-						<ColumnDefinition />
-						<ColumnDefinition />
+						<ColumnDefinition Width="1.5*" />
 					</Grid.ColumnDefinitions>
-					<Button Width="150" FontSize="70" Content="-" Tag="Ц" HorizontalContentAlignment="Right" Click="DecreaseBlueViolations" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="0" />
-					<Label Content="{Binding Fight.BlueViolations}" VerticalContentAlignment="Top" FontSize="100" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" />
-					<Button Width="150" FontSize="70" Content="+" Tag="Х" HorizontalContentAlignment="Left" Click="IncreaseBlueViolations" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="2" />
+					<!-- ТАБЛО КРАСНОГО -->
+					<Grid Background="PaleVioletRed" Grid.Column="0">
+						<Grid.RowDefinitions>
+							<RowDefinition />
+							<RowDefinition />
+							<RowDefinition />
+						</Grid.RowDefinitions>
+						<Button IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Panel.ZIndex="1" Content="⮝" Tag="Й" HorizontalContentAlignment="Right"  Margin="0,-105,0,0" Height="200" FontSize="110" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="IncreaseRedScore" Grid.Row="0">
+							<Button.LayoutTransform>
+								<ScaleTransform ScaleX="1.5" ScaleY="0.5" />
+							</Button.LayoutTransform>
+						</Button>
+						<Label Content="{Binding Fight.RedScore}" Margin="0,-280,0,-120" Foreground="White" FontSize="550" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1" x:Name="RedScoreLbl"/>
+						<Button IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Panel.ZIndex="1" Content="⮟" Tag="Ф" HorizontalContentAlignment="Right" Margin="0,120,0,-30" Height="200" FontSize="110" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="DecreaseRedScore" Grid.Row="2">
+							<Button.LayoutTransform>
+								<ScaleTransform ScaleX="1.5" ScaleY="0.5" />
+							</Button.LayoutTransform>
+						</Button>
+					</Grid>
+					<!-- ЦЕНТРАЛЬНЫЙ БЛОК -->
+					<Grid Grid.Column="1">
+						<Grid.RowDefinitions>
+							<RowDefinition />
+							<RowDefinition />
+							<RowDefinition />
+							<RowDefinition />
+						</Grid.RowDefinitions>
+						<Button Content="■" Tag="↵" HorizontalContentAlignment="Center" Width="350" Margin="0,15,0 10" FontSize="70" Background="WhiteSmoke" Click="ResetTimer" FontWeight="Bold" />
+						<!-- ПРЕДУПРЕЖДЕНИЯ СИНЕГО -->
+						<Grid Background="LightSkyBlue" Grid.Row="1" Margin="2">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition />
+								<ColumnDefinition />
+								<ColumnDefinition />
+							</Grid.ColumnDefinitions>
+							<Button Width="150" FontSize="70" Content="-" Tag="Ц" HorizontalContentAlignment="Right" Click="DecreaseBlueViolations" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="0" />
+							<Label Content="{Binding Fight.BlueViolations}" VerticalContentAlignment="Top" FontSize="100" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" />
+							<Button Width="150" FontSize="70" Content="+" Tag="Х" HorizontalContentAlignment="Left" Click="IncreaseBlueViolations" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="2" />
+						</Grid>
+						<!-- ПРЕДУПРЕЖДЕНИЯ КРАСНОГО -->
+						<Grid Background="PaleVioletRed" Grid.Row="2" Margin="2">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition />
+								<ColumnDefinition />
+								<ColumnDefinition />
+							</Grid.ColumnDefinitions>
+							<Button Width="150" FontSize="70" Content="-" Tag="Ы" HorizontalContentAlignment="Right" Click="DecreaseRedViolations" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="0" />
+							<Label Content="{Binding Fight.RedViolations}" FontSize="100" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" />
+							<Button Width="150" FontSize="70" Content="+" Tag="Ж" HorizontalContentAlignment="Left" Click="IncreaseRedViolations" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="2" />
+						</Grid>
+						<!-- ОБОЮДНЫЕ ПОРАЖЕНИЯ -->
+						<Grid Grid.Row="3" Margin="2">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition />
+								<ColumnDefinition />
+								<ColumnDefinition />
+							</Grid.ColumnDefinitions>
+							<Button Width="150" FontSize="70" Content="-" Tag="Ч" HorizontalContentAlignment="Right" Click="DecreaseDoubleHits" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="0" />
+							<Label Content="{Binding Fight.DoubleHits}" FontSize="100" x:Name="DoubleHitlLbl" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" />
+							<Button Width="150" FontSize="70" Content="+" Tag="Ю" HorizontalContentAlignment="Left" Click="IncreaseDoubleHits" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="2" />
+						</Grid>
+					</Grid>
+					<!-- ТАБЛО СИНЕГО -->
+					<Grid Background="LightSkyBlue" Grid.Column="2">
+						<Grid.RowDefinitions>
+							<RowDefinition />
+							<RowDefinition />
+							<RowDefinition />
+						</Grid.RowDefinitions>
+						<Button IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Panel.ZIndex="1" Content="⮝" Tag="Ъ" HorizontalContentAlignment="Left" Margin="0,-105,0,0" Height="200" FontSize="110" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="IncreaseBlueScore" Grid.Row="0">
+							<Button.LayoutTransform>
+								<ScaleTransform ScaleX="1.5" ScaleY="0.5" />
+							</Button.LayoutTransform>
+						</Button>
+						<Label Content="{Binding Fight.BlueScore}" Margin="0,-280,0,-120" Foreground="White" FontSize="550" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1" x:Name="BlueScoreLbl"/>
+						<Button IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Panel.ZIndex="1" Content="⮟" Tag="Э" HorizontalContentAlignment="Left" Margin="0,120,0,-30" Height="200" FontSize="110" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="DecreaseBlueScore" Grid.Row="2">
+							<Button.LayoutTransform>
+								<ScaleTransform ScaleX="1.5" ScaleY="0.5" />
+							</Button.LayoutTransform>
+						</Button>
+					</Grid>
 				</Grid>
-				<!-- ПРЕДУПРЕЖДЕНИЯ КРАСНОГО -->
-				<Grid Background="PaleVioletRed" Grid.Row="2" Margin="2">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition />
-						<ColumnDefinition />
-						<ColumnDefinition />
-					</Grid.ColumnDefinitions>
-					<Button Width="150" FontSize="70" Content="-" Tag="Ы" HorizontalContentAlignment="Right" Click="DecreaseRedViolations" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="0" />
-					<Label Content="{Binding Fight.RedViolations}" FontSize="100" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" />
-					<Button Width="150" FontSize="70" Content="+" Tag="Ж" HorizontalContentAlignment="Left" Click="IncreaseRedViolations" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="2" />
-				</Grid>
-				<!-- ОБОЮДНЫЕ ПОРАЖЕНИЯ -->
-				<Grid Grid.Row="3" Margin="2">
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition />
-						<ColumnDefinition />
-						<ColumnDefinition />
-					</Grid.ColumnDefinitions>
-					<Button Width="150" FontSize="70" Content="-" Tag="Ч" HorizontalContentAlignment="Right" Click="DecreaseDoubleHits" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="0" />
-					<Label Content="{Binding Fight.DoubleHits}" FontSize="100" x:Name="DoubleHitlLbl" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" />
-					<Button Width="150" FontSize="70" Content="+" Tag="Ю" HorizontalContentAlignment="Left" Click="IncreaseDoubleHits" Margin="5" IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Grid.Column="2" />
-				</Grid>
-			</Grid>
-			<!-- ТАБЛО СИНЕГО -->
-			<Grid Background="LightSkyBlue" Grid.Column="2">
-				<Grid.RowDefinitions>
-					<RowDefinition />
-					<RowDefinition />
-					<RowDefinition />
-				</Grid.RowDefinitions>
-				<Button IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Panel.ZIndex="1" Content="⮝" Tag="Ъ" HorizontalContentAlignment="Left" Margin="0,-105,0,0" Height="200" FontSize="110" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="IncreaseBlueScore" Grid.Row="0">
-					<Button.LayoutTransform>
-						<ScaleTransform ScaleX="1.5" ScaleY="0.5" />
-					</Button.LayoutTransform>
-				</Button>
-				<Label Content="{Binding Fight.BlueScore}" Margin="0,-280,0,-120" Foreground="White" FontSize="550" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.Row="1" x:Name="BlueScoreLbl"/>
-				<Button IsEnabled="{Binding Fight.IsScoreChangeEnabled}" Panel.ZIndex="1" Content="⮟" Tag="Э" HorizontalContentAlignment="Left" Margin="0,120,0,-30" Height="200" FontSize="110" Background="Transparent" BorderThickness="0" Cursor="Hand" Click="DecreaseBlueScore" Grid.Row="2">
-					<Button.LayoutTransform>
-						<ScaleTransform ScaleX="1.5" ScaleY="0.5" />
-					</Button.LayoutTransform>
-				</Button>
-			</Grid>
-		</Grid>
-		<!-- МЕНЮ -->
-		<Grid Grid.Row="1" Panel.ZIndex="-1">
-			<Grid.RowDefinitions>
-				<RowDefinition />
-				<RowDefinition Height="2.9*" />
-				<RowDefinition />
-			</Grid.RowDefinitions>
-			<!-- ТЕКУЩИЙ КРАСНЫЙ -->
-			<Label Content="{Binding Fight.RedName}" Width="720" HorizontalContentAlignment="Right" 
-				   Background="PaleVioletRed" Padding="0,15,20,0" BorderThickness="0"
+				<!-- МЕНЮ -->
+				<Grid Grid.Row="1" Panel.ZIndex="-1">
+					<Grid.RowDefinitions>
+						<RowDefinition />
+						<RowDefinition Height="2.9*" />
+						<RowDefinition />
+					</Grid.RowDefinitions>
+					<!-- ТЕКУЩИЙ КРАСНЫЙ -->
+					<Label Content="{Binding Fight.RedName}" Width="720" HorizontalContentAlignment="Right" 
+						Background="PaleVioletRed" Padding="0,15,20,0" BorderThickness="0"
 				   FontSize="50" HorizontalAlignment="Left" VerticalAlignment="Stretch" Grid.Row="0"/>
-			<StackPanel HorizontalAlignment="Center" Margin="0,5" Orientation="Horizontal">
-				<Button Content="📋" Tag="B" HorizontalContentAlignment="Right" FontSize="40" Grid.Row="0" Margin="2,1" Width="115" Click="OpenFightsList" />
-				<Button Content="⌚" Tag="T" HorizontalContentAlignment="Right" FontSize="40" Grid.Row="0" Margin="2,1" Width="115" Click="ShowPopupTime_Click" />
-				<Button Content="📄" Tag="O" HorizontalContentAlignment="Right" FontSize="40" Grid.Row="0" Margin="2,1" Width="115" Click="OpenFileButton_Click" />
-				<Button Content="🥇" Tag="Д" HorizontalContentAlignment="Right" FontSize="40" Grid.Row="0" Margin="2,1" Width="115" Click="OpenRaitingButton_Click" />
-			</StackPanel>
-			<!-- ТЕКУЩИЙ СИНИЙ -->
-			<Label x:Name="CurrentBlueLbl" Content="{Binding Fight.BlueName}" HorizontalContentAlignment="Left" Width="720" Background="LightSkyBlue" Padding="20,15,0,0" BorderThickness="0" FontSize="50" HorizontalAlignment="Right" VerticalAlignment="Stretch" Grid.Row="0" Panel.ZIndex="-1" />
-			<!-- ТАЙМЕР -->
-			<Button x:Name="StartBtn" Content="{Binding Fight.Elapsed, Converter={StaticResource TimeSpanToStringConverter}}" Tag="пробел" 
+					<StackPanel HorizontalAlignment="Center" Margin="0,5" Orientation="Horizontal">
+						<Button Content="📋" Tag="B" HorizontalContentAlignment="Right" FontSize="40" Grid.Row="0" Margin="2,1" Width="115" Click="OpenFightsList" />
+						<Button Content="⌚" Tag="T" HorizontalContentAlignment="Right" FontSize="40" Grid.Row="0" Margin="2,1" Width="115" Click="ShowPopupTime_Click" />
+						<Button Content="📄" Tag="O" HorizontalContentAlignment="Right" FontSize="40" Grid.Row="0" Margin="2,1" Width="115" Click="OpenFileButton_Click" />
+						<Button Content="🥇" Tag="Д" HorizontalContentAlignment="Right" FontSize="40" Grid.Row="0" Margin="2,1" Width="115" Click="OpenRaitingButton_Click" />
+					</StackPanel>
+					<!-- ТЕКУЩИЙ СИНИЙ -->
+					<Label x:Name="CurrentBlueLbl" Content="{Binding Fight.BlueName}" HorizontalContentAlignment="Left" Width="720" Background="LightSkyBlue" Padding="20,15,0,0" BorderThickness="0" FontSize="50" HorizontalAlignment="Right" VerticalAlignment="Stretch" Grid.Row="0" Panel.ZIndex="-1" />
+					<!-- ТАЙМЕР -->
+					<Button x:Name="StartBtn" Content="{Binding Fight.Elapsed, Converter={StaticResource TimeSpanToStringConverter}}" Tag="пробел" 
 					HorizontalContentAlignment="Left" Foreground="Black" FontSize="250" FontFamily="Courier" Background="WhiteSmoke" 
 					VerticalAlignment="Stretch" Click="StartTimer" Grid.Row="1" Padding="0,-1,0,0" BorderThickness="0" Cursor="Hand"/>
-			<!-- ГОТОВЯТСЯ -->
-			<Label Content="{Binding NextFight.RedName}" Width="720" Background="WhiteSmoke" Padding="50,0" BorderThickness="0" FontSize="50" HorizontalAlignment="Left" VerticalAlignment="Stretch" Grid.Row="2" />
-			<Label Content="{Binding NextFight.BlueName}" Width="720" HorizontalContentAlignment="Right" Background="WhiteSmoke" Padding="150,0,50,0" BorderThickness="0" FontSize="50" HorizontalAlignment="Right" VerticalAlignment="Stretch" Grid.Row="2" />
-			<Label Content="готовятся" Width="720" Padding="0,0,0,15" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom" Background="WhiteSmoke" BorderThickness="0" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Stretch" Grid.Row="2" />
-		</Grid>
-	</Grid>
+					<!-- ГОТОВЯТСЯ -->
+					<Label Content="{Binding NextFight.RedName}" Width="720" Background="WhiteSmoke" Padding="50,0" BorderThickness="0" FontSize="50" HorizontalAlignment="Left" VerticalAlignment="Stretch" Grid.Row="2" />
+					<Label Content="{Binding NextFight.BlueName}" Width="720" HorizontalContentAlignment="Right" Background="WhiteSmoke" Padding="150,0,50,0" BorderThickness="0" FontSize="50" HorizontalAlignment="Right" VerticalAlignment="Stretch" Grid.Row="2" />
+					<Label Content="готовятся" Width="720" Padding="0,0,0,15" HorizontalContentAlignment="Center" VerticalContentAlignment="Bottom" Background="WhiteSmoke" BorderThickness="0" FontSize="30" HorizontalAlignment="Center" VerticalAlignment="Stretch" Grid.Row="2" />
+				</Grid>
+			</Grid>
+		</DockPanel>
+	</Border>
 </Window>

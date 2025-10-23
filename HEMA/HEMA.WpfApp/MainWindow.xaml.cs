@@ -2,19 +2,15 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Media;
-using System.Security.Policy;
 using System.Text.Json;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Media3D;
 
 using HEMA.Models;
 
 using Microsoft.Win32;
-
-using Color = System.Drawing.Color;
 
 
 namespace HEMA.WpfApp
@@ -30,6 +26,7 @@ namespace HEMA.WpfApp
 		private FightsListWindow fightsListWindow;
 		private IEnumerator<Fight> enumerator;
 		private string currentFolder;
+		private bool gitExists;
 		private MediaPlayer[] mediaPlayers;
 		private TimerAlarmLight[] ttmerAlarms =
 			[
@@ -75,6 +72,8 @@ namespace HEMA.WpfApp
 			DataContext = this;
 			fightsListWindow = new FightsListWindow(this);
 			RaitingWindow = new RaitingWindow(this);
+
+			gitExists = DefineGitExists();
 		}
 
 		private async void ShowPopupTime_Click(object sender, RoutedEventArgs e)
@@ -297,6 +296,14 @@ namespace HEMA.WpfApp
 				fight.RedRaitingChange = "0";
 				fight.BlueRaitingChange = "0";
 
+				if (fight.DoubleHits >= fight.MaxDoubleHits)
+				{
+					fighters[fight.RedName].WinsCoefficient -= 2;
+					fighters[fight.BlueName].WinsCoefficient -= 2;
+					fight.RedRaitingChange = "-2";
+					fight.BlueRaitingChange = "-2";
+					continue;
+				}
 				if (fight.RedScore <= MinAvailableScore)
 				{
 					fighters[fight.RedName].WinsCoefficient -= 2;
@@ -327,14 +334,6 @@ namespace HEMA.WpfApp
 						fighters[fight.RedName].WinsCoefficient -= 2;
 						fight.RedRaitingChange = "-2";
 					}
-					continue;
-				}
-				if (fight.DoubleHits >= fight.MaxDoubleHits)
-				{
-					fighters[fight.RedName].WinsCoefficient -= 2;
-					fighters[fight.BlueName].WinsCoefficient -= 2;
-					fight.RedRaitingChange = "-2";
-					fight.BlueRaitingChange = "-2";
 					continue;
 				}
 				if (fight.RedScore == 10 && fight.BlueScore == 0)
@@ -373,6 +372,8 @@ namespace HEMA.WpfApp
 
 			foreach (var fighter in fighters)
 			{
+				int fightsCount = Fights.Count(f => f.RedName == fighter.Key || f.BlueName == fighter.Key);
+
 				var fightsAsBlue = Fights.Where(fight => fight.BlueName == fighter.Key);
 				var givenAsBlue = fightsAsBlue.Sum(fight => fight.BlueScore);
 				var takenAsBlue = fightsAsBlue.Sum(fight => fight.RedScore);
@@ -386,6 +387,11 @@ namespace HEMA.WpfApp
 				var elapsedAsBlue = fightsAsBlue.Sum(fight => fight.Elapsed.TotalMilliseconds);
 				var elapsedAsRed = fightsAsRed.Sum(fight => fight.Elapsed.TotalMilliseconds);
 
+				fighter.Value.MaxPossibleWinsCoefficient = fightsCount * 2;
+				fighter.Value.MaxPosiibleGivenTakenCoefficient = fightsCount * 10;
+				fighter.Value.MaxPossibleGivenScore = fightsCount * 10;
+				fighter.Value.MaxDoubleHits = fightsCount * 3;
+
 				fighter.Value.GivenScore = givenAsBlue + givenAsRed;
 				fighter.Value.TakenScore = takenAsBlue + takenAsRed;
 				fighter.Value.DoubleHits = doubleHitsAsBlue + doubleHistAsRed;
@@ -396,15 +402,55 @@ namespace HEMA.WpfApp
 			Raiting.Clear();
 			foreach (var fighter in fighters
 				.Values
-				.OrderByDescending(fighter => fighter.WinsCoefficient)
-				.ThenByDescending(fighter => fighter.GivenTakenCoefficient)
-				.ThenByDescending(fighter => fighter.GivenScore)
-				.ThenBy(fighter => fighter.DoubleHits)
+				.OrderByDescending(fighter => fighter.WinsCoefficientCalculated)
+				.ThenByDescending(fighter => fighter.GivenTakenCoefficientCalculated)
+				.ThenByDescending(fighter => fighter.GivenScoreCalculated)
+				.ThenBy(fighter => fighter.DoubleHitsCalculated)
 				.ThenBy(fighter => fighter.Violations)
 				.ThenBy(fighter => fighter.Elapsed))
 			{
 				Raiting.Add(fighter);
 			}
+
+			File.WriteAllLines(
+				"Fights.csv",
+				// Заголовок
+				new[] { "№;Имя (Red);Нанес (Red);Время;Нанес (Blue);Имя (Blue);Обоюдн.;Предупр. (Red);Предупр. (Blue);Номинация;Подгруппа" }
+				.Concat(
+					Fights.Select(fight =>
+						$"{fight.OriginalIndex};" +
+						$"{fight.RedName};" +
+						$"{fight.RedScore};" +
+						$"{fight.Elapsed};" +
+						$"{fight.BlueScore};" +
+						$"{fight.BlueName};" +
+						$"{fight.DoubleHits};" +
+						$"{fight.RedViolations};" +
+						$"{fight.BlueViolations};" +
+						$"{fight.NominationName};" +
+						$"{fight.SubgroupName}"
+					)
+				)
+			);
+
+			// Экспорт массива fighters (или коллекции Raiting) в CSV
+			File.WriteAllLines(
+				"FightersRaiting.csv",
+				// Заголовок
+				new[] { "Имя;Коэф. побед;Нанес. - пропущ.;Нанес.;Обоюд.;Предупр.;Время" }
+				.Concat(
+					Raiting.Select(fighter =>
+						$"{fighter.Name};" +
+						$"{fighter.WinsCoefficientDisplay};" +
+						$"{fighter.GivenTakenCoefficient};" +
+						$"{fighter.GivenScoreDisplay};" +
+						$"{fighter.DoubleHitsDisplay};" +
+						$"{fighter.Violations};" +
+						$"{fighter.Time}"
+					)
+				)
+			);
+
 
 			if (sender != null)
 			{
@@ -478,17 +524,24 @@ namespace HEMA.WpfApp
 			string gitInint = init ? " && git init" : string.Empty;
 			string command = $"cd /d \"{folderPath}\"{gitInint} && git add -A && git commit -m \"%date:~6,4%-%date:~3,2%-%date:~0,2% %time:~0,8%\"\r\n";
 
-			Process process = new Process();
-			process.StartInfo.FileName = "cmd.exe";
-			process.StartInfo.Arguments = "/c " + command; // /c — выполнить и закрыть
-			process.StartInfo.RedirectStandardOutput = true;
-			process.StartInfo.UseShellExecute = false;
-			process.StartInfo.CreateNoWindow = true;
-
-			process.Start();
+			Process process = ExecuteCmd(command);
 
 			string output = await process.StandardOutput.ReadToEndAsync();
 			await process.WaitForExitAsync();
+		}
+
+		private Task SaveToHistoryFolderAsync(string folderPath, bool init = false)
+		{
+			var dateTimeNow = DateTime.Now;
+			const string historyFolderName = "history";
+			if (init)
+			{
+				Directory.CreateDirectory(Path.Combine(folderPath, historyFolderName));
+			}
+			string json = GetSerializedFights();
+			return File.WriteAllTextAsync(
+				Path.Combine(folderPath, historyFolderName, dateTimeNow.ToString("HH_mm_ss")),
+				json);
 		}
 
 		private void InitFights(IEnumerable<string> names, int maxDoubleHits)
@@ -506,6 +559,7 @@ namespace HEMA.WpfApp
 		private void SetupFights(IEnumerable<Fight> fights, ICommand editFightCommand)
 		{
 			Fights.Clear();
+
 			foreach (var fight in fights)
 			{
 				fight.OneDoubleHitLeft += isOneDoubleHitLeft => DoubleHitlLbl.Foreground = isOneDoubleHitLeft ? Brushes.Red : Brushes.Black;
@@ -537,11 +591,48 @@ namespace HEMA.WpfApp
 		{
 			if (!string.IsNullOrWhiteSpace(currentFolder))
 			{
-				var fights = Fights.ToList();
-				var json = JsonSerializer.Serialize(fights);
+				string json = GetSerializedFights();
 				await File.WriteAllTextAsync(Path.Combine(currentFolder, "Fights.json"), json);
-				await ExecuteGitCmdAsync(currentFolder, init);
+				if (gitExists)
+				{
+					await ExecuteGitCmdAsync(currentFolder, init);
+				}
+				else
+				{
+					await SaveToHistoryFolderAsync(currentFolder, init);
+				}
 			}
+		}
+
+		private string GetSerializedFights()
+		{
+			var fights = Fights.ToList();
+			var json = JsonSerializer.Serialize(fights);
+			return json;
+		}
+
+		private static bool DefineGitExists()
+		{
+			string command = "git version";
+
+			Process process = ExecuteCmd(command);
+
+			string output = process.StandardOutput.ReadToEnd();
+			process.WaitForExit();
+
+			return output.StartsWith(command);
+		}
+
+		private static Process ExecuteCmd(string command)
+		{
+			Process process = new Process();
+			process.StartInfo.FileName = "cmd.exe";
+			process.StartInfo.Arguments = "/c " + command; // /c — выполнить и закрыть
+			process.StartInfo.RedirectStandardOutput = true;
+			process.StartInfo.UseShellExecute = false;
+			process.StartInfo.CreateNoWindow = true;
+			process.Start();
+			return process;
 		}
 
 		private void SetCurrentAndNextFights()

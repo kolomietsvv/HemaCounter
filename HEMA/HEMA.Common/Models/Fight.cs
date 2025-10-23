@@ -27,6 +27,8 @@ namespace HEMA
 		private string blueName;
 		private string redRaitingChange;
 		private string blueRaitingChange;
+		private string subgroupName;
+		private string nominationName;
 		private int originalIndex;
 		private bool isCompleted;
 		private int nextAlarmIndex;
@@ -54,6 +56,26 @@ namespace HEMA
 		public TimerAlarmLight? NextAlarm => NextAlarmIndex != -1 ? TimerAlarms[NextAlarmIndex] : (TimerAlarmLight?)null;
 
 		public bool IsScoreChangeEnabled => !IsTimerStarted || Settings.NoBreak;
+
+		public string NominationName
+		{
+			get => nominationName;
+			set
+			{
+				nominationName = value;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(NominationName)));
+			}
+		}
+
+		public string SubgroupName
+		{
+			get => subgroupName;
+			set
+			{
+				subgroupName = value;
+				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SubgroupName)));
+			}
+		}
 
 		public int OriginalIndex
 		{

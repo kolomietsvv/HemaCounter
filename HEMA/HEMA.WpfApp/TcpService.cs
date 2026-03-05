@@ -24,7 +24,9 @@ public class TcpService
 		Action<string> acceptFights,
 		CancellationToken cancellationToken)
 	{
-		listenTasks.Add(AnswerAsServerTask());
+		var updListeningTask = AnswerAsServerTask();
+		updListeningTask.Start();
+		listenTasks.Add(updListeningTask);
 
 		TcpListener listener = new TcpListener(IPAddress.Any, tcpPort);
 		listener.Start();
@@ -84,24 +86,21 @@ public class TcpService
 		await SendFightsAsync(stream, fights, cancellationToken);
 	}
 
-	private Task AnswerAsServerTask()
+	private async Task AnswerAsServerTask()
 	{
-		return Task.Run(async () =>
+		using var udp = new UdpClient(udpPort);
+		while (true)
 		{
-			using var udp = new UdpClient(udpPort);
-			while (true)
-			{
-				var req = await udp.ReceiveAsync();
-				var text = Encoding.UTF8.GetString(req.Buffer);
+			var req = await udp.ReceiveAsync();
+			var text = Encoding.UTF8.GetString(req.Buffer);
 
-				if (text == "DISCOVER")
-				{
-					var bytes = Encoding.UTF8.GetBytes($"{ServerName}");
-					await udp.SendAsync(bytes, bytes.Length, req.RemoteEndPoint);
-				}
-				await Task.Delay(200);
+			if (text == "DISCOVER")
+			{
+				var bytes = Encoding.UTF8.GetBytes($"{ServerName}");
+				await udp.SendAsync(bytes, bytes.Length, req.RemoteEndPoint);
 			}
-		});
+			await Task.Delay(200);
+		}
 	}
 
 	private Task WaitForMessages(

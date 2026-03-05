@@ -190,12 +190,13 @@ namespace HEMA.WpfApp
 			}
 		}
 
-		private void UploadFights_Click(object sender, RoutedEventArgs e)
+		private async void UploadFights_Click(object sender, RoutedEventArgs e)
 		{
 			if (!HostsListPopup.IsOpen)
 			{
-				FilterPopup.IsOpen = true;
-				FilterNameBox.Focus();
+				var hosts = await MainWindow.TcpService.GetAllHosts(20);
+				HostsListPopup.IsOpen = true;
+				HostsListPopup.Focus();
 			}
 		}
 
@@ -203,8 +204,8 @@ namespace HEMA.WpfApp
 		{
 			if (!HostsListPopup.IsOpen)
 			{
-				FilterPopup.IsOpen = true;
-				FilterNameBox.Focus();
+				HostsListPopup.IsOpen = true;
+				HostsListPopup.Focus();
 			}
 		}
 
@@ -255,6 +256,21 @@ namespace HEMA.WpfApp
 		}
 
 		private void HostsConnect_Click(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void HostsListPopupCard_Loaded(object sender, RoutedEventArgs e)
+		{
+
+		}
+
+		private void HostsListPopup_KeyDown(object sender, KeyEventArgs e)
+		{
+
+		}
+
+		private void HostsListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
 
 		}

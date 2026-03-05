@@ -6,7 +6,6 @@ using System.Text.Json;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Media3D;
 
 using HEMA.Models;
 
@@ -33,12 +32,16 @@ namespace HEMA.WpfApp
 				new TimerAlarmLight { TotalSeconds = 105},
 				new TimerAlarmLight { TotalSeconds = 120, PauseFight = true }
 			];
-		private const int MinAvailableScore = -2;
+		private Task hostTask;
+		private const int MinAvailableScore = -100;
 
 		public event PropertyChangedEventHandler? PropertyChanged;
 		public RaitingWindow RaitingWindow { get; private set; }
 		public ObservableCollection<Fight> Fights { get; }
 		public ObservableCollection<Fighter> Raiting { get; }
+		public ObservableCollection<HostInfo> DiscoveredHosts { get; } = new();
+		public HostInfo? SelectedHost { get; set; }
+		public TcpService TcpService { get; }
 
 		public Fight Fight
 		{
@@ -67,13 +70,19 @@ namespace HEMA.WpfApp
 
 			Fights = new ObservableCollection<Fight>();
 			Raiting = new ObservableCollection<Fighter>();
-			InitFights(["Боец 1", "Боец 2", "Боец 3"], 3);
+			InitFights(["Боец 1", "Боец 2", "Боец 3"], 5);
 
 			DataContext = this;
 			fightsListWindow = new FightsListWindow(this);
 			RaitingWindow = new RaitingWindow(this);
 
 			gitExists = DefineGitExists();
+
+			TcpService = new TcpService();
+			hostTask = TcpService.HostTask(
+				fightsListWindow.HandleFightsRequest, 
+				fightsListWindow.AcceptFights, 
+				CancellationToken.None);
 		}
 
 		private async void ShowPopupTime_Click(object sender, RoutedEventArgs e)
@@ -98,13 +107,13 @@ namespace HEMA.WpfApp
 				{
 					Fight.NextAlarmIndex = 0;
 					mediaPlayers[0].Stop();
-					mediaPlayers[0].Open(new Uri(@"C:\Vika\HemaCounter\HEMA\HEMA.Android\Resources\raw\beep.mp3", UriKind.Absolute));
+					mediaPlayers[0].Open(new Uri(@"raw\beep.mp3", UriKind.Relative));
 				}
 				else if (popup.Value.TotalSeconds <= ttmerAlarms[0].TotalSeconds)
 				{
 					Fight.NextAlarmIndex = 1;
 					mediaPlayers[1].Stop();
-					mediaPlayers[1].Open(new Uri(@"C:\Vika\HemaCounter\HEMA\HEMA.Android\Resources\raw\longBeep.mp3", UriKind.Absolute));
+					mediaPlayers[1].Open(new Uri(@"raw\longBeep.mp3", UriKind.Relative));
 				}
 
 			}
@@ -140,7 +149,7 @@ namespace HEMA.WpfApp
 				{
 					string filePath = fileDialog.FileName;
 					var names = await File.ReadAllLinesAsync(filePath);
-					InitFights(names, 3);
+					InitFights(names, 5);
 					currentFolder = folderDialog.FolderName;
 					await TrySaveStateAsync(init: true);
 				}

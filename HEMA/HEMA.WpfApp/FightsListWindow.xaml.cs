@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System.Collections.ObjectModel;
+using System.IO;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,6 +27,16 @@ namespace HEMA.WpfApp
 			InitializeComponent();
 			MainWindow = mainWindow;
 			DataContext = mainWindow;
+		}
+
+		public void AcceptFights(string fightsMessage)
+		{
+
+		}
+
+		public string HandleFightsRequest()
+		{
+			return "[]";
 		}
 
 		private void FightButton_Click(object sender, RoutedEventArgs e)
@@ -179,6 +190,24 @@ namespace HEMA.WpfApp
 			}
 		}
 
+		private void UploadFights_Click(object sender, RoutedEventArgs e)
+		{
+			if (!HostsListPopup.IsOpen)
+			{
+				FilterPopup.IsOpen = true;
+				FilterNameBox.Focus();
+			}
+		}
+
+		private void DownloadFights_Click(object sender, RoutedEventArgs e)
+		{
+			if (!HostsListPopup.IsOpen)
+			{
+				FilterPopup.IsOpen = true;
+				FilterNameBox.Focus();
+			}
+		}
+
 		private void ApplyFilter_Click(object sender, RoutedEventArgs e)
 		{
 			if (!FilterPopup.IsOpen)
@@ -218,6 +247,16 @@ namespace HEMA.WpfApp
 			view.Refresh();
 
 			FilterPopup.IsOpen = false;
+		}
+
+		private void HostsCancel_Click(object sender, RoutedEventArgs e)
+		{
+			FilterPopup.IsOpen = false;
+		}
+
+		private void HostsConnect_Click(object sender, RoutedEventArgs e)
+		{
+
 		}
 	}
 }

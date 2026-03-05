@@ -298,6 +298,34 @@
 				BorderBrush="DarkGreen"
 				Cursor="Hand"
 				Click="Filter_Click"/>
+			<!-- Кнопка Выгрузить -->
+			<Button Content="♥" 
+				Tag="F"
+				HorizontalContentAlignment="Right"
+				Width="60" Height="60" 
+				FontSize="27" 
+				HorizontalAlignment="Left" 
+				VerticalAlignment="Bottom" 
+				Margin="20"
+				Background="LightGreen"
+				Foreground="White"
+				BorderBrush="DarkGreen"
+				Cursor="Hand"
+				Click="UploadFights_Click"/>
+			<!-- Кнопка Загрузить -->
+			<Button Content="♣" 
+				Tag="F"
+				HorizontalContentAlignment="Right"
+				Width="60" Height="60" 
+				FontSize="27" 
+				HorizontalAlignment="Left" 
+				VerticalAlignment="Bottom" 
+				Margin="20"
+				Background="LightGreen"
+				Foreground="White"
+				BorderBrush="DarkGreen"
+				Cursor="Hand"
+				Click="DownloadFights_Click"/>
 		</StackPanel>
 
 		<Popup x:Name="FilterPopup"
@@ -370,6 +398,110 @@
 								Tag="f7"/>
 						</StackPanel>
 					</StackPanel>
+				</Border>
+			</Grid>
+		</Popup>
+
+		<Popup x:Name="HostsListPopup"
+			StaysOpen="False"
+			AllowsTransparency="True"
+			PopupAnimation="Fade"
+			Placement="Center">
+			<Grid HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,20,0,0">
+				<Border Background="White"
+                BorderBrush="#CCC"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="20"
+                Width="520"
+                Opacity="0"
+                Focusable="True"
+                Loaded="HostsListPopupCard_Loaded"
+                KeyDown="HostsListPopup_KeyDown">
+					<Border.Triggers>
+						<EventTrigger RoutedEvent="Loaded">
+							<BeginStoryboard>
+								<Storyboard>
+									<DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                                             From="-30" To="0"
+                                             Duration="0:0:0.25"
+                                             DecelerationRatio="0.8"/>
+									<DoubleAnimation Storyboard.TargetProperty="Opacity"
+                                             From="0" To="1"
+                                             Duration="0:0:0.25"/>
+								</Storyboard>
+							</BeginStoryboard>
+						</EventTrigger>
+					</Border.Triggers>
+					<Border.RenderTransform>
+						<TranslateTransform Y="0"/>
+					</Border.RenderTransform>
+
+					<Grid>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="Auto"/>
+							<RowDefinition Height="*"/>
+							<RowDefinition Height="Auto"/>
+						</Grid.RowDefinitions>
+
+						<!-- Заголовок -->
+						<TextBlock Grid.Row="0"
+                           Text="Выбор хоста"
+                           FontSize="20"
+                           FontWeight="Bold"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,6"/>
+
+						<!-- Подзаголовок -->
+						<TextBlock Grid.Row="1"
+                           Text="Выберите имя машины"
+                           Opacity="0.7"
+                           TextWrapping="Wrap"
+                           Margin="0,0,0,10"/>
+
+						<!-- Список хостов -->
+						<Border Grid.Row="2" BorderBrush="#EEE" BorderThickness="1" CornerRadius="6">
+							<ListView x:Name="HostsListView"
+                              ItemsSource="{Binding DiscoveredHosts}"
+                              SelectedItem="{Binding SelectedHost, Mode=TwoWay}"
+                              FontSize="18"
+                              MinHeight="220"
+                              MouseDoubleClick="HostsListView_MouseDoubleClick">
+								<ListView.View>
+									<GridView>
+										<GridViewColumn Header="Имя" Width="220" DisplayMemberBinding="{Binding Name}" />
+										<GridViewColumn Header="IP" Width="150" DisplayMemberBinding="{Binding Ip}" />
+										<GridViewColumn Header="Порт" Width="80" DisplayMemberBinding="{Binding Port}" />
+										<!-- опционально -->
+										<!--<GridViewColumn Header="Версия" Width="80" DisplayMemberBinding="{Binding Version}" />-->
+									</GridView>
+								</ListView.View>
+							</ListView>
+						</Border>
+
+						<!-- Кнопки -->
+						<StackPanel Grid.Row="3"
+                            Orientation="Horizontal"
+                            HorizontalAlignment="Right"
+                            Margin="0,15,0,0">
+							<Button Content="Отмена"
+                            Width="110"
+                            Background="LightGray"
+                            HorizontalContentAlignment="Right"
+                            Tag="Esc"
+                            Click="HostsCancel_Click"/>
+
+							<Button Content="Выбрать"
+                            Width="160"
+                            Margin="10,0,0,0"
+                            Background="LightGreen"
+                            HorizontalContentAlignment="Right"
+                            Tag="↵"
+                            IsEnabled="{Binding SelectedHost, Converter={StaticResource InverseBoolConverter}}"
+                            Click="HostsConnect_Click"/>
+						</StackPanel>
+					</Grid>
 				</Border>
 			</Grid>
 		</Popup>

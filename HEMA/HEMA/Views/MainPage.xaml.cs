@@ -1,13 +1,18 @@
-﻿using Android.Media;
-using HEMA.Models;
-using HEMA.Views;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Xml;
+
+using Android.Media;
+
+using HEMA.Models;
+using HEMA.Views;
+
+using Newtonsoft.Json;
+
 using Xamarin.Forms;
 
 namespace HEMA

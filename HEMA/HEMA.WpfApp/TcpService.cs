@@ -4,69 +4,91 @@ using System.Text;
 
 namespace HEMA.WpfApp;
 
-public class TcpService
+public sealed class TcpService : IDisposable
 {
 	private const int tcpPort = 5002;
 	private const int udpPort = 8888;
-	private List<Task> listenTasks = new();
+
+	private CancellationTokenSource? _cts;
+	private Task? _udpTask;
+	private Task? _tcpTask;
+
+	private UdpClient? _udpServer;
+	private TcpListener? _tcpListener;
 
 	public string ServerName => Environment.MachineName;
 
 	/// <summary>
-	/// Ожидание подключения.
+	/// Запустить фоновые слушатели (UDP discovery + TCP server).
+	/// Вызывать один раз, например на старте приложения.
 	/// </summary>
-	/// <param name="handleFightsRequest"></param>
-	/// <param name="acceptFights"></param>
-	/// <param name="cancellationToken"></param>
-	/// <returns></returns>
-	public Task HostTask(
-		Func<string> handleFightsRequest,
-		Action<string> acceptFights,
-		CancellationToken cancellationToken)
+	public void Start(Func<string> handleFightsRequest, Action<string> acceptFights)
 	{
-		var updListeningTask = AnswerAsServerTask();
-		updListeningTask.Start();
-		listenTasks.Add(updListeningTask);
+		if (_cts != null) return; // уже запущено
 
-		TcpListener listener = new TcpListener(IPAddress.Any, tcpPort);
-		listener.Start();
+		_cts = new CancellationTokenSource();
 
-		return Task.Run(async () =>
-		{
-			while (true)
-			{
-				var anyConnectionReqeust = listener.Pending();
-				if (!anyConnectionReqeust)
-				{
-					await Task.Delay(200);
-					continue;
-				}
-
-				TcpClient client = await listener.AcceptTcpClientAsync();
-				NetworkStream stream = client.GetStream();
-				listenTasks.Add(WaitForMessages(handleFightsRequest, acceptFights, stream, cancellationToken));
-			}
-		}, cancellationToken);
+		_udpTask = RunUdpDiscoveryResponderAsync(_cts.Token);
+		_tcpTask = RunTcpServerAsync(handleFightsRequest, acceptFights, _cts.Token);
 	}
 
-	public async Task<Dictionary<string, IPAddress>> GetAllHosts(int waitInSeconds)
+	/// <summary>
+	/// Остановить слушатели.
+	/// </summary>
+	public async Task StopAsync()
+	{
+		var cts = _cts;
+		if (cts == null) return;
+
+		_cts = null;
+		cts.Cancel();
+
+		// Важно: закрываем сокеты, чтобы прервать Receive/Accept
+		try { _udpServer?.Close(); } catch { }
+		try { _tcpListener?.Stop(); } catch { }
+
+		try
+		{
+			await Task.WhenAll(_udpTask ?? Task.CompletedTask, _tcpTask ?? Task.CompletedTask);
+		}
+		catch (OperationCanceledException) { }
+		finally
+		{
+			_udpServer?.Dispose();
+			_udpServer = null;
+
+			_tcpListener = null;
+
+			cts.Dispose();
+		}
+	}
+
+	public void Dispose()
+	{
+		_ = StopAsync();
+	}
+
+	// ---------- CLIENT API ----------
+
+	public async Task<Dictionary<string, IPAddress>> GetAllHosts(int waitInSeconds, CancellationToken ct = default)
 	{
 		using var udp = new UdpClient();
 		udp.EnableBroadcast = true;
+
 		var probe = Encoding.UTF8.GetBytes("DISCOVER");
 		await udp.SendAsync(probe, probe.Length, new IPEndPoint(IPAddress.Broadcast, udpPort));
 
 		var found = new Dictionary<string, IPAddress>();
 		var stopAt = DateTime.UtcNow.AddSeconds(waitInSeconds);
 
-		while (DateTime.UtcNow <= stopAt)
+		while (DateTime.UtcNow <= stopAt && !ct.IsCancellationRequested)
 		{
-			var waitTask = udp.ReceiveAsync();
-			var done = await Task.WhenAny(waitTask, Task.Delay(200));
+			var receiveTask = udp.ReceiveAsync();
+			var done = await Task.WhenAny(receiveTask, Task.Delay(200, ct));
 
-			if (done != waitTask) continue;
+			if (done != receiveTask) continue;
 
-			var response = waitTask.Result;
+			var response = receiveTask.Result;
 			var name = Encoding.UTF8.GetString(response.Buffer);
 			found.TryAdd(name, response.RemoteEndPoint.Address);
 		}
@@ -74,97 +96,163 @@ public class TcpService
 		return found;
 	}
 
-	public async Task ConnectAndReqeustFights(string serverIp, CancellationToken cancellationToken)
+	public async Task ConnectAndRequestFights(string serverIp, CancellationToken cancellationToken)
 	{
-		NetworkStream stream = await ConnectToServer(serverIp);
-		await stream.WriteAsync(Encoding.UTF8.GetBytes("S"), cancellationToken);
+		using var client = new TcpClient();
+		await client.ConnectAsync(serverIp, tcpPort, cancellationToken);
+		await using var stream = client.GetStream();
+
+		// R = запрос
+		await stream.WriteAsync(Encoding.UTF8.GetBytes("R"), cancellationToken);
+		// дальше сервер пришлёт "S"+len+payload — вы можете принять это в отдельном методе при необходимости
 	}
 
 	public async Task ConnectAndSendFights(string serverIp, string fights, CancellationToken cancellationToken)
 	{
-		NetworkStream stream = await ConnectToServer(serverIp);
+		using var client = new TcpClient();
+		await client.ConnectAsync(serverIp, tcpPort, cancellationToken);
+		await using var stream = client.GetStream();
+
 		await SendFightsAsync(stream, fights, cancellationToken);
 	}
 
-	private async Task AnswerAsServerTask()
-	{
-		using var udp = new UdpClient(udpPort);
-		while (true)
-		{
-			var req = await udp.ReceiveAsync();
-			var text = Encoding.UTF8.GetString(req.Buffer);
+	// ---------- SERVER LOOPS ----------
 
-			if (text == "DISCOVER")
+	private async Task RunUdpDiscoveryResponderAsync(CancellationToken ct)
+	{
+		_udpServer = new UdpClient(udpPort);
+
+		try
+		{
+			while (!ct.IsCancellationRequested)
 			{
-				var bytes = Encoding.UTF8.GetBytes($"{ServerName}");
-				await udp.SendAsync(bytes, bytes.Length, req.RemoteEndPoint);
+				UdpReceiveResult req;
+				try
+				{
+					req = await _udpServer.ReceiveAsync(); // отмена через Close()
+				}
+				catch (ObjectDisposedException) { break; }
+				catch (SocketException) { if (ct.IsCancellationRequested) break; continue; }
+
+				var text = Encoding.UTF8.GetString(req.Buffer);
+				if (text == "DISCOVER")
+				{
+					var bytes = Encoding.UTF8.GetBytes(ServerName);
+					await _udpServer.SendAsync(bytes, bytes.Length, req.RemoteEndPoint);
+				}
 			}
-			await Task.Delay(200);
+		}
+		finally
+		{
+			_udpServer?.Dispose();
+			_udpServer = null;
 		}
 	}
 
-	private Task WaitForMessages(
+	private async Task RunTcpServerAsync(
 		Func<string> handleFightsRequest,
 		Action<string> acceptFights,
-		NetworkStream stream,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
-		return Task.Run(async () =>
+		_tcpListener = new TcpListener(IPAddress.Any, tcpPort);
+		_tcpListener.Start();
+
+		try
 		{
-			while (true)
+			while (!ct.IsCancellationRequested)
 			{
-				int size = 1;
-				var commanad = await GetMessageAsync(stream, size, cancellationToken);
-				switch (commanad)
+				TcpClient client;
+				try
 				{
-					case "S":                                                                       // пришла команда на отправку
-						string fightsMessage = await ReadFightsMessageAsync(stream, cancellationToken);
-						acceptFights(fightsMessage);
-						continue;
-					case "R":                                                                       // пришла команда-запрос
-						var fights = handleFightsRequest();
-						await SendFightsAsync(stream, fights, cancellationToken);
-						continue;
+					client = await _tcpListener.AcceptTcpClientAsync(ct);
 				}
-				await Task.Delay(200);
+				catch (OperationCanceledException) { break; }
+				catch (ObjectDisposedException) { break; }
+
+				_ = HandleClientAsync(client, handleFightsRequest, acceptFights, ct);
 			}
-		});
+		}
+		finally
+		{
+			try { _tcpListener.Stop(); } catch { }
+			_tcpListener = null;
+		}
 	}
 
-	private static async Task<NetworkStream> ConnectToServer(string serverIp)
+	private async Task HandleClientAsync(
+		TcpClient client,
+		Func<string> handleFightsRequest,
+		Action<string> acceptFights,
+		CancellationToken ct)
 	{
-		TcpClient client = new TcpClient();
-		await client.ConnectAsync(serverIp, tcpPort);
-		NetworkStream stream = client.GetStream();
-		return stream;
+		await using var stream = client.GetStream();
+
+		while (!ct.IsCancellationRequested)
+		{
+			// читаем 1 байт команды гарантированно
+			var command = await ReadExactlyStringAsync(stream, 1, ct);
+			if (command.Length == 0) return; // disconnect
+
+			switch (command)
+			{
+				case "S": // клиент прислал данные
+					var fightsMessage = await ReadFightsMessageAsync(stream, ct);
+					acceptFights(fightsMessage);
+					break;
+
+				case "R": // клиент запросил данные
+					var fights = handleFightsRequest();
+					await SendFightsAsync(stream, fights, ct);
+					break;
+
+				default:
+					// неизвестная команда — можно разорвать соединение
+					return;
+			}
+		}
 	}
 
-	private static async Task<string> ReadFightsMessageAsync(NetworkStream stream, CancellationToken cancellationToken)
+	// ---------- PROTOCOL HELPERS ----------
+
+	private static async Task<string> ReadFightsMessageAsync(NetworkStream stream, CancellationToken ct)
 	{
-		var fightsMessageLength = await GetIntMessageAsync(stream, cancellationToken);
-		return await GetMessageAsync(stream, fightsMessageLength, cancellationToken);
+		var lenBytes = await ReadExactlyAsync(stream, 4, ct);
+		var length = BitConverter.ToInt32(lenBytes, 0);
+		var payload = await ReadExactlyAsync(stream, length, ct);
+		return Encoding.UTF8.GetString(payload);
 	}
 
-	private async Task SendFightsAsync(NetworkStream stream, string fights, CancellationToken cancellationToken)
+	private static async Task SendFightsAsync(NetworkStream stream, string fights, CancellationToken ct)
 	{
-		await stream.WriteAsync(Encoding.UTF8.GetBytes("S"));                      // отправить команду на отправку
-		var fightsMessage = Encoding.UTF8.GetBytes(fights);
-		var fightsLengsMessage = BitConverter.GetBytes(fightsMessage.Length);
-		await stream.WriteAsync(fightsLengsMessage, cancellationToken);            // отправить длинну сообщения
-		await stream.WriteAsync(fightsMessage, cancellationToken);                 // отправить бои
+		// S = сервер отправляет данные
+		await stream.WriteAsync(Encoding.UTF8.GetBytes("S"), ct);
+
+		var payload = Encoding.UTF8.GetBytes(fights);
+		var len = BitConverter.GetBytes(payload.Length);
+
+		await stream.WriteAsync(len, ct);
+		await stream.WriteAsync(payload, ct);
 	}
 
-	private static async Task<string> GetMessageAsync(NetworkStream stream, int size, CancellationToken cancellationToken)
+	private static async Task<byte[]> ReadExactlyAsync(NetworkStream stream, int size, CancellationToken ct)
 	{
-		byte[] buffer = new byte[size];
-		int bytes = await stream.ReadAsync(buffer, cancellationToken);
-		return Encoding.UTF8.GetString(buffer, 0, bytes);
+		var buffer = new byte[size];
+		var offset = 0;
+
+		while (offset < size)
+		{
+			var read = await stream.ReadAsync(buffer.AsMemory(offset, size - offset), ct);
+			if (read == 0) return Array.Empty<byte>(); // disconnect
+			offset += read;
+		}
+
+		return buffer;
 	}
 
-	private static async Task<int> GetIntMessageAsync(NetworkStream stream, CancellationToken cancellationToken)
+	private static async Task<string> ReadExactlyStringAsync(NetworkStream stream, int size, CancellationToken ct)
 	{
-		byte[] buffer = new byte[4];
-		int bytes = await stream.ReadAsync(buffer, cancellationToken);
-		return BitConverter.ToInt32(buffer, 0);
+		var bytes = await ReadExactlyAsync(stream, size, ct);
+		if (bytes.Length == 0) return "";
+		return Encoding.UTF8.GetString(bytes);
 	}
 }

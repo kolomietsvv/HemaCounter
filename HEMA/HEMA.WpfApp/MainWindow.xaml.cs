@@ -79,10 +79,9 @@ namespace HEMA.WpfApp
 			gitExists = DefineGitExists();
 
 			TcpService = new TcpService();
-			hostTask = TcpService.HostTask(
+			TcpService.Start(
 				fightsListWindow.HandleFightsRequest, 
-				fightsListWindow.AcceptFights, 
-				CancellationToken.None);
+				fightsListWindow.AcceptFights);
 		}
 
 		private async void ShowPopupTime_Click(object sender, RoutedEventArgs e)

@@ -29,7 +29,7 @@ namespace HEMA.WpfApp
 
 		public void AcceptFights(string fightsMessage)
 		{
-
+			AddFights(fightsMessage);
 		}
 
 		public string HandleFightsRequest()
@@ -127,12 +127,17 @@ namespace HEMA.WpfApp
 			{
 				var extension = Path.GetExtension(fileDialog.FileName);
 				var json = await File.ReadAllTextAsync(fileDialog.FileName);
-				var fights = JsonSerializer.Deserialize<List<Fight>>(json);
-				foreach (var fight in fights!)
-				{
-					MainWindow.Fights.Add(fight);
-					MainWindow.OpenRaitingButton_Click(null!, null!);
-				}
+				AddFights(json);
+			}
+		}
+
+		private void AddFights(string json)
+		{
+			var fights = JsonSerializer.Deserialize<List<Fight>>(json);
+			foreach (var fight in fights!)
+			{
+				MainWindow.Fights.Add(fight);
+				MainWindow.OpenRaitingButton_Click(null!, null!);
 			}
 		}
 

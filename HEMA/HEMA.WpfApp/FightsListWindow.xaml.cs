@@ -6,6 +6,8 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 
+using HEMA.WpfApp.Controls;
+
 using Microsoft.Win32;
 
 namespace HEMA.WpfApp
@@ -25,6 +27,12 @@ namespace HEMA.WpfApp
 			InitializeComponent();
 			MainWindow = mainWindow;
 			DataContext = mainWindow;
+
+			FilterPopupContent.ApplyClicked += FilterPopupContent_ApplyClicked;
+			FilterPopupContent.ResetClicked += FilterPopupContent_ResetClicked;
+
+			HostsListPopupContent.CancelClicked += HostsListPopupContent_CancelClicked;
+			HostsListPopupContent.ConnectClicked += HostsListPopupContent_ConnectClicked;
 		}
 
 		public void AcceptFights(string fightsMessage)
@@ -150,14 +158,23 @@ namespace HEMA.WpfApp
 					{
 						FilterPopup.IsOpen = false;
 					}
+					else if (HostsListPopup.IsOpen)
+					{
+						HostsListPopup.IsOpen = false;
+					}
 					else
 					{
 						Close();
 					}
 					return;
+
 				case Key.Enter:
-					ApplyFilter_Click(null!, null!);
+					if (FilterPopup.IsOpen)
+					{
+						ApplyFilter(FilterPopupContent.FilterText);
+					}
 					return;
+
 				case Key.F:
 					if (!FilterPopup.IsOpen)
 					{
@@ -165,11 +182,16 @@ namespace HEMA.WpfApp
 						e.Handled = true;
 					}
 					return;
+
 				case Key.OemPlus:
 					AddFightsButton_Click(null!, null!);
 					return;
+
 				case Key.F7:
-					ResetFilter_Click(null!, null!);
+					if (FilterPopup.IsOpen)
+					{
+						ResetFilter();
+					}
 					return;
 			}
 		}
@@ -182,15 +204,6 @@ namespace HEMA.WpfApp
 		private void ExportButton_Click(object sender, RoutedEventArgs e)
 		{
 			ExcelExporter.ExportListViewToExcel(FightsListView, "Бои");
-		}
-
-		private void Filter_Click(object sender, RoutedEventArgs e)
-		{
-			if (!FilterPopup.IsOpen)
-			{
-				FilterPopup.IsOpen = true;
-				FilterNameBox.Focus();
-			}
 		}
 
 		private async void UploadFights_Click(object sender, RoutedEventArgs e)
@@ -219,24 +232,43 @@ namespace HEMA.WpfApp
 			}
 		}
 
-		private void ApplyFilter_Click(object sender, RoutedEventArgs e)
+		private void FilterPopupContent_ApplyClicked(object? sender, string filterText)
+		{
+			ApplyFilter(filterText);
+		}
+
+		private void FilterPopupContent_ResetClicked(object? sender, EventArgs e)
+		{
+			ResetFilter();
+		}
+
+		private void HostsListPopupContent_CancelClicked(object? sender, EventArgs e)
+		{
+			HostsListPopup.IsOpen = false;
+		}
+
+		private async void HostsListPopupContent_ConnectClicked(object? sender, EventArgs e)
+		{
+			await ConnectToSelectedHostAsync();
+		}
+
+		private void ApplyFilter(string filterText)
 		{
 			if (!FilterPopup.IsOpen)
-			{
 				return;
-			}
-			string nameFilter = FilterNameBox.Text.Trim().ToLower();
+
+			string nameFilter = filterText.Trim().ToLower();
 
 			var view = CollectionViewSource.GetDefaultView(FightsListView.ItemsSource);
 			view.Filter = fightObj =>
 			{
 				if (fightObj is Fight fight)
 				{
-					bool nameMatch = string.IsNullOrEmpty(nameFilter)
-									 || fight.RedName.ToLower().Contains(nameFilter)
-									 || fight.BlueName.ToLower().Contains(nameFilter);
-					return nameMatch;
+					return string.IsNullOrEmpty(nameFilter)
+						|| fight.RedName.ToLower().Contains(nameFilter)
+						|| fight.BlueName.ToLower().Contains(nameFilter);
 				}
+
 				return false;
 			};
 
@@ -244,14 +276,12 @@ namespace HEMA.WpfApp
 			FilterPopup.IsOpen = false;
 		}
 
-		private void ResetFilter_Click(object sender, RoutedEventArgs e)
+		private void ResetFilter()
 		{
 			if (!FilterPopup.IsOpen)
-			{
 				return;
-			}
 
-			FilterNameBox.Text = string.Empty;
+			FilterPopupContent.Clear();
 
 			var view = CollectionViewSource.GetDefaultView(FightsListView.ItemsSource);
 			view.Filter = null;
@@ -260,47 +290,25 @@ namespace HEMA.WpfApp
 			FilterPopup.IsOpen = false;
 		}
 
-		private void HostsCancel_Click(object sender, RoutedEventArgs e)
+		private async Task ConnectToSelectedHostAsync()
 		{
-			HostsListPopup.IsOpen = false;
+			if (MainWindow.SelectedHost == null)
+				return;
 
-		}
-
-		async void HostsConnect_Click(object sender, RoutedEventArgs e)
-		{
 			await MainWindow.TcpService.ConnectAndSendFights(
 				MainWindow.SelectedHost.IpAddress.ToString(),
 				MainWindow.GetSerializedFights(),
 				CancellationToken.None);
+
 			HostsListPopup.IsOpen = false;
 		}
 
-		private void HostsListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+		private void Filter_Click(object sender, RoutedEventArgs e)
 		{
-			HostsConnect_Click(sender, e);
-		}
-
-		// чтобы карточка гарантированно получала KeyDown (WPF иногда капризничает)
-		private void HostsListPopupCard_Loaded(object sender, RoutedEventArgs e)
-		{
-			if (sender is FrameworkElement fe)
-				fe.Focus();
-		}
-
-		private void HostsListPopup_KeyDown(object sender, KeyEventArgs e)
-		{
-			if (e.Key == Key.Escape)
+			if (!FilterPopup.IsOpen)
 			{
-				HostsCancel_Click(sender, e);
-				e.Handled = true;
-				return;
-			}
-
-			if (e.Key == Key.Enter)
-			{
-				HostsConnect_Click(sender, e);
-				e.Handled = true;
-				return;
+				FilterPopup.IsOpen = true;
+				FilterPopupContent.FocusInput();
 			}
 		}
 	}

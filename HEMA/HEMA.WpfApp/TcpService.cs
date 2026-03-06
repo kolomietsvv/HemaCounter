@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
 
@@ -70,26 +71,60 @@ public sealed class TcpService : IDisposable
 
 	// ---------- CLIENT API ----------
 
-	public async Task<Dictionary<string, IPAddress>> GetAllHosts(int waitInSeconds, CancellationToken ct = default)
+	public async Task<Dictionary<string, IPAddress>> GetAllHosts(int waitInSeconds, bool ignoreSefHost = true)
 	{
 		using var udp = new UdpClient();
 		udp.EnableBroadcast = true;
 
 		var probe = Encoding.UTF8.GetBytes("DISCOVER");
-		await udp.SendAsync(probe, probe.Length, new IPEndPoint(IPAddress.Broadcast, udpPort));
+
+		foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
+		{
+			if (ni.OperationalStatus != OperationalStatus.Up)
+				continue;
+
+			var props = ni.GetIPProperties();
+
+			foreach (var addr in props.UnicastAddresses)
+			{
+				if (addr.Address.AddressFamily != AddressFamily.InterNetwork)
+					continue;
+
+				var mask = addr.IPv4Mask;
+				if (mask == null)
+					continue;
+
+				var ip = addr.Address.GetAddressBytes();
+				var maskBytes = mask.GetAddressBytes();
+
+				var broadcast = new byte[4];
+				for (int i = 0; i < 4; i++)
+					broadcast[i] = (byte)(ip[i] | (~maskBytes[i]));
+
+				var broadcastIp = new IPAddress(broadcast);
+
+				await udp.SendAsync(probe, probe.Length, new IPEndPoint(broadcastIp, udpPort));
+			}
+		}
 
 		var found = new Dictionary<string, IPAddress>();
 		var stopAt = DateTime.UtcNow.AddSeconds(waitInSeconds);
 
-		while (DateTime.UtcNow <= stopAt && !ct.IsCancellationRequested)
+		while (DateTime.UtcNow <= stopAt)
 		{
-			var receiveTask = udp.ReceiveAsync();
-			var done = await Task.WhenAny(receiveTask, Task.Delay(200, ct));
+			var waitTask = udp.ReceiveAsync();
+			var done = await Task.WhenAny(waitTask, Task.Delay(200));
 
-			if (done != receiveTask) continue;
+			if (done != waitTask)
+				continue;
 
-			var response = receiveTask.Result;
+			var response = waitTask.Result;
 			var name = Encoding.UTF8.GetString(response.Buffer);
+
+			if (ignoreSefHost && name == ServerName)
+			{
+				continue;
+			}
 			found.TryAdd(name, response.RemoteEndPoint.Address);
 		}
 
@@ -204,10 +239,6 @@ public sealed class TcpService : IDisposable
 					var fights = handleFightsRequest();
 					await SendFightsAsync(stream, fights, ct);
 					break;
-
-				default:
-					// неизвестная команда — можно разорвать соединение
-					return;
 			}
 		}
 	}

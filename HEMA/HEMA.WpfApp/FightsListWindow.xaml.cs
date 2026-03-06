@@ -1,12 +1,10 @@
-﻿using System.Collections.ObjectModel;
-using System.IO;
+﻿using System.IO;
 using System.Text.Json;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Media3D;
 
 using Microsoft.Win32;
 
@@ -194,7 +192,14 @@ namespace HEMA.WpfApp
 		{
 			if (!HostsListPopup.IsOpen)
 			{
-				var hosts = await MainWindow.TcpService.GetAllHosts(20);
+				var hosts = await MainWindow.TcpService.GetAllHosts(1);
+				MainWindow.DiscoveredHosts.Clear();
+
+				foreach (var host in hosts)
+				{
+					MainWindow.DiscoveredHosts.Add(new HostInfo { Name = host.Key, IpAddress = host.Value });
+				}
+
 				HostsListPopup.IsOpen = true;
 				HostsListPopup.Focus();
 			}
@@ -252,27 +257,46 @@ namespace HEMA.WpfApp
 
 		private void HostsCancel_Click(object sender, RoutedEventArgs e)
 		{
-			FilterPopup.IsOpen = false;
-		}
-
-		private void HostsConnect_Click(object sender, RoutedEventArgs e)
-		{
+			HostsListPopup.IsOpen = false;
 
 		}
 
-		private void HostsListPopupCard_Loaded(object sender, RoutedEventArgs e)
+		async void HostsConnect_Click(object sender, RoutedEventArgs e)
 		{
-
-		}
-
-		private void HostsListPopup_KeyDown(object sender, KeyEventArgs e)
-		{
-
+			await MainWindow.TcpService.ConnectAndSendFights(
+				MainWindow.SelectedHost.IpAddress.ToString(),
+				MainWindow.GetSerializedFights(),
+				CancellationToken.None);
+			HostsListPopup.IsOpen = false;
 		}
 
 		private void HostsListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
 		{
+			HostsConnect_Click(sender, e);
+		}
 
+		// чтобы карточка гарантированно получала KeyDown (WPF иногда капризничает)
+		private void HostsListPopupCard_Loaded(object sender, RoutedEventArgs e)
+		{
+			if (sender is FrameworkElement fe)
+				fe.Focus();
+		}
+
+		private void HostsListPopup_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.Key == Key.Escape)
+			{
+				HostsCancel_Click(sender, e);
+				e.Handled = true;
+				return;
+			}
+
+			if (e.Key == Key.Enter)
+			{
+				HostsConnect_Click(sender, e);
+				e.Handled = true;
+				return;
+			}
 		}
 	}
 }

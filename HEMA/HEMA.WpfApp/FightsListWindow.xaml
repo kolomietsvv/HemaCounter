@@ -413,7 +413,7 @@
                 BorderThickness="1"
                 CornerRadius="8"
                 Padding="20"
-                Width="520"
+                Width="400"
                 Opacity="0"
                 Focusable="True"
                 Loaded="HostsListPopupCard_Loaded"
@@ -471,8 +471,7 @@
 								<ListView.View>
 									<GridView>
 										<GridViewColumn Header="Имя" Width="220" DisplayMemberBinding="{Binding Name}" />
-										<GridViewColumn Header="IP" Width="150" DisplayMemberBinding="{Binding Ip}" />
-										<GridViewColumn Header="Порт" Width="80" DisplayMemberBinding="{Binding Port}" />
+										<GridViewColumn Header="IP" Width="150" DisplayMemberBinding="{Binding IpAddress}" />
 										<!-- опционально -->
 										<!--<GridViewColumn Header="Версия" Width="80" DisplayMemberBinding="{Binding Version}" />-->
 									</GridView>

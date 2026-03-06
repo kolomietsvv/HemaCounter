@@ -84,6 +84,13 @@ namespace HEMA.WpfApp
 				fightsListWindow.AcceptFights);
 		}
 
+		public string GetSerializedFights()
+		{
+			var fights = Fights.ToList();
+			var json = JsonSerializer.Serialize(fights);
+			return json;
+		}
+
 		private async void ShowPopupTime_Click(object sender, RoutedEventArgs e)
 		{
 			Fight.PauseTimer();
@@ -610,13 +617,6 @@ namespace HEMA.WpfApp
 					await SaveToHistoryFolderAsync(currentFolder, init);
 				}
 			}
-		}
-
-		private string GetSerializedFights()
-		{
-			var fights = Fights.ToList();
-			var json = JsonSerializer.Serialize(fights);
-			return json;
 		}
 
 		private static bool DefineGitExists()

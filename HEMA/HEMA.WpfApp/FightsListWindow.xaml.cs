@@ -35,9 +35,18 @@ namespace HEMA.WpfApp
 			HostsListPopupContent.ConnectClicked += HostsListPopupContent_ConnectClicked;
 		}
 
-		public void AcceptFights(string fightsMessage)
+		public void AcceptFights(string fightsMessage, string machineName)
 		{
-			AddFights(fightsMessage);
+			var result = MessageBox.Show(
+				$"Вамотправлены бои от {machineName}. Принять?",
+				"Подтверждение",
+				MessageBoxButton.YesNo,
+				MessageBoxImage.Question);
+
+			if (result == MessageBoxResult.Yes)
+			{
+				AddFights(fightsMessage);
+			}
 		}
 
 		public string HandleFightsRequest()
@@ -142,11 +151,62 @@ namespace HEMA.WpfApp
 		private void AddFights(string json)
 		{
 			var fights = JsonSerializer.Deserialize<List<Fight>>(json);
-			foreach (var fight in fights!)
+			
+			if (fights == null || fights.Count == 0)
 			{
-				MainWindow.Fights.Add(fight);
-				MainWindow.OpenRaitingButton_Click(null!, null!);
+				return;
 			}
+
+			DuplicateFightDialogResult? applyActionToAll = null;
+			foreach (var incomingFight in fights)
+			{
+				var existingFight = MainWindow.Fights.FirstOrDefault(fight =>
+					fight.RedName == incomingFight.RedName &&
+					fight.BlueName == incomingFight.BlueName);
+
+				if (existingFight == null)
+				{
+					MainWindow.Fights.Add(incomingFight);
+					continue;
+				}
+
+				var result = applyActionToAll ?? AskDuplicateFightAction(incomingFight);
+				if (result.ApplyToAll)
+				{
+					applyActionToAll = result;
+				}
+
+				switch (result.Action)
+				{
+					case DuplicateFightAction.Add:
+						MainWindow.Fights.Add(incomingFight);
+						break;
+
+					case DuplicateFightAction.Replace:
+						{
+							var index = MainWindow.Fights.IndexOf(existingFight);
+							if (index >= 0)
+							{
+								MainWindow.Fights[index] = incomingFight;
+							}
+							break;
+						}
+
+					case DuplicateFightAction.Ignore:
+						break;
+				}
+			}
+
+			MainWindow.OpenRaitingButton_Click(null!, null!);
+		}
+
+		private DuplicateFightDialogResult AskDuplicateFightAction(Fight incomingFight)
+		{
+			var dialog = new DuplicateFightDialog(
+				$"Бой \"{incomingFight.RedName} — {incomingFight.BlueName}\" уже существует.\n\n");
+
+			dialog.ShowDialog();
+			return dialog.Result;
 		}
 
 		private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -210,7 +270,7 @@ namespace HEMA.WpfApp
 		{
 			if (!HostsListPopup.IsOpen)
 			{
-				var hosts = await MainWindow.TcpService.GetAllHosts(1);
+				var hosts = await MainWindow.TcpService.GetAllHosts(1, ignoreSefHost: false);
 				MainWindow.DiscoveredHosts.Clear();
 
 				foreach (var host in hosts)

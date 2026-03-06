@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Text;
@@ -23,7 +24,7 @@ public sealed class TcpService : IDisposable
 	/// Запустить фоновые слушатели (UDP discovery + TCP server).
 	/// Вызывать один раз, например на старте приложения.
 	/// </summary>
-	public void Start(Func<string> handleFightsRequest, Action<string> acceptFights)
+	public void Start(Func<string> handleFightsRequest, Action<string, string> acceptFights)
 	{
 		if (_cts != null) return; // уже запущено
 
@@ -186,7 +187,7 @@ public sealed class TcpService : IDisposable
 
 	private async Task RunTcpServerAsync(
 		Func<string> handleFightsRequest,
-		Action<string> acceptFights,
+		Action<string, string> acceptFights,
 		CancellationToken ct)
 	{
 		_tcpListener = new TcpListener(IPAddress.Any, tcpPort);
@@ -217,7 +218,7 @@ public sealed class TcpService : IDisposable
 	private async Task HandleClientAsync(
 		TcpClient client,
 		Func<string> handleFightsRequest,
-		Action<string> acceptFights,
+		Action<string, string> acceptFights,
 		CancellationToken ct)
 	{
 		await using var stream = client.GetStream();
@@ -228,11 +229,14 @@ public sealed class TcpService : IDisposable
 			var command = await ReadExactlyStringAsync(stream, 1, ct);
 			if (command.Length == 0) return; // disconnect
 
+			var endpoint = (IPEndPoint)client.Client.RemoteEndPoint!;
+			string ip = endpoint.Address.ToString();
+
 			switch (command)
 			{
 				case "S": // клиент прислал данные
 					var fightsMessage = await ReadFightsMessageAsync(stream, ct);
-					acceptFights(fightsMessage);
+					acceptFights(fightsMessage, ip);
 					break;
 
 				case "R": // клиент запросил данные

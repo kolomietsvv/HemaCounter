@@ -20,15 +20,15 @@
                     BorderThickness="1"
                     CornerRadius="6">
 				<StackPanel>
-					<StackPanel>
+					<StackPanel Orientation="Horizontal">
 						<TextBlock Text="{Binding Title}"
                                Margin="0,0,0,6"
                                FontWeight="SemiBold"
                                Foreground="White"/>
 						<Button x:Name="RunButton"
 						        Content="Запустить"
-						        Width="100"
-						        Margin="0,0,10,0"
+						        Width="80"
+						        Margin="30,2"
 						        Click="RunButton_Click" />
 					</StackPanel>
 

@@ -6,6 +6,8 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 
+using DocumentFormat.OpenXml.Spreadsheet;
+
 using HEMA.WpfApp.Controls;
 
 using Microsoft.Win32;
@@ -33,6 +35,8 @@ namespace HEMA.WpfApp
 
 			HostsListPopupContent.CancelClicked += HostsListPopupContent_CancelClicked;
 			HostsListPopupContent.ConnectClicked += HostsListPopupContent_ConnectClicked;
+
+			Content = new DoubleEliminationBracketControl(MainWindow.Raiting.ToList(), 26);
 		}
 
 		public void AcceptFights(string fightsMessage, string machineName)

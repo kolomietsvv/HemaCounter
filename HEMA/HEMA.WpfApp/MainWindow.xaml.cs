@@ -70,7 +70,10 @@ namespace HEMA.WpfApp
 
 			Fights = new ObservableCollection<Fight>();
 			Raiting = new ObservableCollection<Fighter>();
-			InitFights(["Боец 1", "Боец 2", "Боец 3"], 5);
+			InitFights(["Боец 1", "Боец 2", "Боец 3", "Боец 4", "Боец 5", 
+				"Боец 6", "Боец 7", "Боец 8", "Боец 9", "Боец 10", "Боец 11", "Боец 12",
+				"Боец 13", "Боец 14", "Боец 15", "Боец 16", "Боец 17", "Боец 18", "Боец 19", 
+				"Боец 20", "Боец 21", "Боец 22", "Боец 23", "Боец 24", "Боец 25", "Боец 26"], 5);
 
 			DataContext = this;
 			fightsListWindow = new FightsListWindow(this);
@@ -585,7 +588,12 @@ namespace HEMA.WpfApp
 				Fights.Add(fight);
 			}
 
-			enumerator = Fights.GetEnumerator();
+			SetupEnumerator(Fights);
+		}
+
+		public void SetupEnumerator(IEnumerable<Fight> fights)
+		{
+			enumerator = fights.GetEnumerator();
 			enumerator.MoveNext();
 			SetCurrentAndNextFights();
 		}

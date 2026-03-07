@@ -1,0 +1,164 @@
+﻿<UserControl x:Class="HEMA.WpfApp.Controls.DoubleEliminationBracketControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:local="clr-namespace:HEMA.WpfApp.Controls"
+             mc:Ignorable="d"
+             Background="#111111">
+
+	<UserControl.Resources>
+
+		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+
+		<DataTemplate x:Key="MatchTemplate">
+			<Border Margin="6"
+                    Padding="8"
+                    Width="220"
+                    MinHeight="78"
+                    Background="#222222"
+                    BorderBrush="#4E4E4E"
+                    BorderThickness="1"
+                    CornerRadius="6">
+				<StackPanel>
+					<TextBlock Text="{Binding Title}"
+                               Margin="0,0,0,6"
+                               FontWeight="SemiBold"
+                               Foreground="White"/>
+
+					<Border Margin="0,2,0,2"
+                            Padding="5"
+                            Background="#303030"
+                            CornerRadius="4">
+						<TextBlock Text="{Binding Fighter1Name}"
+                                   Foreground="White"
+                                   TextTrimming="CharacterEllipsis"/>
+					</Border>
+
+					<Border Margin="0,2,0,2"
+                            Padding="5"
+                            Background="#303030"
+                            CornerRadius="4">
+						<TextBlock Text="{Binding Fighter2Name}"
+                                   Foreground="White"
+                                   TextTrimming="CharacterEllipsis"/>
+					</Border>
+				</StackPanel>
+			</Border>
+		</DataTemplate>
+
+		<DataTemplate x:Key="RoundTemplate">
+			<StackPanel Margin="8,0"
+                        VerticalAlignment="Center">
+				<TextBlock Text="{Binding Title}"
+                           Margin="0,0,0,8"
+                           HorizontalAlignment="Center"
+                           FontWeight="Bold"
+                           Foreground="White"/>
+
+				<ItemsControl ItemsSource="{Binding Matches}"
+                              ItemTemplate="{StaticResource MatchTemplate}">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<StackPanel VerticalAlignment="Center"/>
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+				</ItemsControl>
+			</StackPanel>
+		</DataTemplate>
+
+		<DataTemplate x:Key="BracketTemplate">
+			<Grid Margin="0,10,0,10">
+				<Grid.ColumnDefinitions>
+					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="Auto" />
+					<ColumnDefinition Width="*" />
+				</Grid.ColumnDefinitions>
+
+				<!-- Левая половина -->
+				<ItemsControl Grid.Column="0"
+                              ItemsSource="{Binding LeftRounds}"
+                              ItemTemplate="{StaticResource RoundTemplate}"
+                              HorizontalAlignment="Right"
+                              VerticalAlignment="Center">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Right"/>
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+				</ItemsControl>
+
+				<!-- Центральный финал -->
+				<StackPanel Grid.Column="1"
+                            Margin="24,0"
+                            VerticalAlignment="Center">
+					<TextBlock Text="{Binding FinalTitle}"
+                               Margin="0,0,0,8"
+                               HorizontalAlignment="Center"
+                               FontWeight="Bold"
+                               FontSize="14"
+                               Foreground="White"/>
+
+					<ContentControl Content="{Binding FinalMatch}"
+                                    ContentTemplate="{StaticResource MatchTemplate}"
+                                    HorizontalAlignment="Center"/>
+				</StackPanel>
+
+				<!-- Правая половина -->
+				<ItemsControl Grid.Column="2"
+                              ItemsSource="{Binding RightRounds}"
+                              ItemTemplate="{StaticResource RoundTemplate}"
+                              HorizontalAlignment="Left"
+                              VerticalAlignment="Center">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Left"/>
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+				</ItemsControl>
+			</Grid>
+		</DataTemplate>
+
+	</UserControl.Resources>
+
+	<ScrollViewer HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto"
+                  Background="#111111">
+		<StackPanel Margin="12">
+
+			<TextBlock Text="Верхняя сетка"
+                       Margin="0,0,0,8"
+                       FontSize="20"
+                       FontWeight="Bold"
+                       Foreground="White"/>
+
+			<ContentControl Content="{Binding WinnersBracket}"
+                            ContentTemplate="{StaticResource BracketTemplate}"/>
+
+			<Separator Margin="0,16,0,16" Background="#444444"/>
+
+			<TextBlock Text="Нижняя сетка"
+                       Margin="0,0,0,8"
+                       FontSize="20"
+                       FontWeight="Bold"
+                       Foreground="White"/>
+
+			<ContentControl Content="{Binding LosersBracket}"
+                            ContentTemplate="{StaticResource BracketTemplate}"/>
+
+			<Separator Margin="0,16,0,16" Background="#444444"/>
+
+			<TextBlock Text="Grand Final"
+                       Margin="0,0,0,8"
+                       FontSize="20"
+                       FontWeight="Bold"
+                       Foreground="White"/>
+
+			<ContentControl Content="{Binding GrandFinal}"
+                            ContentTemplate="{StaticResource MatchTemplate}"
+                            HorizontalAlignment="Center"/>
+		</StackPanel>
+	</ScrollViewer>
+</UserControl>

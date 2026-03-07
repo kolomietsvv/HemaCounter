@@ -41,6 +41,8 @@ namespace HEMA
 		[JsonIgnore]
 		public ICommand EditFightCommand { get; set; }
 
+		public string? Title { get; set; }
+
 		public int? MaxDoubleHits { get; set; }
 
 		public FightSettings Settings { get; set; }

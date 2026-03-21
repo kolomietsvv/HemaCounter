@@ -1,20 +1,30 @@
-﻿namespace HEMA.WpfApp.Controls;
+﻿
+using System.ComponentModel;
+
+namespace HEMA.WpfApp.Controls;
 
 public static class DoubleEliminationBracketViewModelFactory
 {
-	public static DoubleEliminationBracketViewModel Create(DoubleEliminationBracket bracket)
+	private static Dictionary<string, Fight> fightsDictionary = new Dictionary<string, Fight>();
+	private static DoubleEliminationBracket? currentBracket;
+
+	public static DoubleEliminationBracketViewModel Create(DoubleEliminationBracket bracket, FightSettings fightSettings)
 	{
+		currentBracket = bracket;
+
 		if (bracket is null)
 			return null!;
 
 		var winners = CreateBracketViewModel(
 			bracket.WinnersMatches.OrderBy(x => x.Round).ThenBy(x => x.Index).ToList(),
 			"Финал верхней сетки",
+			fightSettings,
 			isLoosers: false);
 
 		var losers = CreateBracketViewModel(
 			bracket.LosersMatches.OrderBy(x => x.Round).ThenBy(x => x.Index).ToList(),
 			"Финал нижней сетки",
+			fightSettings,
 			isLoosers: true);
 
 		var grandFinalNode = bracket.GrandFinalMatches
@@ -28,13 +38,14 @@ public static class DoubleEliminationBracketViewModelFactory
 			LosersBracket = losers,
 			GrandFinal = grandFinalNode is null
 				? new Fight() { Title = "Финал" }
-				: ToFight(grandFinalNode)
+				: ToFight(grandFinalNode, fightSettings)
 		};
 	}
 
 	private static BracketViewModel CreateBracketViewModel(
 		List<MatchNode> matches,
 		string finalTitle,
+		FightSettings fightSettings,
 		bool isLoosers)
 	{
 		var groupedRounds = matches
@@ -43,9 +54,9 @@ public static class DoubleEliminationBracketViewModelFactory
 			.Select(g => new RoundViewModel
 			{
 				Title = $"1/{GetTitle(g, isLoosers)}",
-				Matches = g
+				Fights = g
 					.OrderBy(x => x.Index)
-					.Select(ToFight)
+					.Select(fight => ToFight(fight, fightSettings))
 					.ToList()
 			})
 			.ToList();
@@ -64,12 +75,20 @@ public static class DoubleEliminationBracketViewModelFactory
 			return new BracketViewModel
 			{
 				FinalTitle = finalTitle,
-				FinalMatch = groupedRounds[0].Matches.FirstOrDefault() ?? new Fight { Title = finalTitle }
+				FinalMatch = groupedRounds[0].Fights.FirstOrDefault() ?? new Fight { Title = finalTitle }
 			};
 		}
 
 		var finalRound = groupedRounds.Last();
-		var finalMatch = finalRound.Matches.FirstOrDefault() ?? new Fight { Title = finalTitle };
+		var finalMatch = finalRound.Fights.FirstOrDefault() ?? new Fight(string.Empty, string.Empty, fightSettings)
+		{
+			Title = finalTitle,
+			BracketInfo = new()
+			{
+				BracketType = HEMA.BracketType.Final,
+				BracketOrientation = BracketOrientation.Left,
+			}
+		};
 
 		var roundsWithoutFinal = groupedRounds.Take(groupedRounds.Count - 1).ToList();
 
@@ -80,15 +99,21 @@ public static class DoubleEliminationBracketViewModelFactory
 		var rightRounds = new List<RoundViewModel>(rightCount);
 		for (int i = 0; i < roundsWithoutFinal.Count; i++)
 		{
-			var matchesCount = roundsWithoutFinal[i].Matches.Count / 2;
+			var matchesCount = roundsWithoutFinal[i].Fights.Count / 2;
 			leftRounds.Add(new()
 			{
-				Matches = roundsWithoutFinal[i].Matches.Take(matchesCount).ToList(),
+				Fights = roundsWithoutFinal[i].Fights
+					.Select(fight => SetOrientation(fight, BracketOrientation.Left))
+					.Take(matchesCount)
+					.ToList(),
 				Title = roundsWithoutFinal[i].Title,
 			});
 			rightRounds.Add(new()
 			{
-				Matches = roundsWithoutFinal[i].Matches.Skip(matchesCount).ToList(),
+				Fights = roundsWithoutFinal[i].Fights
+					.Skip(matchesCount)
+					.Select(fight => SetOrientation(fight, BracketOrientation.Right))
+					.ToList(),
 				Title = roundsWithoutFinal[i].Title,
 			});
 		}
@@ -102,16 +127,66 @@ public static class DoubleEliminationBracketViewModelFactory
 		};
 	}
 
+	private static Fight SetOrientation(Fight fight, BracketOrientation bracketOrientation)
+	{
+		fight.BracketInfo.BracketOrientation = bracketOrientation;
+		return fight;
+	}
+
 	private static int GetTitle(IGrouping<int, MatchNode> g, bool isLoosers)
 		=> isLoosers ? g.Count() * 2 : g.Count();
 
-	private static Fight ToFight(MatchNode match)
+	private static Fight ToFight(MatchNode match, FightSettings fightSettings)
 	{
-		return new Fight(GetSlotName(match.Slot1), GetSlotName(match.Slot2), null!)
+		var fight = new Fight(GetSlotName(match.Slot1), GetSlotName(match.Slot2), fightSettings)
 		{
 			Title = GetMatchTitle(match),
+			BracketInfo = new()
+			{
+				BracketId = match.Id,
+			},
+			WinnerNextFightInfo = ToNextFightInfo(match.WinnerTo),
+			LooserNextFightInfo = ToNextFightInfo(match.LoserTo),
 		};
+		fight.PropertyChanged += FightCompleted;
+		fightsDictionary.TryAdd(match.Id, fight);
+		return fight;
 	}
+
+	private static void FightCompleted(object sender, PropertyChangedEventArgs e)
+	{
+		var fight = (Fight)sender;
+		if (e.PropertyName == nameof(fight.IsCompleted))
+		{
+			if (!fight.IsCompleted)
+			{
+				var match = currentBracket!.NodesDictionary[fight.BracketInfo.BracketId];
+				fight.WinnerNextFightInfo = ToNextFightInfo(match.WinnerTo);
+				fight.LooserNextFightInfo = ToNextFightInfo(match.LoserTo);
+			}
+			if (fight.RedScore == fight.BlueScore)
+			{
+				return;
+			}
+			var winnerName = fight.RedScore > fight.BlueScore ? fight.RedName : fight.BlueName;
+			var looserName = fight.BlueScore < fight.RedScore ? fight.BlueName : fight.RedName;
+			if (fight.WinnerNextFightInfo is not null)
+			{
+				fightsDictionary[fight.WinnerNextFightInfo.NextFightId].SetName(fight.WinnerNextFightInfo.NextFighterColor, winnerName);
+			}
+			if (fight.LooserNextFightInfo is not null)
+			{
+				fightsDictionary[fight.LooserNextFightInfo.NextFightId].SetName(fight.LooserNextFightInfo.NextFighterColor, looserName);
+			}
+		}
+	}
+
+	private static NextFightInfo? ToNextFightInfo(MatchLink? matchLink)
+		=> matchLink is null ? null : new()
+		{
+			NextFighterColor = matchLink.FighterColor,
+			NextFightId = matchLink.MatchId
+		};
 
 	private static string GetMatchTitle(MatchNode match)
 	{

@@ -6,8 +6,6 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 
-using DocumentFormat.OpenXml.Spreadsheet;
-
 using HEMA.WpfApp.Controls;
 
 using Microsoft.Win32;
@@ -35,8 +33,6 @@ namespace HEMA.WpfApp
 
 			HostsListPopupContent.CancelClicked += HostsListPopupContent_CancelClicked;
 			HostsListPopupContent.ConnectClicked += HostsListPopupContent_ConnectClicked;
-
-			Content = new DoubleEliminationBracketControl(MainWindow.Raiting.ToList(), 26, MainWindow.SetupEnumerator);
 		}
 
 		public void AcceptFights(string fightsMessage, string machineName)
@@ -62,7 +58,7 @@ namespace HEMA.WpfApp
 		{
 			if ((sender as Button)?.CommandParameter is Fight fight)
 			{
-				MainWindow.SetEnumerator(fight.RedName, fight.BlueName);
+				MainWindow.SetEnumerator(MainWindow.Fights, fight.RedName, fight.BlueName);
 			}
 			MainWindow.RaitingWindow.Close();
 			Close();
@@ -123,7 +119,7 @@ namespace HEMA.WpfApp
 				collection.Move(oldIndex, newIndex);
 
 			_draggedItem = null;
-			MainWindow.SetEnumerator(MainWindow.Fight.RedName, MainWindow.Fight.BlueName);
+			MainWindow.SetEnumerator(MainWindow.Fights, MainWindow.Fight.RedName, MainWindow.Fight.BlueName);
 		}
 
 		private object? GetItemUnderMouse(object origin)
@@ -294,6 +290,19 @@ namespace HEMA.WpfApp
 				HostsListPopup.IsOpen = true;
 				HostsListPopup.Focus();
 			}
+		}
+
+		private void ShowBrackets_Click(object sender, RoutedEventArgs e)
+		{
+			Content = MainWindow.BracketControl;
+		}
+
+		private void CalculateBrackets_Click(object sender, RoutedEventArgs e)
+		{
+			MainWindow.BracketControl = new DoubleEliminationBracketControl(
+				MainWindow.Raiting.ToList(),
+				26, MainWindow.SetEnumerator,
+				MainWindow.GetSettings());
 		}
 
 		private void FilterPopupContent_ApplyClicked(object? sender, string filterText)

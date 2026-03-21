@@ -4,7 +4,7 @@
 	public sealed class RoundViewModel
 	{
 		public string Title { get; set; } = "";
-		public List<Fight> Matches { get; set; } = new();
+		public List<Fight> Fights { get; set; } = new();
 	}
 
 	public sealed class BracketViewModel

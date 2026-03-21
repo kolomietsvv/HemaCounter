@@ -11,7 +11,7 @@
             <RowDefinition/>
         </Grid.RowDefinitions>
         <StackLayout Margin ="0,0,0,-5" Grid.Row="0" Orientation="Horizontal">
-            <Grid BackgroundColor="LightSkyBlue" HorizontalOptions="FillAndExpand">
+            <Grid BackgroundColor="CadetBlue" HorizontalOptions="FillAndExpand">
                 <Label Text="ˆ" HorizontalOptions="Center" VerticalOptions="Start" FontSize="72" VerticalTextAlignment="Start" Margin="-15" TextColor="{Binding BtnsColor}">
                     <Label.GestureRecognizers>
                         <TapGestureRecognizer Tapped="IncreaseBlueScore"/>
@@ -48,7 +48,7 @@
                 <StackLayout HorizontalOptions="Center" Orientation="Horizontal" VerticalOptions="Fill" Margin ="0,-40,0,0">
                     <Button Text="■" TextColor="Silver" Padding="-10,2,-10,5" Font="30" BackgroundColor="WhiteSmoke" HorizontalOptions="Center" VerticalOptions="EndAndExpand" Clicked="ResetTimer" FontAttributes="Bold"/>
                 </StackLayout>
-                <StackLayout HorizontalOptions="Center" BackgroundColor="LightSkyBlue" Orientation="Horizontal" VerticalOptions="EndAndExpand" Margin ="0,0,0,-5">
+                <StackLayout HorizontalOptions="Center" BackgroundColor="CadetBlue" Orientation="Horizontal" VerticalOptions="EndAndExpand" Margin ="0,0,0,-5">
                     <Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="-" Clicked="DecreaseBlueViolations" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>
                     <Label Text="{Binding Fight.BlueViolations}" HorizontalOptions="FillAndExpand" HorizontalTextAlignment="Start" FontSize="30"/>
                     <Button WidthRequest="50" HorizontalOptions="Start" Font="20" Text="+" Clicked="IncreaseBlueViolations" IsEnabled="{Binding Fight.IsScoreChangeEnabled}"/>

@@ -1,4 +1,6 @@
-﻿namespace HEMA.WpfApp;
+﻿using HEMA.Common.Models;
+
+namespace HEMA.WpfApp;
 
 public enum BracketType
 {
@@ -29,7 +31,7 @@ public sealed record SlotRef
 	public static SlotRef LoserOf(string matchId) => new() { Kind = SlotSourceKind.MatchLoser, FromMatchId = matchId };
 }
 
-public sealed record MatchLink(string MatchId, int SlotNumber);
+public sealed record MatchLink(string MatchId, FighterColor FighterColor);
 
 public sealed class MatchNode
 {
@@ -62,6 +64,8 @@ public sealed class DoubleEliminationBracket
 	public required IReadOnlyDictionary<int, Fighter> SeedToFighter { get; init; }
 
 	public required IReadOnlyList<MatchNode> Matches { get; init; }
+
+	public required Dictionary<string, MatchNode> NodesDictionary { get; init; }
 
 	public IReadOnlyList<MatchNode> WinnersMatches =>
 		Matches.Where(x => x.Bracket == BracketType.Winners).ToList();
@@ -161,7 +165,7 @@ public static class DoubleEliminationBracketGenerator
 			for (int k = 1; k <= count; k++)
 			{
 				int nextIndex = (k + 1) / 2;
-				int nextSlot = k % 2 == 1 ? 1 : 2;
+				FighterColor nextSlot = k % 2 == 1 ? FighterColor.Red : FighterColor.Blue;
 
 				wb[(t, k)].WinnerTo = new MatchLink(wb[(t + 1, nextIndex)].Id, nextSlot);
 			}
@@ -202,8 +206,8 @@ public static class DoubleEliminationBracketGenerator
 				lb[(1, k)].Slot1 = SlotRef.LoserOf(wbLeft.Id);
 				lb[(1, k)].Slot2 = SlotRef.LoserOf(wbRight.Id);
 
-				wbLeft.LoserTo = new MatchLink(lb[(1, k)].Id, 1);
-				wbRight.LoserTo = new MatchLink(lb[(1, k)].Id, 2);
+				wbLeft.LoserTo = new MatchLink(lb[(1, k)].Id, FighterColor.Red);
+				wbRight.LoserTo = new MatchLink(lb[(1, k)].Id, FighterColor.Blue);
 			}
 		}
 
@@ -226,8 +230,8 @@ public static class DoubleEliminationBracketGenerator
 					lb[(sMinor, k)].Slot1 = SlotRef.WinnerOf(prev1.Id);
 					lb[(sMinor, k)].Slot2 = SlotRef.WinnerOf(prev2.Id);
 
-					prev1.WinnerTo = new MatchLink(lb[(sMinor, k)].Id, 1);
-					prev2.WinnerTo = new MatchLink(lb[(sMinor, k)].Id, 2);
+					prev1.WinnerTo = new MatchLink(lb[(sMinor, k)].Id, FighterColor.Red);
+					prev2.WinnerTo = new MatchLink(lb[(sMinor, k)].Id, FighterColor.Blue);
 				}
 			}
 
@@ -249,8 +253,8 @@ public static class DoubleEliminationBracketGenerator
 				lb[(sMajor, k)].Slot1 = SlotRef.WinnerOf(previousLbNode.Id);
 				lb[(sMajor, k)].Slot2 = SlotRef.LoserOf(wbLoserSource.Id);
 
-				previousLbNode.WinnerTo = new MatchLink(lb[(sMajor, k)].Id, 1);
-				wbLoserSource.LoserTo = new MatchLink(lb[(sMajor, k)].Id, 2);
+				previousLbNode.WinnerTo = new MatchLink(lb[(sMajor, k)].Id, FighterColor.Red);
+				wbLoserSource.LoserTo = new MatchLink(lb[(sMajor, k)].Id, FighterColor.Blue);
 			}
 		}
 
@@ -266,7 +270,7 @@ public static class DoubleEliminationBracketGenerator
 				{
 					for (int k = 1; k <= count; k++)
 					{
-						lb[(s, k)].WinnerTo ??= new MatchLink(lb[(s + 1, k)].Id, 1);
+						lb[(s, k)].WinnerTo ??= new MatchLink(lb[(s + 1, k)].Id, FighterColor.Red);
 					}
 				}
 			}
@@ -278,7 +282,7 @@ public static class DoubleEliminationBracketGenerator
 
 		var gf1 = new MatchNode
 		{
-			Id = "GF-1",
+			Id = "Фин. 1",
 			Bracket = BracketType.GrandFinal,
 			Round = 1,
 			Index = 1,
@@ -286,8 +290,8 @@ public static class DoubleEliminationBracketGenerator
 			Slot2 = SlotRef.WinnerOf(lbChampion.Id)
 		};
 
-		wbChampion.WinnerTo = new MatchLink(gf1.Id, 1);
-		lbChampion.WinnerTo = new MatchLink(gf1.Id, 2);
+		wbChampion.WinnerTo = new MatchLink(gf1.Id, FighterColor.Red);
+		lbChampion.WinnerTo = new MatchLink(gf1.Id, FighterColor.Blue);
 
 		allMatches.Add(gf1);
 
@@ -295,7 +299,7 @@ public static class DoubleEliminationBracketGenerator
 		{
 			var gf2 = new MatchNode
 			{
-				Id = "GF-2",
+				Id = "Фин 2",
 				Bracket = BracketType.GrandFinal,
 				Round = 2,
 				Index = 1,
@@ -303,8 +307,8 @@ public static class DoubleEliminationBracketGenerator
 				Slot2 = SlotRef.LoserOf(gf1.Id)
 			};
 
-			gf1.WinnerTo = new MatchLink(gf2.Id, 1);
-			gf1.LoserTo = new MatchLink(gf2.Id, 2);
+			gf1.WinnerTo = new MatchLink(gf2.Id, FighterColor.Red);
+			gf1.LoserTo = new MatchLink(gf2.Id, FighterColor.Blue);
 
 			allMatches.Add(gf2);
 		}
@@ -317,7 +321,8 @@ public static class DoubleEliminationBracketGenerator
 			Height = height,
 			SeedOrder = seedOrder,
 			SeedToFighter = seedToFighter,
-			Matches = allMatches
+			Matches = allMatches,
+			NodesDictionary = allMatches.ToDictionary(match => match.Id)
 		};
 	}
 

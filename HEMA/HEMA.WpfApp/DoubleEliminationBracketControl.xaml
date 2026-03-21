@@ -28,26 +28,55 @@
 						<Button x:Name="RunButton"
 						        Content="Запустить"
 						        Width="80"
-						        Margin="30,2"
+								Height="20"
+								Padding="0"
+						        Margin="30,-3,0,0"
 						        Click="RunButton_Click" />
 					</StackPanel>
 
 					<Border Margin="0,2,0,2"
                             Padding="5"
-                            Background="#303030"
+                            Background="PaleVioletRed"
                             CornerRadius="4">
-						<TextBlock Text="{Binding RedName}"
-                                   Foreground="White"
-                                   TextTrimming="CharacterEllipsis"/>
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*" />
+								<ColumnDefinition Width="Auto" />
+							</Grid.ColumnDefinitions>
+
+							<TextBlock Grid.Column="0"
+							Text="{Binding RedName}"
+							Foreground="White"
+							TextTrimming="CharacterEllipsis"/>
+
+							<TextBlock Grid.Column="1"
+							Text="{Binding RedScore}"
+							Foreground="White"
+							Margin="10,0,0,0"/>
+						</Grid>
 					</Border>
+
 
 					<Border Margin="0,2,0,2"
                             Padding="5"
-                            Background="#303030"
+                            Background="CadetBlue"
                             CornerRadius="4">
-						<TextBlock Text="{Binding BlueName}"
-                                   Foreground="White"
-                                   TextTrimming="CharacterEllipsis"/>
+						<Grid>
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="*" />
+								<ColumnDefinition Width="Auto" />
+							</Grid.ColumnDefinitions>
+
+							<TextBlock Grid.Column="0"
+							Text="{Binding BlueName}"
+							Foreground="White"
+							TextTrimming="CharacterEllipsis"/>
+
+							<TextBlock Grid.Column="1"
+							Text="{Binding BlueScore}"
+							Foreground="White"
+							Margin="10,0,0,0"/>
+						</Grid>
 					</Border>
 				</StackPanel>
 			</Border>
@@ -62,7 +91,7 @@
                            FontWeight="Bold"
                            Foreground="White"/>
 
-				<ItemsControl ItemsSource="{Binding Matches}"
+				<ItemsControl ItemsSource="{Binding Fights}"
                               ItemTemplate="{StaticResource MatchTemplate}">
 					<ItemsControl.ItemsPanel>
 						<ItemsPanelTemplate>
@@ -156,7 +185,7 @@
 
 			<Separator Margin="0,16,0,16" Background="#444444"/>
 
-			<TextBlock Text="Grand Final"
+			<TextBlock Text="Финал"
                        Margin="0,0,0,8"
                        FontSize="20"
                        FontWeight="Bold"

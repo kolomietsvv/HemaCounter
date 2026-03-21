@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 
 using HEMA.Models;
+using HEMA.WpfApp.Controls;
 
 using Microsoft.Win32;
 
@@ -25,6 +26,7 @@ namespace HEMA.WpfApp
 		private FightsListWindow fightsListWindow;
 		private IEnumerator<Fight> enumerator;
 		private string currentFolder;
+		private int maxDoubleHits;
 		private bool gitExists;
 		private MediaPlayer[] mediaPlayers;
 		private TimerAlarmLight[] ttmerAlarms =
@@ -42,6 +44,10 @@ namespace HEMA.WpfApp
 		public ObservableCollection<HostInfo> DiscoveredHosts { get; } = new();
 		public HostInfo? SelectedHost { get; set; }
 		public TcpService TcpService { get; }
+		public FightSettings FightSettings { get; private set; }
+
+		public DoubleEliminationBracketControl BracketControl { get; set; }
+
 
 		public Fight Fight
 		{
@@ -70,10 +76,10 @@ namespace HEMA.WpfApp
 
 			Fights = new ObservableCollection<Fight>();
 			Raiting = new ObservableCollection<Fighter>();
-			InitFights(["Боец 1", "Боец 2", "Боец 3", "Боец 4", "Боец 5", 
+			InitFights(["Боец 1", "Боец 2", "Боец 3", "Боец 4", "Боец 5",
 				"Боец 6", "Боец 7", "Боец 8", "Боец 9", "Боец 10", "Боец 11", "Боец 12",
-				"Боец 13", "Боец 14", "Боец 15", "Боец 16", "Боец 17", "Боец 18", "Боец 19", 
-				"Боец 20", "Боец 21", "Боец 22", "Боец 23", "Боец 24", "Боец 25", "Боец 26"], 5);
+				"Боец 13", "Боец 14", "Боец 15", "Боец 16", "Боец 17", "Боец 18", "Боец 19",
+				"Боец 20", "Боец 21", "Боец 22", "Боец 23", "Боец 24", "Боец 25", "Боец 26"]);
 
 			DataContext = this;
 			fightsListWindow = new FightsListWindow(this);
@@ -83,7 +89,7 @@ namespace HEMA.WpfApp
 
 			TcpService = new TcpService();
 			TcpService.Start(
-				fightsListWindow.HandleFightsRequest, 
+				fightsListWindow.HandleFightsRequest,
 				fightsListWindow.AcceptFights);
 		}
 
@@ -158,7 +164,7 @@ namespace HEMA.WpfApp
 				{
 					string filePath = fileDialog.FileName;
 					var names = await File.ReadAllLinesAsync(filePath);
-					InitFights(names, 5);
+					InitFights(names);
 					currentFolder = folderDialog.FolderName;
 					await TrySaveStateAsync(init: true);
 				}
@@ -532,7 +538,7 @@ namespace HEMA.WpfApp
 
 			fight.IsCompleted = false;
 			Fight = fight;
-			SetEnumerator(fight.RedName, fight.BlueName);
+			SetEnumerator(Fights, fight.RedName, fight.BlueName);
 			fightsListWindow.Close();
 			Focus();
 		}
@@ -562,16 +568,21 @@ namespace HEMA.WpfApp
 				json);
 		}
 
-		private void InitFights(IEnumerable<string> names, int maxDoubleHits)
+		private void InitFights(IEnumerable<string> names)
 		{
 			var fights = FightsListFactory.CreateFights(
 				names.Select(name => new Fighter { Name = name }).ToList(),
-				new FightSettings()
-				{
-					DoubleHitsInARow = maxDoubleHits,
-					DoubleHitsCommon = maxDoubleHits
-				});
+				GetSettings());
 			SetupFights(fights, new RelayCommand<Fight>(OnEditFight));
+		}
+
+		public FightSettings GetSettings()
+		{
+			return new FightSettings()
+			{
+				DoubleHitsInARow = maxDoubleHits,
+				DoubleHitsCommon = maxDoubleHits
+			};
 		}
 
 		private void SetupFights(IEnumerable<Fight> fights, ICommand editFightCommand)
@@ -598,9 +609,9 @@ namespace HEMA.WpfApp
 			SetCurrentAndNextFights();
 		}
 
-		public void SetEnumerator(string redName, string blueName)
+		public void SetEnumerator(IEnumerable<Fight> fights, string redName, string blueName)
 		{
-			enumerator = Fights.GetEnumerator();
+			enumerator = fights.GetEnumerator();
 			do
 			{
 				enumerator.MoveNext();

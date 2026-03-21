@@ -6,7 +6,7 @@
         <StackLayout Orientation="Horizontal">
             <StackLayout Orientation="Vertical" HorizontalOptions="FillAndExpand">
                 <RadioButton Value="♥" />
-                <RadioButton BackgroundColor="LightSkyBlue" />
+                <RadioButton BackgroundColor="CadetBlue" />
                 <RadioButton BackgroundColor="PaleVioletRed" />
                 <RadioButton BackgroundColor="WhiteSmoke" />
             </StackLayout>
@@ -16,11 +16,11 @@
                 <RadioButton BackgroundColor="PaleVioletRed" />
                 <RadioButton BackgroundColor="PaleVioletRed" />
             </StackLayout>
-            <StackLayout Orientation="Vertical" HorizontalOptions="FillAndExpand"  BackgroundColor="LightSkyBlue">
-                <RadioButton BackgroundColor="LightSkyBlue" />
-                <RadioButton BackgroundColor="LightSkyBlue" />
-                <RadioButton BackgroundColor="LightSkyBlue" />
-                <RadioButton BackgroundColor="LightSkyBlue" />
+            <StackLayout Orientation="Vertical" HorizontalOptions="FillAndExpand"  BackgroundColor="CadetBlue">
+                <RadioButton BackgroundColor="CadetBlue" />
+                <RadioButton BackgroundColor="CadetBlue" />
+                <RadioButton BackgroundColor="CadetBlue" />
+                <RadioButton BackgroundColor="CadetBlue" />
             </StackLayout>
         </StackLayout>
     </ContentPage.Content>

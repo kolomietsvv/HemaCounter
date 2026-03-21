@@ -30,7 +30,7 @@
 		</DataTemplate>
 
 		<DataTemplate x:Key="HeaderBlue">
-			<Border Background="LightSkyBlue" Padding="6,3">
+			<Border Background="CadetBlue" Padding="6,3">
 				<TextBlock Text="{Binding}" FontWeight="Bold"/>
 			</Border>
 		</DataTemplate>
@@ -300,7 +300,7 @@
 				Cursor="Hand"
 				Click="Filter_Click"/>
 			<!-- Кнопка Выгрузить -->
-			<Button Content="♥" 
+			<Button Content=" 📩 " 
 				Tag="F"
 				HorizontalContentAlignment="Right"
 				Width="60" Height="60" 
@@ -314,7 +314,7 @@
 				Cursor="Hand"
 				Click="UploadFights_Click"/>
 			<!-- Кнопка Загрузить -->
-			<Button Content="♣" 
+			<Button Content="🔀" 
 				Tag="F"
 				HorizontalContentAlignment="Right"
 				Width="60" Height="60" 
@@ -326,7 +326,21 @@
 				Foreground="White"
 				BorderBrush="DarkGreen"
 				Cursor="Hand"
-				Click="DownloadFights_Click"/>
+				Click="ShowBrackets_Click"/>
+			<!-- Кнопка Рассчитать Сетку -->
+			<Button Content="🧮" 
+				Tag="F"
+				HorizontalContentAlignment="Right"
+				Width="60" Height="60" 
+				FontSize="27" 
+				HorizontalAlignment="Left" 
+				VerticalAlignment="Bottom" 
+				Margin="20"
+				Background="LightGreen"
+				Foreground="White"
+				BorderBrush="DarkGreen"
+				Cursor="Hand"
+				Click="CalculateBrackets_Click"/>
 		</StackPanel>
 
 		<Popup x:Name="FilterPopup"

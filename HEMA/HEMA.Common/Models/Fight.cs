@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using System.Threading;
 using System.Windows.Input;
 
+using HEMA.Common.Models;
 using HEMA.Models;
 
 namespace HEMA
@@ -41,7 +42,13 @@ namespace HEMA
 		[JsonIgnore]
 		public ICommand EditFightCommand { get; set; }
 
+		public NextFightInfo? WinnerNextFightInfo { get; set; }
+		
+		public NextFightInfo? LooserNextFightInfo { get; set; }
+
 		public string? Title { get; set; }
+
+		public BracketInfo BracketInfo { get; set; }
 
 		public int? MaxDoubleHits { get; set; }
 
@@ -96,6 +103,19 @@ namespace HEMA
 			{
 				isCompleted = value;
 				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsCompleted)));
+			}
+		}
+
+		public void SetName(FighterColor fighterColor, string name)
+		{
+			switch (fighterColor)	
+			{
+				case FighterColor.Red:
+					RedName = name;
+					return;
+				case FighterColor.Blue:
+					BlueName = name;
+					return;
 			}
 		}
 

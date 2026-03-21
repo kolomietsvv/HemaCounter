@@ -150,7 +150,7 @@
 						</Grid.RowDefinitions>
 						<Button Content="■" Tag="↵" HorizontalContentAlignment="Center" Width="350" Margin="0,15,0 10" FontSize="70" Background="WhiteSmoke" Click="ResetTimer" FontWeight="Bold" />
 						<!-- ПРЕДУПРЕЖДЕНИЯ СИНЕГО -->
-						<Grid Background="LightSkyBlue" Grid.Row="1" Margin="2">
+						<Grid Background="CadetBlue" Grid.Row="1" Margin="2">
 							<Grid.ColumnDefinitions>
 								<ColumnDefinition />
 								<ColumnDefinition />
@@ -184,7 +184,7 @@
 						</Grid>
 					</Grid>
 					<!-- ТАБЛО СИНЕГО -->
-					<Grid Background="LightSkyBlue" Grid.Column="2">
+					<Grid Background="CadetBlue" Grid.Column="2">
 						<Grid.RowDefinitions>
 							<RowDefinition />
 							<RowDefinition />
@@ -221,7 +221,7 @@
 						<Button Content="🥇" Tag="Д" HorizontalContentAlignment="Right" FontSize="40" Grid.Row="0" Margin="2,1" Width="115" Click="OpenRaitingButton_Click" />
 					</StackPanel>
 					<!-- ТЕКУЩИЙ СИНИЙ -->
-					<Label x:Name="CurrentBlueLbl" Content="{Binding Fight.BlueName}" HorizontalContentAlignment="Left" Width="720" Background="LightSkyBlue" Padding="20,15,0,0" BorderThickness="0" FontSize="50" HorizontalAlignment="Right" VerticalAlignment="Stretch" Grid.Row="0" Panel.ZIndex="-1" />
+					<Label x:Name="CurrentBlueLbl" Content="{Binding Fight.BlueName}" HorizontalContentAlignment="Left" Width="720" Background="CadetBlue" Padding="20,15,0,0" BorderThickness="0" FontSize="50" HorizontalAlignment="Right" VerticalAlignment="Stretch" Grid.Row="0" Panel.ZIndex="-1" />
 					<!-- ТАЙМЕР -->
 					<Button x:Name="StartBtn" Content="{Binding Fight.Elapsed, Converter={StaticResource TimeSpanToStringConverter}}" Tag="пробел" 
 					HorizontalContentAlignment="Left" Foreground="Black" FontSize="250" FontFamily="Courier" Background="WhiteSmoke" 

@@ -157,8 +157,8 @@
 		</DataTemplate>
 
 	</UserControl.Resources>
-
-	<ScrollViewer HorizontalScrollBarVisibility="Auto"
+	<Grid>
+		<ScrollViewer HorizontalScrollBarVisibility="Auto"
                   VerticalScrollBarVisibility="Auto"
                   Background="#111111">
 		<StackPanel Margin="12">
@@ -196,4 +196,21 @@
                             HorizontalAlignment="Center"/>
 		</StackPanel>
 	</ScrollViewer>
+		<StackPanel Orientation="Horizontal">
+			<!-- Кнопка Назад -->
+			<Button Content="🥇" 
+				Tag="F"
+				HorizontalContentAlignment="Right"
+				Width="60" Height="60" 
+				FontSize="27" 
+				HorizontalAlignment="Left" 
+				VerticalAlignment="Bottom" 
+				Margin="20"
+				Background="LightGreen"
+				Foreground="White"
+				BorderBrush="DarkGreen"
+				Cursor="Hand"
+				Click="ReturnBack_Click"/>
+		</StackPanel>
+	</Grid>
 </UserControl>

@@ -5,14 +5,16 @@ namespace HEMA.WpfApp.Controls;
 
 public partial class DoubleEliminationBracketControl : UserControl
 {
-	private Action<List<Fight>, string, string> setCurrentFightAction;
+	private Action<List<Fight>, string, string> _setCurrentFightAction;
+	private Action _returnBackClick;
 	public DoubleEliminationBracketViewModel BracketVM { get; set; }
 
 	public DoubleEliminationBracketControl(
 		List<Fighter> fighters,
 		int participantsCount,
 		Action<List<Fight>, string, string> setCurrentFightAction,
-		FightSettings fightSettings)
+		FightSettings fightSettings,
+		Action returnBackClick)
 	{
 		ArgumentNullException.ThrowIfNull(fighters);
 
@@ -25,14 +27,15 @@ public partial class DoubleEliminationBracketControl : UserControl
 
 		BracketVM = DoubleEliminationBracketViewModelFactory.Create(bracket, fightSettings);
 		DataContext = BracketVM;
-		this.setCurrentFightAction = setCurrentFightAction;
+		_setCurrentFightAction = setCurrentFightAction;
+		_returnBackClick = returnBackClick;
 	}
 
 	private void RunButton_Click(object sender, RoutedEventArgs e)
 	{
 		var fight = (Fight)((FrameworkElement)sender).DataContext;
 
-		setCurrentFightAction(GetFights(GetBracket(fight), fight), fight.RedName, fight.BlueName);
+		_setCurrentFightAction(GetFights(GetBracket(fight), fight), fight.RedName, fight.BlueName);
 	}
 
 	private BracketViewModel GetBracket(Fight fight)
@@ -68,5 +71,10 @@ public partial class DoubleEliminationBracketControl : UserControl
 				return bracket.RightRounds.SelectMany(round => round.Fights).ToList();
 		}
 		throw new InvalidOperationException();
+	}
+
+	private void ReturnBack_Click(object sender, RoutedEventArgs e)
+	{
+		_returnBackClick();
 	}
 }

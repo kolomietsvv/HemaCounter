@@ -292,19 +292,6 @@ namespace HEMA.WpfApp
 			}
 		}
 
-		private void ShowBrackets_Click(object sender, RoutedEventArgs e)
-		{
-			Content = MainWindow.BracketControl;
-		}
-
-		private void CalculateBrackets_Click(object sender, RoutedEventArgs e)
-		{
-			MainWindow.BracketControl = new DoubleEliminationBracketControl(
-				MainWindow.Raiting.ToList(),
-				26, MainWindow.SetEnumerator,
-				MainWindow.GetSettings());
-		}
-
 		private void FilterPopupContent_ApplyClicked(object? sender, string filterText)
 		{
 			ApplyFilter(filterText);

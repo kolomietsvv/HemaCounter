@@ -1,4 +1,5 @@
-﻿<Window x:Class="HEMA.WpfApp.RaitingWindow"
+﻿<Window x:Class="HEMA.WpfApp.RaitingWindow"	 
+		xmlns:controls="clr-namespace:HEMA.WpfApp.Controls"
 		xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 		xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 		xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -100,5 +101,13 @@
 				Cursor="Hand"
 				Click="CalculateBrackets_Click"/>
 		</StackPanel>
+
+		<Popup x:Name="CalcBracketsPopup"
+			StaysOpen="False"
+			AllowsTransparency="True"
+			PopupAnimation="Fade"
+			Placement="Center">
+			<controls:CalcBracketsPopupContent x:Name="CalcBracketsPopupContent"/>
+		</Popup>
 	</Grid>
 </Window>

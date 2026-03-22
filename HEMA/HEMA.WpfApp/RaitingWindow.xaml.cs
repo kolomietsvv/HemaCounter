@@ -22,6 +22,29 @@ namespace HEMA.WpfApp
 			MainWindow = mainWindow;
 			DataContext = mainWindow;
 			_defaultContent = Content;
+
+			CalcBracketsPopupContent.ApplyClicked += CalcBracketsPopup_ApplyClicked;
+			CalcBracketsPopupContent.ResetClicked += CalcBracketPopup_CancledClicked;
+		}
+
+		private void CalcBracketPopup_CancledClicked(object? sender, EventArgs e)
+		{
+			CalcBracketsPopup.IsOpen = false;
+		}
+
+		private void CalcBracketsPopup_ApplyClicked(object? sender, string e)
+		{
+			var count = CalcBracketsPopupContent.ParticipantcCount;
+			if(count <= 4)
+			{
+
+			}
+			MainWindow.BracketControl = new DoubleEliminationBracketControl(
+				MainWindow.Raiting.ToList(),
+				count, MainWindow.SetEnumerator,
+				MainWindow.GetSettings(),
+				ReturnContentBack);
+			Content = MainWindow.BracketControl;
 		}
 
 		private void ShowBrackets_Click(object sender, RoutedEventArgs e)
@@ -31,11 +54,11 @@ namespace HEMA.WpfApp
 
 		private void CalculateBrackets_Click(object sender, RoutedEventArgs e)
 		{
-			MainWindow.BracketControl = new DoubleEliminationBracketControl(
-				MainWindow.Raiting.ToList(),
-				26, MainWindow.SetEnumerator,
-				MainWindow.GetSettings(),
-				ReturnContentBack);
+			if (!CalcBracketsPopup.IsOpen)
+			{
+				CalcBracketsPopup.IsOpen = true;
+				CalcBracketsPopupContent.FocusInput();
+			}
 		}
 
 		private void Window_KeyDown(object sender, KeyEventArgs e)

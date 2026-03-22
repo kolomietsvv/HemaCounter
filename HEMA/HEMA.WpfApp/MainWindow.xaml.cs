@@ -26,7 +26,7 @@ namespace HEMA.WpfApp
 		private FightsListWindow fightsListWindow;
 		private IEnumerator<Fight> enumerator;
 		private string currentFolder;
-		private int maxDoubleHits;
+		private int maxDoubleHits = 5;
 		private bool gitExists;
 		private MediaPlayer[] mediaPlayers;
 		private TimerAlarmLight[] ttmerAlarms =

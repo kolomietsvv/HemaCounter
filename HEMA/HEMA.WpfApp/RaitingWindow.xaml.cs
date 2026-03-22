@@ -43,7 +43,8 @@ namespace HEMA.WpfApp
 				MainWindow.Raiting.ToList(),
 				count, MainWindow.SetEnumerator,
 				MainWindow.GetSettings(),
-				ReturnContentBack);
+				ReturnContentBack,
+				MainWindow.ChangeDoubleHitColor);
 			Content = MainWindow.BracketControl;
 		}
 

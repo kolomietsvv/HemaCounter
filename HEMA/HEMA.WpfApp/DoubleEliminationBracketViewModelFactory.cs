@@ -8,7 +8,10 @@ public static class DoubleEliminationBracketViewModelFactory
 	private static Dictionary<string, Fight> fightsDictionary = new Dictionary<string, Fight>();
 	private static DoubleEliminationBracket? currentBracket;
 
-	public static DoubleEliminationBracketViewModel Create(DoubleEliminationBracket bracket, FightSettings fightSettings)
+	public static DoubleEliminationBracketViewModel Create(
+		DoubleEliminationBracket bracket, 
+		FightSettings fightSettings,
+		Action<bool> oneDoubleHitLeftHandler)
 	{
 		currentBracket = bracket;
 
@@ -19,12 +22,14 @@ public static class DoubleEliminationBracketViewModelFactory
 			bracket.WinnersMatches.OrderBy(x => x.Round).ThenBy(x => x.Index).ToList(),
 			"Финал верхней сетки",
 			fightSettings,
+			oneDoubleHitLeftHandler,
 			isLoosers: false);
 
 		var losers = CreateBracketViewModel(
 			bracket.LosersMatches.OrderBy(x => x.Round).ThenBy(x => x.Index).ToList(),
 			"Финал нижней сетки",
 			fightSettings,
+			oneDoubleHitLeftHandler,
 			isLoosers: true);
 
 		var grandFinalNode = bracket.GrandFinalMatches
@@ -38,7 +43,7 @@ public static class DoubleEliminationBracketViewModelFactory
 			LosersBracket = losers,
 			GrandFinal = grandFinalNode is null
 				? new Fight() { Title = "Финал" }
-				: ToFight(grandFinalNode, fightSettings)
+				: ToFight(grandFinalNode, fightSettings, oneDoubleHitLeftHandler)
 		};
 	}
 
@@ -46,6 +51,7 @@ public static class DoubleEliminationBracketViewModelFactory
 		List<MatchNode> matches,
 		string finalTitle,
 		FightSettings fightSettings,
+		Action<bool> oneDoubleHitLeftHandler,
 		bool isLoosers)
 	{
 		var groupedRounds = matches
@@ -56,7 +62,7 @@ public static class DoubleEliminationBracketViewModelFactory
 				Title = $"1/{GetTitle(g, isLoosers)}",
 				Fights = g
 					.OrderBy(x => x.Index)
-					.Select(fight => ToFight(fight, fightSettings))
+					.Select(fight => ToFight(fight, fightSettings, oneDoubleHitLeftHandler))
 					.ToList()
 			})
 			.ToList();
@@ -136,7 +142,7 @@ public static class DoubleEliminationBracketViewModelFactory
 	private static int GetTitle(IGrouping<int, MatchNode> g, bool isLoosers)
 		=> isLoosers ? g.Count() * 2 : g.Count();
 
-	private static Fight ToFight(MatchNode match, FightSettings fightSettings)
+	private static Fight ToFight(MatchNode match, FightSettings fightSettings, Action<bool> oneDoubleHitLeftHandler)
 	{
 		var fight = new Fight(GetSlotName(match.Slot1), GetSlotName(match.Slot2), fightSettings)
 		{
@@ -148,6 +154,7 @@ public static class DoubleEliminationBracketViewModelFactory
 			WinnerNextFightInfo = ToNextFightInfo(match.WinnerTo),
 			LooserNextFightInfo = ToNextFightInfo(match.LoserTo),
 		};
+		fight.OneDoubleHitLeft += oneDoubleHitLeftHandler;
 		fight.PropertyChanged += FightCompleted;
 		fightsDictionary.TryAdd(match.Id, fight);
 		return fight;
@@ -164,12 +171,28 @@ public static class DoubleEliminationBracketViewModelFactory
 				fight.WinnerNextFightInfo = ToNextFightInfo(match.WinnerTo);
 				fight.LooserNextFightInfo = ToNextFightInfo(match.LoserTo);
 			}
-			if (fight.RedScore == fight.BlueScore)
+			var winnerName = fight.RedScore > fight.BlueScore ? fight.RedName : fight.BlueName;
+			var looserName = fight.BlueScore < fight.RedScore ? fight.BlueName : fight.RedName;
+
+			if (fight.DoubleHits >= fight.MaxDoubleHits)
+			{
+				winnerName = looserName = "Проходной";
+			}
+			else if (fight.RedName == "Проходной")
+			{
+				winnerName = fight.BlueName;
+				looserName = "Проходной";
+			}
+			else if (fight.BlueName == "Проходной")
+			{
+				winnerName = fight.RedName;
+				looserName = "Проходной";
+			}
+			else if (fight.RedScore == fight.BlueScore)
 			{
 				return;
 			}
-			var winnerName = fight.RedScore > fight.BlueScore ? fight.RedName : fight.BlueName;
-			var looserName = fight.BlueScore < fight.RedScore ? fight.BlueName : fight.RedName;
+
 			if (fight.WinnerNextFightInfo is not null)
 			{
 				fightsDictionary[fight.WinnerNextFightInfo.NextFightId].SetName(fight.WinnerNextFightInfo.NextFighterColor, winnerName);

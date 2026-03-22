@@ -14,7 +14,8 @@ public partial class DoubleEliminationBracketControl : UserControl
 		int participantsCount,
 		Action<List<Fight>, string, string> setCurrentFightAction,
 		FightSettings fightSettings,
-		Action returnBackClick)
+		Action returnBackClick,
+		Action<bool> oneDoubleHitLeftHandler)
 	{
 		ArgumentNullException.ThrowIfNull(fighters);
 
@@ -25,7 +26,7 @@ public partial class DoubleEliminationBracketControl : UserControl
 			participantsCount,
 			includeGrandFinalReset: false);
 
-		BracketVM = DoubleEliminationBracketViewModelFactory.Create(bracket, fightSettings);
+		BracketVM = DoubleEliminationBracketViewModelFactory.Create(bracket, fightSettings, oneDoubleHitLeftHandler);
 		DataContext = BracketVM;
 		_setCurrentFightAction = setCurrentFightAction;
 		_returnBackClick = returnBackClick;

@@ -591,7 +591,7 @@ namespace HEMA.WpfApp
 
 			foreach (var fight in fights)
 			{
-				fight.OneDoubleHitLeft += isOneDoubleHitLeft => DoubleHitlLbl.Foreground = isOneDoubleHitLeft ? Brushes.Red : Brushes.Black;
+				fight.OneDoubleHitLeft += ChangeDoubleHitColor;
 				fight.MaxDoubleHitsReached += () => DisplayFinishFightDialog(TextCollection.MaxDoubleHits, FinishCause.DoubleHits);
 				fight.TimerTick += PlaySound;
 				fight.TimerAlarms = ttmerAlarms;
@@ -600,6 +600,11 @@ namespace HEMA.WpfApp
 			}
 
 			SetupEnumerator(Fights);
+		}
+
+		public void ChangeDoubleHitColor(bool isOneDoubleHitLeft)
+		{
+			 DoubleHitlLbl.Foreground = isOneDoubleHitLeft ? Brushes.Red : Brushes.Black;
 		}
 
 		public void SetupEnumerator(IEnumerable<Fight> fights)

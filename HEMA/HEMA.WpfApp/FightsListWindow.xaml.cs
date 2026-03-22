@@ -270,7 +270,7 @@ namespace HEMA.WpfApp
 		{
 			if (!HostsListPopup.IsOpen)
 			{
-				var hosts = await MainWindow.TcpService.GetAllHosts(1, ignoreSefHost: false);
+				var hosts = await MainWindow.TcpService.GetAllHosts(1, ignoreSefHost: true);
 				MainWindow.DiscoveredHosts.Clear();
 
 				foreach (var host in hosts)

@@ -46,7 +46,7 @@ public sealed class MatchNode
 	public MatchLink? WinnerTo { get; set; }
 	public MatchLink? LoserTo { get; set; }
 
-	public override string ToString() => $"{Id}: {Bracket} R{Round} M{Index}";
+	public override string ToString() => $"{Id}: {Bracket} {Round}.{Index}";
 }
 
 public sealed class DoubleEliminationBracket

@@ -481,10 +481,12 @@ namespace HEMA.WpfApp
 				if (!RaitingWindow.IsLoaded)
 				{
 					RaitingWindow = new(this);
+					RaitingWindow.Closing += (s, e) => { ((RaitingWindow)s).Hide(); e.Cancel = true; };
 					RaitingWindow.Show();
 				}
 				else
 				{
+					RaitingWindow.Show();
 					RaitingWindow.WindowState = WindowState.Normal;
 					RaitingWindow.Focus();
 				}
@@ -604,7 +606,7 @@ namespace HEMA.WpfApp
 
 		public void ChangeDoubleHitColor(bool isOneDoubleHitLeft)
 		{
-			 DoubleHitlLbl.Foreground = isOneDoubleHitLeft ? Brushes.Red : Brushes.Black;
+			DoubleHitlLbl.Foreground = isOneDoubleHitLeft ? Brushes.Red : Brushes.Black;
 		}
 
 		public void SetupEnumerator(IEnumerable<Fight> fights)

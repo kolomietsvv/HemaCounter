@@ -68,7 +68,7 @@
                             Width="100"
                             Background="LightGray"
                             HorizontalContentAlignment="Right"
-                            Tag="F7"
+                            Tag="Esc"
                             Click="ResetButton_Click"/>
 				</StackPanel>
 			</StackPanel>

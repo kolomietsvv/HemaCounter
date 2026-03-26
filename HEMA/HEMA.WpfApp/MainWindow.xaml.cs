@@ -91,6 +91,7 @@ namespace HEMA.WpfApp
 			TcpService.Start(
 				fightsListWindow.HandleFightsRequest,
 				fightsListWindow.AcceptFights);
+			WindowState = WindowState.Maximized;
 		}
 
 		public string GetSerializedFights()

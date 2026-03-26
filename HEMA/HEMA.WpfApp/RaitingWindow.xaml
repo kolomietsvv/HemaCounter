@@ -74,7 +74,7 @@
 		<StackPanel Orientation="Horizontal">
 			<!-- Кнопка Отобразить Сетку -->
 			<Button Content="🔀" 
-				Tag="F"
+				Tag="Tab"
 				HorizontalContentAlignment="Right"
 				Width="60" Height="60" 
 				FontSize="27" 
@@ -88,7 +88,7 @@
 				Click="ShowBrackets_Click"/>
 			<!-- Кнопка Рассчитать Сетку -->
 			<Button Content="🧮" 
-				Tag="F"
+				Tag="C"
 				HorizontalContentAlignment="Right"
 				Width="60" Height="60" 
 				FontSize="27" 

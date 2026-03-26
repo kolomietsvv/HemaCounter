@@ -1,8 +1,5 @@
 ﻿using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Media3D;
 
 using HEMA.WpfApp.Controls;
 
@@ -13,6 +10,7 @@ namespace HEMA.WpfApp
 	/// </summary>
 	public partial class RaitingWindow : Window
 	{
+		private bool bracketsCalculated;
 		private object _defaultContent;
 		public MainWindow MainWindow { get; }
 
@@ -35,7 +33,7 @@ namespace HEMA.WpfApp
 		private void CalcBracketsPopup_ApplyClicked(object? sender, string e)
 		{
 			var count = CalcBracketsPopupContent.ParticipantcCount;
-			if(count <= 4)
+			if (count <= 4)
 			{
 
 			}
@@ -45,12 +43,16 @@ namespace HEMA.WpfApp
 				MainWindow.GetSettings(),
 				ReturnContentBack,
 				MainWindow.ChangeDoubleHitColor);
+			bracketsCalculated = true;
 			Content = MainWindow.BracketControl;
 		}
 
 		private void ShowBrackets_Click(object sender, RoutedEventArgs e)
 		{
-			Content = MainWindow.BracketControl;
+			if (bracketsCalculated)
+				Content = MainWindow.BracketControl;
+			else
+				CalculateBrackets_Click(sender, e);
 		}
 
 		private void CalculateBrackets_Click(object sender, RoutedEventArgs e)
@@ -67,7 +69,29 @@ namespace HEMA.WpfApp
 			switch (e.Key)
 			{
 				case Key.Back:
-					ReturnContentBack();
+				case Key.Tab:
+					if (Content == _defaultContent)
+						ShowBrackets_Click(sender, e);
+					else
+						ReturnContentBack();
+					return;
+				case Key.Escape:
+					if (CalcBracketsPopup.IsOpen)
+					{
+						CalcBracketsPopup.IsOpen = false;
+						return;
+					}
+					Hide();
+					return;
+				case Key.Enter:
+					if (CalcBracketsPopup.IsOpen)
+					{
+						CalcBracketsPopup_ApplyClicked(sender, CalcBracketsPopupContent.ParticipantCountBox.Text);
+					}
+					return;
+				case Key.C:
+					e.Handled = true;
+					CalculateBrackets_Click(sender, e);
 					return;
 			}
 		}

@@ -67,11 +67,16 @@ public partial class DoubleEliminationBracketControl : UserControl
 		switch (fight.BracketInfo.BracketOrientation)
 		{
 			case BracketOrientation.Left:
-				return bracket.LeftRounds.SelectMany(round => round.Fights).ToList();
+				return GetOrderedFights(bracket.LeftRounds);
 			case BracketOrientation.Right:
-				return bracket.RightRounds.SelectMany(round => round.Fights).ToList();
+				return GetOrderedFights(bracket.RightRounds);
 		}
 		throw new InvalidOperationException();
+	}
+
+	private static List<Fight> GetOrderedFights(List<RoundViewModel> rounds)
+	{
+		return rounds.OrderByDescending(round => round.FightsCount).SelectMany(round => round.Fights).ToList();
 	}
 
 	private void ReturnBack_Click(object sender, RoutedEventArgs e)

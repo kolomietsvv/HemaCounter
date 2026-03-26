@@ -1,10 +1,15 @@
-﻿namespace HEMA.WpfApp.Controls
+﻿using System.Windows;
+
+using DocumentFormat.OpenXml.Wordprocessing;
+
+namespace HEMA.WpfApp.Controls
 
 {
 	public sealed class RoundViewModel
 	{
 		public string Title { get; set; } = "";
 		public List<Fight> Fights { get; set; } = new();
+		public int FightsCount => Fights.Count;
 	}
 
 	public sealed class BracketViewModel

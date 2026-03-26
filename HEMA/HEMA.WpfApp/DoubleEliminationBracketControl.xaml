@@ -3,153 +3,441 @@
 			 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 			 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 			 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+			 xmlns:local="clr-namespace:HEMA.WpfApp"
 			 mc:Ignorable="d"
-             Background="#111111">
+			 Background="#111111">
 
 	<UserControl.Resources>
 
 		<BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+		<local:HalfConverter x:Key="HalfConverter"/>
+		<local:QuoterConverter x:Key="QuoterConverter"/>
+		<local:QuoterNegativeConverter x:Key="QuoterNegativeConverter"/>
 
-		<DataTemplate x:Key="MatchTemplate">
-			<Border Margin="6"
-                    Padding="8"
-                    Width="220"
-                    MinHeight="78"
-                    Background="#222222"
-                    BorderBrush="#4E4E4E"
-                    BorderThickness="1"
-                    CornerRadius="6">
-				<StackPanel>
-					<StackPanel Orientation="Horizontal">
-						<TextBlock Text="{Binding Title}"
-                               Margin="0,0,0,6"
-                               FontWeight="SemiBold"
-                               Foreground="White"/>
-						<Button x:Name="RunButton"
-						        Content="Запустить"
-						        Width="80"
-								Height="20"
-								Padding="0"
-						        Margin="30,-3,0,0"
-						        Click="RunButton_Click" />
+		<!-- Шаблон матча финала -->
+		<DataTemplate x:Key="MatchTemplateFinal">
+			<Grid>
+				<Border Grid.Column="0"
+						Margin="27,5"
+						Padding="8"
+						Width="220"
+						MinHeight="78"
+						VerticalAlignment="Center"
+						Background="#222222"
+						BorderBrush="#4E4E4E"
+						BorderThickness="1"
+						CornerRadius="6">
+					<StackPanel VerticalAlignment="Center">
+						<StackPanel Orientation="Horizontal">
+							<TextBlock Text="{Binding Title}"
+									   Margin="0,0,0,6"
+									   FontWeight="SemiBold"
+									   Foreground="White"/>
+							<Button x:Name="RunButton"
+									Content="Запустить"
+									Width="80"
+									Height="20"
+									Padding="0"
+									Margin="30,-3,0,0"
+									Click="RunButton_Click"/>
+						</StackPanel>
+
+						<Border Margin="0,2,0,2"
+								Padding="5"
+								Background="PaleVioletRed"
+								CornerRadius="4">
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="Auto"/>
+								</Grid.ColumnDefinitions>
+
+								<TextBlock Grid.Column="0"
+										   Text="{Binding RedName}"
+										   Foreground="White"
+										   TextTrimming="CharacterEllipsis"/>
+
+								<TextBlock Grid.Column="1"
+										   Text="{Binding RedScore}"
+										   Foreground="White"
+										   Margin="10,0,0,0"/>
+							</Grid>
+						</Border>
+
+						<Border Margin="0,2,0,2"
+								Padding="5"
+								Background="CadetBlue"
+								CornerRadius="4">
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="Auto"/>
+								</Grid.ColumnDefinitions>
+
+								<TextBlock Grid.Column="0"
+										   Text="{Binding BlueName}"
+										   Foreground="White"
+										   TextTrimming="CharacterEllipsis"/>
+
+								<TextBlock Grid.Column="1"
+										   Text="{Binding BlueScore}"
+										   Foreground="White"
+										   Margin="10,0,0,0"/>
+							</Grid>
+						</Border>
 					</StackPanel>
-
-					<Border Margin="0,2,0,2"
-                            Padding="5"
-                            Background="PaleVioletRed"
-                            CornerRadius="4">
-						<Grid>
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="*" />
-								<ColumnDefinition Width="Auto" />
-							</Grid.ColumnDefinitions>
-
-							<TextBlock Grid.Column="0"
-							Text="{Binding RedName}"
-							Foreground="White"
-							TextTrimming="CharacterEllipsis"/>
-
-							<TextBlock Grid.Column="1"
-							Text="{Binding RedScore}"
-							Foreground="White"
-							Margin="10,0,0,0"/>
-						</Grid>
-					</Border>
-
-
-					<Border Margin="0,2,0,2"
-                            Padding="5"
-                            Background="CadetBlue"
-                            CornerRadius="4">
-						<Grid>
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="*" />
-								<ColumnDefinition Width="Auto" />
-							</Grid.ColumnDefinitions>
-
-							<TextBlock Grid.Column="0"
-							Text="{Binding BlueName}"
-							Foreground="White"
-							TextTrimming="CharacterEllipsis"/>
-
-							<TextBlock Grid.Column="1"
-							Text="{Binding BlueScore}"
-							Foreground="White"
-							Margin="10,0,0,0"/>
-						</Grid>
-					</Border>
-				</StackPanel>
-			</Border>
+				</Border>
+			</Grid>
 		</DataTemplate>
 
-		<DataTemplate x:Key="RoundTemplate">
-			<StackPanel Margin="8,0"
-                        VerticalAlignment="Center">
-				<TextBlock Text="{Binding Title}"
-                           Margin="0,0,0,8"
-                           HorizontalAlignment="Center"
-                           FontWeight="Bold"
-                           Foreground="White"/>
+		<!-- Шаблон матча для левой стороны -->
+		<DataTemplate x:Key="MatchTemplateLeft">
+			<Grid>
+				<Border Grid.Column="0"
+						Margin="27,5"
+						Padding="8"
+						Width="220"
+						MinHeight="78"
+						VerticalAlignment="Center"
+						Background="#222222"
+						BorderBrush="#4E4E4E"
+						BorderThickness="1"
+						CornerRadius="6">
+					<StackPanel VerticalAlignment="Center">
+						<StackPanel Orientation="Horizontal">
+							<TextBlock Text="{Binding Title}"
+									   Margin="0,0,0,6"
+									   FontWeight="SemiBold"
+									   Foreground="White"/>
+							<Button x:Name="RunButton"
+									Content="Запустить"
+									Width="80"
+									Height="20"
+									Padding="0"
+									Margin="30,-3,0,0"
+									Click="RunButton_Click"/>
+						</StackPanel>
 
-				<ItemsControl ItemsSource="{Binding Fights}"
-                              ItemTemplate="{StaticResource MatchTemplate}">
+						<Border Margin="0,2,0,2"
+								Padding="5"
+								Background="PaleVioletRed"
+								CornerRadius="4">
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="Auto"/>
+								</Grid.ColumnDefinitions>
+
+								<TextBlock Grid.Column="0"
+										   Text="{Binding RedName}"
+										   Foreground="White"
+										   TextTrimming="CharacterEllipsis"/>
+
+								<TextBlock Grid.Column="1"
+										   Text="{Binding RedScore}"
+										   Foreground="White"
+										   Margin="10,0,0,0"/>
+							</Grid>
+						</Border>
+
+						<Border Margin="0,2,0,2"
+								Padding="5"
+								Background="CadetBlue"
+								CornerRadius="4">
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="Auto"/>
+								</Grid.ColumnDefinitions>
+
+								<TextBlock Grid.Column="0"
+										   Text="{Binding BlueName}"
+										   Foreground="White"
+										   TextTrimming="CharacterEllipsis"/>
+
+								<TextBlock Grid.Column="1"
+										   Text="{Binding BlueScore}"
+										   Foreground="White"
+										   Margin="10,0,0,0"/>
+							</Grid>
+						</Border>
+					</StackPanel>
+				</Border>
+
+				<Canvas HorizontalAlignment="Stretch"
+						VerticalAlignment="Stretch"
+						Name="MatchCanvas">
+					<!-- Горизонталь слева -->
+					<Line X1="27"
+						  Y1="{Binding ActualHeight, ElementName=MatchCanvas, Converter={StaticResource HalfConverter}}"
+						  X2="1"
+						  Y2="{Binding ActualHeight, ElementName=MatchCanvas, Converter={StaticResource HalfConverter}}"
+						  Stroke="#4E4E4E"
+						  StrokeThickness="2"/>
+
+					<!-- Горизонталь справа -->
+					<Line X1="249"
+						  Y1="{Binding ActualHeight, ElementName=MatchCanvas, Converter={StaticResource HalfConverter}}"
+						  X2="279"
+						  Y2="{Binding ActualHeight, ElementName=MatchCanvas, Converter={StaticResource HalfConverter}}"
+						  Stroke="#4E4E4E"
+						  StrokeThickness="2"/>
+
+					<!-- Вертикали слева -->
+					<Line X1="2"
+						  Y1="{Binding ActualHeight, ElementName=MatchCanvas, Converter={StaticResource HalfConverter}}"
+						  X2="2"
+						  Y2="{Binding ActualHeight, ElementName=MatchCanvas, Converter={StaticResource QuoterConverter}}"
+						  Stroke="#4E4E4E"
+						  StrokeThickness="2"/>
+
+					<Line X1="2"
+						  Y1="{Binding ActualHeight, ElementName=MatchCanvas, Converter={StaticResource HalfConverter}}"
+						  X2="2"
+						  Y2="{Binding ActualHeight, ElementName=MatchCanvas, Converter={StaticResource QuoterNegativeConverter}}"
+						  Stroke="#4E4E4E"
+						  StrokeThickness="2"/>
+				</Canvas>
+			</Grid>
+		</DataTemplate>
+
+		<!-- Шаблон матча для правой стороны -->
+		<DataTemplate x:Key="MatchTemplateRight">
+			<Grid>
+				<Border Grid.Column="0"
+						Margin="27,5"
+						Padding="8"
+						Width="220"
+						MinHeight="78"
+						VerticalAlignment="Center"
+						Background="#222222"
+						BorderBrush="#4E4E4E"
+						BorderThickness="1"
+						CornerRadius="6">
+					<StackPanel VerticalAlignment="Center">
+						<StackPanel Orientation="Horizontal">
+							<TextBlock Text="{Binding Title}"
+									   Margin="0,0,0,6"
+									   FontWeight="SemiBold"
+									   Foreground="White"/>
+							<Button x:Name="RunButton"
+									Content="Запустить"
+									Width="80"
+									Height="20"
+									Padding="0"
+									Margin="30,-3,0,0"
+									Click="RunButton_Click"/>
+						</StackPanel>
+
+						<Border Margin="0,2,0,2"
+								Padding="5"
+								Background="PaleVioletRed"
+								CornerRadius="4">
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="Auto"/>
+								</Grid.ColumnDefinitions>
+
+								<TextBlock Grid.Column="0"
+										   Text="{Binding RedName}"
+										   Foreground="White"
+										   TextTrimming="CharacterEllipsis"/>
+
+								<TextBlock Grid.Column="1"
+										   Text="{Binding RedScore}"
+										   Foreground="White"
+										   Margin="10,0,0,0"/>
+							</Grid>
+						</Border>
+
+						<Border Margin="0,2,0,2"
+								Padding="5"
+								Background="CadetBlue"
+								CornerRadius="4">
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="*"/>
+									<ColumnDefinition Width="Auto"/>
+								</Grid.ColumnDefinitions>
+
+								<TextBlock Grid.Column="0"
+										   Text="{Binding BlueName}"
+										   Foreground="White"
+										   TextTrimming="CharacterEllipsis"/>
+
+								<TextBlock Grid.Column="1"
+										   Text="{Binding BlueScore}"
+										   Foreground="White"
+										   Margin="10,0,0,0"/>
+							</Grid>
+						</Border>
+					</StackPanel>
+				</Border>
+
+				<Canvas HorizontalAlignment="Stretch"
+						VerticalAlignment="Stretch"
+						Name="MatchCanvas">
+					<!-- Горизонталь слева -->
+					<Line X1="1"
+						  Y1="{Binding ActualHeight, ElementName=MatchCanvas, Converter={StaticResource HalfConverter}}"
+						  X2="31"
+						  Y2="{Binding ActualHeight, ElementName=MatchCanvas, Converter={StaticResource HalfConverter}}"
+						  Stroke="#4E4E4E"
+						  StrokeThickness="2"/>
+
+					<!-- Горизонталь справа -->
+					<Line X1="249"
+						  Y1="{Binding ActualHeight, ElementName=MatchCanvas, Converter={StaticResource HalfConverter}}"
+						  X2="279"
+						  Y2="{Binding ActualHeight, ElementName=MatchCanvas, Converter={StaticResource HalfConverter}}"
+						  Stroke="#4E4E4E"
+						  StrokeThickness="2"/>
+
+					<!-- Вертикали справа -->
+					<Line X1="278"
+						  Y1="{Binding ActualHeight, ElementName=MatchCanvas, Converter={StaticResource HalfConverter}}"
+						  X2="278"
+						  Y2="{Binding ActualHeight, ElementName=MatchCanvas, Converter={StaticResource QuoterConverter}}"
+						  Stroke="#4E4E4E"
+						  StrokeThickness="2"/>
+
+					<Line X1="278"
+						  Y1="{Binding ActualHeight, ElementName=MatchCanvas, Converter={StaticResource HalfConverter}}"
+						  X2="278"
+						  Y2="{Binding ActualHeight, ElementName=MatchCanvas, Converter={StaticResource QuoterNegativeConverter}}"
+						  Stroke="#4E4E4E"
+						  StrokeThickness="2"/>
+				</Canvas>
+			</Grid>
+		</DataTemplate>
+
+		<!-- Раунд для левой стороны -->
+		<DataTemplate x:Key="RoundTemplateLeft">
+			<Grid Margin="1,0"
+				  VerticalAlignment="Stretch">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="*"/>
+				</Grid.RowDefinitions>
+
+				<TextBlock Grid.Row="0"
+						   Text="{Binding Title}"
+						   Margin="0,0,0,8"
+						   HorizontalAlignment="Center"
+						   FontWeight="Bold"
+						   Foreground="#4E4E4E"/>
+
+				<ItemsControl Grid.Row="1"
+							  ItemsSource="{Binding Fights}"
+							  ItemTemplate="{StaticResource MatchTemplateLeft}"
+							  VerticalAlignment="Stretch"
+							  HorizontalAlignment="Stretch"
+							  AlternationCount="2">
 					<ItemsControl.ItemsPanel>
 						<ItemsPanelTemplate>
-							<StackPanel VerticalAlignment="Center"/>
+							<UniformGrid Columns="1"
+										 Rows="{Binding FightsCount}"/>
 						</ItemsPanelTemplate>
 					</ItemsControl.ItemsPanel>
+
+					<ItemsControl.ItemContainerStyle>
+						<Style TargetType="ContentPresenter">
+							<Setter Property="VerticalAlignment" Value="Stretch"/>
+							<Setter Property="HorizontalAlignment" Value="Stretch"/>
+						</Style>
+					</ItemsControl.ItemContainerStyle>
 				</ItemsControl>
-			</StackPanel>
+			</Grid>
+		</DataTemplate>
+
+		<!-- Раунд для правой стороны -->
+		<DataTemplate x:Key="RoundTemplateRight">
+			<Grid Margin="1,0"
+				  VerticalAlignment="Stretch">
+				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto"/>
+					<RowDefinition Height="*"/>
+				</Grid.RowDefinitions>
+
+				<TextBlock Grid.Row="0"
+						   Text="{Binding Title}"
+						   Margin="0,0,0,8"
+						   HorizontalAlignment="Center"
+						   FontWeight="Bold"
+						   Foreground="#4E4E4E"/>
+
+				<ItemsControl Grid.Row="1"
+							  ItemsSource="{Binding Fights}"
+							  ItemTemplate="{StaticResource MatchTemplateRight}"
+							  VerticalAlignment="Stretch"
+							  HorizontalAlignment="Stretch"
+							  AlternationCount="2">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<UniformGrid Columns="1"
+										 Rows="{Binding FightsCount}"/>
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+
+					<ItemsControl.ItemContainerStyle>
+						<Style TargetType="ContentPresenter">
+							<Setter Property="VerticalAlignment" Value="Stretch"/>
+							<Setter Property="HorizontalAlignment" Value="Stretch"/>
+						</Style>
+					</ItemsControl.ItemContainerStyle>
+				</ItemsControl>
+			</Grid>
 		</DataTemplate>
 
 		<DataTemplate x:Key="BracketTemplate">
 			<Grid Margin="0,10,0,10">
 				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="*" />
-					<ColumnDefinition Width="Auto" />
-					<ColumnDefinition Width="*" />
+					<ColumnDefinition Width="*"/>
+					<ColumnDefinition Width="Auto"/>
+					<ColumnDefinition Width="*"/>
 				</Grid.ColumnDefinitions>
 
 				<!-- Левая половина -->
 				<ItemsControl Grid.Column="0"
-                              ItemsSource="{Binding LeftRounds}"
-                              ItemTemplate="{StaticResource RoundTemplate}"
-                              HorizontalAlignment="Right"
-                              VerticalAlignment="Center">
+							  ItemsSource="{Binding LeftRounds}"
+							  ItemTemplate="{StaticResource RoundTemplateLeft}"
+							  HorizontalAlignment="Right"
+							  VerticalAlignment="Center">
 					<ItemsControl.ItemsPanel>
 						<ItemsPanelTemplate>
 							<StackPanel Orientation="Horizontal"
-                                        HorizontalAlignment="Right"/>
+										HorizontalAlignment="Right"/>
 						</ItemsPanelTemplate>
 					</ItemsControl.ItemsPanel>
 				</ItemsControl>
 
 				<!-- Центральный финал -->
 				<StackPanel Grid.Column="1"
-                            Margin="24,0"
-                            VerticalAlignment="Center">
+							Margin="24,0"
+							VerticalAlignment="Center">
 					<TextBlock Text="{Binding FinalTitle}"
-                               Margin="0,0,0,8"
-                               HorizontalAlignment="Center"
-                               FontWeight="Bold"
-                               FontSize="14"
-                               Foreground="White"/>
+							   Margin="0,0,0,8"
+							   HorizontalAlignment="Center"
+							   FontWeight="Bold"
+							   FontSize="14"
+							   Foreground="#4E4E4E"/>
 
 					<ContentControl Content="{Binding FinalMatch}"
-                                    ContentTemplate="{StaticResource MatchTemplate}"
-                                    HorizontalAlignment="Center"/>
+									ContentTemplate="{StaticResource MatchTemplateFinal}"
+									HorizontalAlignment="Center"/>
 				</StackPanel>
 
 				<!-- Правая половина -->
 				<ItemsControl Grid.Column="2"
-                              ItemsSource="{Binding RightRounds}"
-                              ItemTemplate="{StaticResource RoundTemplate}"
-                              HorizontalAlignment="Left"
-                              VerticalAlignment="Center">
+							  ItemsSource="{Binding RightRounds}"
+							  ItemTemplate="{StaticResource RoundTemplateRight}"
+							  HorizontalAlignment="Left"
+							  VerticalAlignment="Center">
 					<ItemsControl.ItemsPanel>
 						<ItemsPanelTemplate>
 							<StackPanel Orientation="Horizontal"
-                                        HorizontalAlignment="Left"/>
+										HorizontalAlignment="Left"/>
 						</ItemsPanelTemplate>
 					</ItemsControl.ItemsPanel>
 				</ItemsControl>
@@ -157,60 +445,64 @@
 		</DataTemplate>
 
 	</UserControl.Resources>
+
 	<Grid>
 		<ScrollViewer HorizontalScrollBarVisibility="Auto"
-                  VerticalScrollBarVisibility="Auto"
-                  Background="#111111">
-		<StackPanel Margin="12">
+					  VerticalScrollBarVisibility="Auto"
+					  Background="#111111">
+			<StackPanel Margin="12">
 
-			<TextBlock Text="Верхняя сетка"
-                       Margin="0,0,0,8"
-                       FontSize="20"
-                       FontWeight="Bold"
-                       Foreground="White"/>
+				<TextBlock Text="Верхняя сетка"
+						   Margin="0,0,0,8"
+						   FontSize="20"
+						   FontWeight="Bold"
+						   Foreground="White"/>
 
-			<ContentControl Content="{Binding WinnersBracket}"
-                            ContentTemplate="{StaticResource BracketTemplate}"/>
+				<ContentControl Content="{Binding WinnersBracket}"
+								ContentTemplate="{StaticResource BracketTemplate}"/>
 
-			<Separator Margin="0,16,0,16" Background="#444444"/>
+				<Separator Margin="0,16,0,16"
+						   Background="#444444"/>
 
-			<TextBlock Text="Нижняя сетка"
-                       Margin="0,0,0,8"
-                       FontSize="20"
-                       FontWeight="Bold"
-                       Foreground="White"/>
+				<TextBlock Text="Нижняя сетка"
+						   Margin="0,0,0,8"
+						   FontSize="20"
+						   FontWeight="Bold"
+						   Foreground="White"/>
 
-			<ContentControl Content="{Binding LosersBracket}"
-                            ContentTemplate="{StaticResource BracketTemplate}"/>
+				<ContentControl Content="{Binding LosersBracket}"
+								ContentTemplate="{StaticResource BracketTemplate}"/>
 
-			<Separator Margin="0,16,0,16" Background="#444444"/>
+				<Separator Margin="0,16,0,16"
+						   Background="#444444"/>
 
-			<TextBlock Text="Финал"
-                       Margin="0,0,0,8"
-                       FontSize="20"
-                       FontWeight="Bold"
-                       Foreground="White"/>
+				<TextBlock Text="Финал"
+						   Margin="0,0,0,8"
+						   FontSize="20"
+						   FontWeight="Bold"
+						   Foreground="White"/>
 
-			<ContentControl Content="{Binding GrandFinal}"
-                            ContentTemplate="{StaticResource MatchTemplate}"
-                            HorizontalAlignment="Center"/>
-		</StackPanel>
-	</ScrollViewer>
+				<ContentControl Content="{Binding GrandFinal}"
+								ContentTemplate="{StaticResource MatchTemplateFinal}"
+								HorizontalAlignment="Center"/>
+			</StackPanel>
+		</ScrollViewer>
+
 		<StackPanel Orientation="Horizontal">
-			<!-- Кнопка Назад -->
-			<Button Content="🥇" 
-				Tag="F"
-				HorizontalContentAlignment="Right"
-				Width="60" Height="60" 
-				FontSize="27" 
-				HorizontalAlignment="Left" 
-				VerticalAlignment="Bottom" 
-				Margin="20"
-				Background="LightGreen"
-				Foreground="White"
-				BorderBrush="DarkGreen"
-				Cursor="Hand"
-				Click="ReturnBack_Click"/>
+			<Button Content="🥇"
+					Tag="F"
+					HorizontalContentAlignment="Right"
+					Width="60"
+					Height="60"
+					FontSize="27"
+					HorizontalAlignment="Left"
+					VerticalAlignment="Bottom"
+					Margin="20"
+					Background="LightGreen"
+					Foreground="White"
+					BorderBrush="DarkGreen"
+					Cursor="Hand"
+					Click="ReturnBack_Click"/>
 		</StackPanel>
 	</Grid>
 </UserControl>

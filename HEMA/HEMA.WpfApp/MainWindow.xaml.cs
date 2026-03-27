@@ -666,6 +666,7 @@ namespace HEMA.WpfApp
 			while (enumerator.Current.RedName != redName || enumerator.Current.BlueName != blueName);
 
 			SetCurrentAndNextFights();
+			Focus();
 		}
 
 		private async Task TrySaveStateAsync(bool init = false)

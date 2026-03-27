@@ -609,6 +609,10 @@ namespace HEMA.WpfApp
 			}
 			if (saveStruct.BracketsVM is not null)
 			{
+				if(RaitingWindow.BracketsCalculated)
+				{
+					UpdateNotCompletedFights(saveStruct);
+				}
 				SetupBracketsFight(saveStruct);
 				BracketControl = new DoubleEliminationBracketControl(
 					saveStruct.BracketsVM, SetEnumerator,
@@ -634,6 +638,10 @@ namespace HEMA.WpfApp
 			{
 				DoubleEliminationBracketViewModelFactory.SetupBracketFight(item, item.Settings, ChangeDoubleHitColor);
 			}
+			{
+				var item = saveStruct.BracketsVM.WinnersBracket.FinalMatch;
+				DoubleEliminationBracketViewModelFactory.SetupBracketFight(item, item.Settings, ChangeDoubleHitColor);
+			}
 			foreach (var item in saveStruct.BracketsVM.LosersBracket.RightRounds.SelectMany(round => round.Fights))
 			{
 				DoubleEliminationBracketViewModelFactory.SetupBracketFight(item, item.Settings, ChangeDoubleHitColor);
@@ -642,7 +650,40 @@ namespace HEMA.WpfApp
 			{
 				DoubleEliminationBracketViewModelFactory.SetupBracketFight(item, item.Settings, ChangeDoubleHitColor);
 			}
+			{
+				var item = saveStruct.BracketsVM.LosersBracket.FinalMatch;
+				DoubleEliminationBracketViewModelFactory.SetupBracketFight(item, item.Settings, ChangeDoubleHitColor);
+			}
 		}
+
+		private void UpdateNotCompletedFights(SaveStruct saveStruct)
+		{
+			foreach (var item in saveStruct.BracketsVM.WinnersBracket.RightRounds.SelectMany(round => round.Fights))
+			{
+				DoubleEliminationBracketViewModelFactory.UpdateFightIfCompleted(item);
+			}
+			foreach (var item in saveStruct.BracketsVM.WinnersBracket.LeftRounds.SelectMany(round => round.Fights))
+			{
+				DoubleEliminationBracketViewModelFactory.UpdateFightIfCompleted(item);
+			}
+			{
+				var item = saveStruct.BracketsVM.WinnersBracket.FinalMatch;
+				DoubleEliminationBracketViewModelFactory.UpdateFightIfCompleted(item);
+			}
+			foreach (var item in saveStruct.BracketsVM.LosersBracket.RightRounds.SelectMany(round => round.Fights))
+			{
+				DoubleEliminationBracketViewModelFactory.UpdateFightIfCompleted(item);
+			}
+			foreach (var item in saveStruct.BracketsVM.LosersBracket.LeftRounds.SelectMany(round => round.Fights))
+			{
+				DoubleEliminationBracketViewModelFactory.UpdateFightIfCompleted(item);
+			}
+			{
+				var item = saveStruct.BracketsVM.LosersBracket.FinalMatch;
+				DoubleEliminationBracketViewModelFactory.UpdateFightIfCompleted(item);
+			}
+		}
+
 
 		public void ChangeDoubleHitColor(bool isOneDoubleHitLeft)
 		{

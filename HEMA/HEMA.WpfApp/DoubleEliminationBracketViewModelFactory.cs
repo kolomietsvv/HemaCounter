@@ -168,6 +168,20 @@ public static class DoubleEliminationBracketViewModelFactory
 		return fight;
 	}
 
+	public static void UpdateFightIfCompleted(Fight fight)
+	{
+		var fightExists = fightsDictionary.TryGetValue(fight.Title, out var existingFight);
+		if (fightExists && !existingFight.IsCompleted && fight.IsCompleted)
+		{
+			existingFight.RedName = fight.RedName;
+			existingFight.BlueName = fight.BlueName;
+			existingFight.BlueScore = fight.BlueScore;
+			existingFight.RedScore = fight.RedScore;
+			existingFight.Elapsed = fight.Elapsed;
+			existingFight.IsCompleted = fight.IsCompleted;
+		}
+	}
+
 	private static void FightCompleted(object sender, PropertyChangedEventArgs e)
 	{
 		var fight = (Fight)sender;

@@ -150,15 +150,15 @@ namespace HEMA.WpfApp
 
 		private void AddFights(string json)
 		{
-			var fights = JsonSerializer.Deserialize<List<Fight>>(json);
+			var saveStruct = JsonSerializer.Deserialize<SaveStruct>(json);
 			
-			if (fights == null || fights.Count == 0)
+			if (saveStruct == null || saveStruct.Fights.Count == 0)
 			{
 				return;
 			}
 
 			DuplicateFightDialogResult? applyActionToAll = null;
-			foreach (var incomingFight in fights)
+			foreach (var incomingFight in saveStruct.Fights)
 			{
 				var existingFight = MainWindow.Fights.FirstOrDefault(fight =>
 					fight.RedName == incomingFight.RedName &&

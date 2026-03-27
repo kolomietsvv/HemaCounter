@@ -32,6 +32,21 @@ public partial class DoubleEliminationBracketControl : UserControl
 		_returnBackClick = returnBackClick;
 	}
 
+	public DoubleEliminationBracketControl(
+		DoubleEliminationBracketViewModel bracket,
+		Action<List<Fight>, string, string> setCurrentFightAction,
+		FightSettings fightSettings,
+		Action returnBackClick,
+		Action<bool> oneDoubleHitLeftHandler)
+	{
+		InitializeComponent();
+
+		BracketVM = bracket;
+		DataContext = BracketVM;
+		_setCurrentFightAction = setCurrentFightAction;
+		_returnBackClick = returnBackClick;
+	}
+
 	private void RunButton_Click(object sender, RoutedEventArgs e)
 	{
 		var fight = (Fight)((FrameworkElement)sender).DataContext;

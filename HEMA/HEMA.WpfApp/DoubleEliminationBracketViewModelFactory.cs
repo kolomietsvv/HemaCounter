@@ -1,5 +1,4 @@
-﻿
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace HEMA.WpfApp.Controls;
 
@@ -9,7 +8,7 @@ public static class DoubleEliminationBracketViewModelFactory
 	private static DoubleEliminationBracket? currentBracket;
 
 	public static DoubleEliminationBracketViewModel Create(
-		DoubleEliminationBracket bracket, 
+		DoubleEliminationBracket bracket,
 		FightSettings fightSettings,
 		Action<bool> oneDoubleHitLeftHandler)
 	{
@@ -154,9 +153,15 @@ public static class DoubleEliminationBracketViewModelFactory
 			WinnerNextFightInfo = ToNextFightInfo(match.WinnerTo),
 			LooserNextFightInfo = ToNextFightInfo(match.LoserTo),
 		};
+		SetupBracketFight(fight, fightSettings, oneDoubleHitLeftHandler);
+		return fight;
+	}
+
+	public static Fight SetupBracketFight(Fight fight, FightSettings fightSettings, Action<bool> oneDoubleHitLeftHandler)
+	{
 		fight.OneDoubleHitLeft += oneDoubleHitLeftHandler;
 		fight.PropertyChanged += FightCompleted;
-		fightsDictionary.TryAdd(match.Id, fight);
+		fightsDictionary.TryAdd(fight.Title, fight);
 		return fight;
 	}
 

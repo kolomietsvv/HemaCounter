@@ -59,10 +59,10 @@ namespace HEMA
 		public int NextAlarmIndex
 		{
 			get => nextAlarmIndex;
-			set => nextAlarmIndex = TimerAlarms.Length > value ? value : -1;
+			set => nextAlarmIndex = TimerAlarms?.Length > value ? value : -1;
 		}
 
-		public TimerAlarmLight? NextAlarm => NextAlarmIndex != -1 ? TimerAlarms[NextAlarmIndex] : (TimerAlarmLight?)null;
+		public TimerAlarmLight? NextAlarm => NextAlarmIndex != -1 && TimerAlarms != null ? TimerAlarms[NextAlarmIndex] : (TimerAlarmLight?)null;
 
 		public bool IsScoreChangeEnabled => !IsTimerStarted || Settings.NoBreak;
 

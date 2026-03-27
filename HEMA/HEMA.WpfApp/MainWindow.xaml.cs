@@ -97,7 +97,12 @@ namespace HEMA.WpfApp
 		public string GetSerializedFights()
 		{
 			var fights = Fights.ToList();
-			var json = JsonSerializer.Serialize(fights);
+			var saveStruct = new SaveStruct
+			{
+				Fights = fights,
+				BracketsVM = BracketControl.BracketVM,
+			};
+			var json = JsonSerializer.Serialize(saveStruct);
 			return json;
 		}
 
@@ -157,8 +162,8 @@ namespace HEMA.WpfApp
 				{
 					currentFolder = Path.GetDirectoryName(fileDialog.FileName);
 					var json = await File.ReadAllTextAsync(fileDialog.FileName);
-					var fights = JsonSerializer.Deserialize<List<Fight>>(json);
-					SetupFights(fights, new RelayCommand<Fight>(OnEditFight));
+					var saveStruct = JsonSerializer.Deserialize<SaveStruct>(json);
+					SetupFights(saveStruct, new RelayCommand<Fight>(OnEditFight));
 					return;
 				}
 				if (folderDialog.ShowDialog().GetValueOrDefault())
@@ -481,7 +486,8 @@ namespace HEMA.WpfApp
 			{
 				if (!RaitingWindow.IsLoaded)
 				{
-					RaitingWindow = new(this);
+					var bracketsCalculated = RaitingWindow?.BracketsCalculated;
+					RaitingWindow = new(this) { BracketsCalculated = bracketsCalculated.GetValueOrDefault() };
 					RaitingWindow.Closing += (s, e) => { ((RaitingWindow)s).Hide(); e.Cancel = true; };
 					RaitingWindow.Show();
 				}
@@ -576,7 +582,7 @@ namespace HEMA.WpfApp
 			var fights = FightsListFactory.CreateFights(
 				names.Select(name => new Fighter { Name = name }).ToList(),
 				GetSettings());
-			SetupFights(fights, new RelayCommand<Fight>(OnEditFight));
+			SetupFights(new SaveStruct { Fights = fights.ToList() }, new RelayCommand<Fight>(OnEditFight));
 		}
 
 		public FightSettings GetSettings()
@@ -588,11 +594,11 @@ namespace HEMA.WpfApp
 			};
 		}
 
-		private void SetupFights(IEnumerable<Fight> fights, ICommand editFightCommand)
+		private void SetupFights(SaveStruct saveStruct, ICommand editFightCommand)
 		{
 			Fights.Clear();
 
-			foreach (var fight in fights)
+			foreach (var fight in saveStruct.Fights)
 			{
 				fight.OneDoubleHitLeft += ChangeDoubleHitColor;
 				fight.MaxDoubleHitsReached += () => DisplayFinishFightDialog(TextCollection.MaxDoubleHits, FinishCause.DoubleHits);
@@ -601,8 +607,41 @@ namespace HEMA.WpfApp
 				fight.EditFightCommand = editFightCommand;
 				Fights.Add(fight);
 			}
+			if (saveStruct.BracketsVM is not null)
+			{
+				SetupBracketsFight(saveStruct);
+				BracketControl = new DoubleEliminationBracketControl(
+					saveStruct.BracketsVM, SetEnumerator,
+					GetSettings(),
+					RaitingWindow.ReturnContentBack,
+					ChangeDoubleHitColor);
+				RaitingWindow.BracketsCalculated = true;
+				RaitingWindow.Closing += (s, e) => { ((RaitingWindow)s).Hide(); e.Cancel = true; };
+				RaitingWindow.Activate();
+				RaitingWindow.Hide();
+			}
 
 			SetupEnumerator(Fights);
+		}
+
+		private void SetupBracketsFight(SaveStruct saveStruct)
+		{
+			foreach (var item in saveStruct.BracketsVM.WinnersBracket.RightRounds.SelectMany(round => round.Fights))
+			{
+				DoubleEliminationBracketViewModelFactory.SetupBracketFight(item, item.Settings, ChangeDoubleHitColor);
+			}
+			foreach (var item in saveStruct.BracketsVM.WinnersBracket.LeftRounds.SelectMany(round => round.Fights))
+			{
+				DoubleEliminationBracketViewModelFactory.SetupBracketFight(item, item.Settings, ChangeDoubleHitColor);
+			}
+			foreach (var item in saveStruct.BracketsVM.LosersBracket.RightRounds.SelectMany(round => round.Fights))
+			{
+				DoubleEliminationBracketViewModelFactory.SetupBracketFight(item, item.Settings, ChangeDoubleHitColor);
+			}
+			foreach (var item in saveStruct.BracketsVM.LosersBracket.LeftRounds.SelectMany(round => round.Fights))
+			{
+				DoubleEliminationBracketViewModelFactory.SetupBracketFight(item, item.Settings, ChangeDoubleHitColor);
+			}
 		}
 
 		public void ChangeDoubleHitColor(bool isOneDoubleHitLeft)
@@ -633,8 +672,8 @@ namespace HEMA.WpfApp
 		{
 			if (!string.IsNullOrWhiteSpace(currentFolder))
 			{
-				string json = GetSerializedFights();
-				await File.WriteAllTextAsync(Path.Combine(currentFolder, "Fights.json"), json);
+				string commonFightsJson = GetSerializedFights();
+				await File.WriteAllTextAsync(Path.Combine(currentFolder, "Fights.json"), commonFightsJson);
 				if (gitExists)
 				{
 					await ExecuteGitCmdAsync(currentFolder, init);

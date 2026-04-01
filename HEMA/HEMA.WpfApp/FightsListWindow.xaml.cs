@@ -151,13 +151,13 @@ namespace HEMA.WpfApp
 		private void AddFights(string json)
 		{
 			var saveStruct = JsonSerializer.Deserialize<SaveStruct>(json);
-			
+
 			if (saveStruct == null || saveStruct.Fights.Count == 0)
 			{
 				return;
 			}
 
-			DuplicateFightDialogResult? applyActionToAll = null;
+			DuplicateFightDialogResult? applyActionToAll = new() { ApplyToAll = true, Action = DuplicateFightAction.Ignore };
 			foreach (var incomingFight in saveStruct.Fights)
 			{
 				var existingFight = MainWindow.Fights.FirstOrDefault(fight =>
@@ -239,6 +239,13 @@ namespace HEMA.WpfApp
 					if (!FilterPopup.IsOpen)
 					{
 						Filter_Click(null!, null!);
+						e.Handled = true;
+					}
+					return;
+				case Key.U:
+					if (!HostsListPopup.IsOpen)
+					{
+						UploadFights_Click(null!, null!);
 						e.Handled = true;
 					}
 					return;

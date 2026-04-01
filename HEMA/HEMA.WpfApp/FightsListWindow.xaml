@@ -7,7 +7,7 @@
 		xmlns:local="clr-namespace:HEMA.WpfApp"
 		mc:Ignorable="d"
 		Title="Список боёв"
-		Height="450" Width="1535"
+		Height="450" Width="1850"
 		KeyDown="Window_KeyDown"
 		UseLayoutRounding="True"
 		SnapsToDevicePixels="True">
@@ -225,7 +225,7 @@
 						</GridViewColumn.CellTemplate>
 					</GridViewColumn>
 
-					<GridViewColumn Header="Номинация" Width="130"
+					<GridViewColumn Header="Номинация" Width="160"
 									HeaderTemplate="{StaticResource HeaderNeutral}">
 						<GridViewColumn.CellTemplate>
 							<DataTemplate>
@@ -236,7 +236,7 @@
 						</GridViewColumn.CellTemplate>
 					</GridViewColumn>
 
-					<GridViewColumn Header="Подгруппа" Width="130"
+					<GridViewColumn Header="Подгруппа" Width="150"
 									HeaderTemplate="{StaticResource HeaderNeutral}">
 						<GridViewColumn.CellTemplate>
 							<DataTemplate>
@@ -301,7 +301,7 @@
 				Click="Filter_Click"/>
 			<!-- Кнопка Выгрузить -->
 			<Button Content=" 📩 " 
-				Tag="F"
+				Tag="U"
 				HorizontalContentAlignment="Right"
 				Width="60" Height="60" 
 				FontSize="27" 

@@ -28,8 +28,8 @@ namespace HEMA
 		private string blueName;
 		private string redRaitingChange;
 		private string blueRaitingChange;
-		private string subgroupName;
-		private string nominationName;
+		private string? subgroupName;
+		private string? nominationName;
 		private int originalIndex;
 		private bool isCompleted;
 		private int nextAlarmIndex;
@@ -66,7 +66,7 @@ namespace HEMA
 
 		public bool IsScoreChangeEnabled => !IsTimerStarted || Settings.NoBreak;
 
-		public string NominationName
+		public string? NominationName
 		{
 			get => nominationName;
 			set
@@ -76,7 +76,7 @@ namespace HEMA
 			}
 		}
 
-		public string SubgroupName
+		public string? SubgroupName
 		{
 			get => subgroupName;
 			set

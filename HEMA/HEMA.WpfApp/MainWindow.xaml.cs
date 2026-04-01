@@ -34,7 +34,6 @@ namespace HEMA.WpfApp
 				new TimerAlarmLight { TotalSeconds = 105},
 				new TimerAlarmLight { TotalSeconds = 120, PauseFight = true }
 			];
-		private Task hostTask;
 		private const int MinAvailableScore = -100;
 
 		public event PropertyChangedEventHandler? PropertyChanged;
@@ -76,10 +75,7 @@ namespace HEMA.WpfApp
 
 			Fights = new ObservableCollection<Fight>();
 			Raiting = new ObservableCollection<Fighter>();
-			InitFights(["Боец 1", "Боец 2", "Боец 3", "Боец 4", "Боец 5",
-				"Боец 6", "Боец 7", "Боец 8", "Боец 9", "Боец 10", "Боец 11", "Боец 12",
-				"Боец 13", "Боец 14", "Боец 15", "Боец 16", "Боец 17", "Боец 18", "Боец 19",
-				"Боец 20", "Боец 21", "Боец 22", "Боец 23", "Боец 24", "Боец 25", "Боец 26"]);
+			InitFights(["Боец 1", "Боец 2", "Боец 3", "Боец 4", "Боец 5"], null, null);
 
 			DataContext = this;
 			fightsListWindow = new FightsListWindow(this);
@@ -100,7 +96,7 @@ namespace HEMA.WpfApp
 			var saveStruct = new SaveStruct
 			{
 				Fights = fights,
-				BracketsVM = BracketControl.BracketVM,
+				BracketsVM = BracketControl?.BracketVM,
 			};
 			var json = JsonSerializer.Serialize(saveStruct);
 			return json;
@@ -170,7 +166,7 @@ namespace HEMA.WpfApp
 				{
 					string filePath = fileDialog.FileName;
 					var names = await File.ReadAllLinesAsync(filePath);
-					InitFights(names);
+					InitFights(names, Path.GetFileNameWithoutExtension(filePath), Path.GetDirectoryName(filePath));
 					currentFolder = folderDialog.FolderName;
 					await TrySaveStateAsync(init: true);
 				}
@@ -577,11 +573,11 @@ namespace HEMA.WpfApp
 				json);
 		}
 
-		private void InitFights(IEnumerable<string> names)
+		private void InitFights(IEnumerable<string> names, string? nomanition, string? subgoupName)
 		{
 			var fights = FightsListFactory.CreateFights(
 				names.Select(name => new Fighter { Name = name }).ToList(),
-				GetSettings());
+				GetSettings(), nomanition, subgoupName);
 			SetupFights(new SaveStruct { Fights = fights.ToList() }, new RelayCommand<Fight>(OnEditFight));
 		}
 

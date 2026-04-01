@@ -8,7 +8,7 @@ namespace HEMA
 {
 	public class FightsListFactory
 	{
-		public static IEnumerable<Fight> CreateFights(List<Fighter> fighters, FightSettings settings)
+		public static IEnumerable<Fight> CreateFights(List<Fighter> fighters, FightSettings settings, string? nomination, string? subroupName)
 		{
 			if (fighters.Count == 0)
 			{
@@ -24,6 +24,8 @@ namespace HEMA
 					pair.Item2,
 					settings)
 				{
+					NominationName = nomination, 
+					SubgroupName = subroupName,
 					OriginalIndex = schedule.Count - i++
 				})
 				.OrderBy(fight => fight.OriginalIndex);

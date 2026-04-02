@@ -616,6 +616,7 @@ namespace HEMA.WpfApp
 				if (RaitingWindow.BracketsCalculated)
 				{
 					UpdateNotCompletedFights(saveStruct);
+					return;
 				}
 				SetupBracketsFight(saveStruct);
 				BracketControl = new DoubleEliminationBracketControl(

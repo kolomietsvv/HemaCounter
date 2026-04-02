@@ -51,7 +51,17 @@ public partial class DoubleEliminationBracketControl : UserControl
 	{
 		var fight = (Fight)((FrameworkElement)sender).DataContext;
 
-		_setCurrentFightAction(GetFights(GetBracket(fight), fight), fight.RedName, fight.BlueName);
+		var fightsList = GetFights(GetBracket(fight), fight);
+
+		foreach (var item in fightsList)
+		{
+			if (item.RedName == "Проходной" || item.BlueName == "Проходной")
+			{
+				item.IsCompleted = true;
+			}
+		}
+
+		_setCurrentFightAction(fightsList, fight.RedName, fight.BlueName);
 	}
 
 	private BracketViewModel GetBracket(Fight fight)
@@ -86,14 +96,14 @@ public partial class DoubleEliminationBracketControl : UserControl
 			case BracketOrientation.Right:
 				return GetOrderedFights(bracket.RightRounds);
 		}
-		throw new InvalidOperationException();
+		return [fight];
 	}
 
 	private static List<Fight> GetOrderedFights(List<RoundViewModel> rounds)
 	{
 		return rounds
 			.OrderByDescending(round => round.FightsCount)
-			.ThenBy(round => round.Fights.First().Title)
+			.ThenBy(round => round.Fights.FirstOrDefault()?.Title ?? "я")
 			.SelectMany(round => round.Fights).ToList();
 	}
 

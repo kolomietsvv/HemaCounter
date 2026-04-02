@@ -149,9 +149,9 @@ public static class DoubleEliminationBracketViewModelFactory
 			BracketInfo = new()
 			{
 				BracketId = match.Id,
-				BracketType = match.Id.StartsWith("В") ? HEMA.BracketType.Winner 
-								: match.Id.StartsWith("Н") ? HEMA.BracketType.Looser 
-								: HEMA.BracketType.Final 
+				BracketType = match.Id.StartsWith("В") ? HEMA.BracketType.Winner
+								: match.Id.StartsWith("Н") ? HEMA.BracketType.Looser
+								: HEMA.BracketType.Final
 			},
 			WinnerNextFightInfo = ToNextFightInfo(match.WinnerTo),
 			LooserNextFightInfo = ToNextFightInfo(match.LoserTo),

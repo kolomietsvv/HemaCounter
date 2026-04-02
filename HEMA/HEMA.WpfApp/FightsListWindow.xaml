@@ -225,22 +225,22 @@
 						</GridViewColumn.CellTemplate>
 					</GridViewColumn>
 
-					<GridViewColumn Header="Номинация" Width="160"
+					<GridViewColumn Header="Подгруппа" Width="150"
 									HeaderTemplate="{StaticResource HeaderNeutral}">
 						<GridViewColumn.CellTemplate>
 							<DataTemplate>
-								<TextBlock Text="{Binding NominationName}"
+								<TextBlock Text="{Binding SubgroupName}"
 										   HorizontalAlignment="Center"
 										   Margin="6,0,6,0"/>
 							</DataTemplate>
 						</GridViewColumn.CellTemplate>
 					</GridViewColumn>
 
-					<GridViewColumn Header="Подгруппа" Width="150"
+					<GridViewColumn Header="Номинация" Width="160"
 									HeaderTemplate="{StaticResource HeaderNeutral}">
 						<GridViewColumn.CellTemplate>
 							<DataTemplate>
-								<TextBlock Text="{Binding SubgroupName}"
+								<TextBlock Text="{Binding NominationName}"
 										   HorizontalAlignment="Center"
 										   Margin="6,0,6,0"/>
 							</DataTemplate>

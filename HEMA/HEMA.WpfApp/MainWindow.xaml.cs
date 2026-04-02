@@ -166,7 +166,8 @@ namespace HEMA.WpfApp
 				{
 					string filePath = fileDialog.FileName;
 					var names = await File.ReadAllLinesAsync(filePath);
-					InitFights(names, Path.GetFileNameWithoutExtension(filePath), Path.GetDirectoryName(filePath));
+					var directoryName = Path.GetDirectoryName(filePath).Split(Path.DirectorySeparatorChar).Last();
+					InitFights(names, Path.GetFileNameWithoutExtension(filePath), directoryName);
 					currentFolder = folderDialog.FolderName;
 					await TrySaveStateAsync(init: true);
 				}
@@ -616,7 +617,8 @@ namespace HEMA.WpfApp
 					RaitingWindow.ReturnContentBack,
 					ChangeDoubleHitColor);
 				RaitingWindow.BracketsCalculated = true;
-				RaitingWindow.Closing += (s, e) => { ((RaitingWindow)s).Hide(); e.Cancel = true; };
+				RaitingWindow.Closing +=
+					(s, e) => { ((RaitingWindow)s).Hide(); e.Cancel = true; };
 				RaitingWindow.Activate();
 				RaitingWindow.Hide();
 			}

@@ -604,9 +604,16 @@ namespace HEMA.WpfApp
 				fight.EditFightCommand = editFightCommand;
 				Fights.Add(fight);
 			}
+			UpdateBrackets(saveStruct);
+
+			SetupEnumerator(Fights);
+		}
+
+		public void UpdateBrackets(SaveStruct saveStruct)
+		{
 			if (saveStruct.BracketsVM is not null)
 			{
-				if(RaitingWindow.BracketsCalculated)
+				if (RaitingWindow.BracketsCalculated)
 				{
 					UpdateNotCompletedFights(saveStruct);
 				}
@@ -622,8 +629,6 @@ namespace HEMA.WpfApp
 				RaitingWindow.Activate();
 				RaitingWindow.Hide();
 			}
-
-			SetupEnumerator(Fights);
 		}
 
 		private void SetupBracketsFight(SaveStruct saveStruct)
@@ -708,7 +713,7 @@ namespace HEMA.WpfApp
 			Focus();
 		}
 
-		private async Task TrySaveStateAsync(bool init = false)
+		public async Task TrySaveStateAsync(bool init = false)
 		{
 			if (!string.IsNullOrWhiteSpace(currentFolder))
 			{

@@ -197,6 +197,8 @@ namespace HEMA.WpfApp
 				}
 			}
 
+			MainWindow.UpdateBrackets(saveStruct);
+
 			MainWindow.OpenRaitingButton_Click(null!, null!);
 		}
 

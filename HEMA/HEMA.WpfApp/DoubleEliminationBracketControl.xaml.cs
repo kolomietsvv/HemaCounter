@@ -91,7 +91,10 @@ public partial class DoubleEliminationBracketControl : UserControl
 
 	private static List<Fight> GetOrderedFights(List<RoundViewModel> rounds)
 	{
-		return rounds.OrderByDescending(round => round.FightsCount).SelectMany(round => round.Fights).ToList();
+		return rounds
+			.OrderByDescending(round => round.FightsCount)
+			.ThenBy(round => round.Fights.First().Title)
+			.SelectMany(round => round.Fights).ToList();
 	}
 
 	private void ReturnBack_Click(object sender, RoutedEventArgs e)

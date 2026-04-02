@@ -15,7 +15,7 @@ namespace HEMA.WpfApp.Controls
 
 		public int ParticipantcCount
 		{
-			get 
+			get
 			{
 				int.TryParse(ParticipantCountBox.Text, out var intValue);
 				return intValue;
@@ -27,11 +27,6 @@ namespace HEMA.WpfApp.Controls
 		{
 			ParticipantCountBox.Focus();
 			ParticipantCountBox.SelectAll();
-		}
-
-		public void Clear()
-		{
-			ParticipantCountBox.Text = string.Empty;
 		}
 
 		private void ApplyButton_Click(object sender, RoutedEventArgs e)

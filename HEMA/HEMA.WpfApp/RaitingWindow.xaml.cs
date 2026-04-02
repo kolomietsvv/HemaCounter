@@ -11,7 +11,7 @@ namespace HEMA.WpfApp
 	public partial class RaitingWindow : Window
 	{
 		private object _defaultContent;
-		
+
 		public bool BracketsCalculated { get; set; }
 
 		public MainWindow MainWindow { get; }
@@ -32,7 +32,7 @@ namespace HEMA.WpfApp
 			CalcBracketsPopup.IsOpen = false;
 		}
 
-		private void CalcBracketsPopup_ApplyClicked(object? sender, string e)
+		private async void CalcBracketsPopup_ApplyClicked(object? sender, string e)
 		{
 			var count = CalcBracketsPopupContent.ParticipantcCount;
 			if (count <= 4)
@@ -47,6 +47,7 @@ namespace HEMA.WpfApp
 				MainWindow.ChangeDoubleHitColor);
 			BracketsCalculated = true;
 			Content = MainWindow.BracketControl;
+			await MainWindow.TrySaveStateAsync();
 		}
 
 		private void ShowBrackets_Click(object sender, RoutedEventArgs e)

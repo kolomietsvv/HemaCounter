@@ -658,6 +658,10 @@ namespace HEMA.WpfApp
 				var item = saveStruct.BracketsVM.LosersBracket.FinalMatch;
 				DoubleEliminationBracketViewModelFactory.SetupBracketFight(item, item.Settings, ChangeDoubleHitColor);
 			}
+			{
+				var item = saveStruct.BracketsVM.GrandFinal;
+				DoubleEliminationBracketViewModelFactory.SetupBracketFight(item, item.Settings, ChangeDoubleHitColor);
+			}
 		}
 
 		private void UpdateNotCompletedFights(SaveStruct saveStruct)

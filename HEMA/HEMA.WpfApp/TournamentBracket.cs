@@ -282,7 +282,7 @@ public static class DoubleEliminationBracketGenerator
 
 		var gf1 = new MatchNode
 		{
-			Id = "Фин. 1",
+			Id = "Фин. 1.1",
 			Bracket = BracketType.GrandFinal,
 			Round = 1,
 			Index = 1,

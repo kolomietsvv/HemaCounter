@@ -96,7 +96,7 @@ public partial class DoubleEliminationBracketControl : UserControl
 			case BracketOrientation.Right:
 				return GetOrderedFights(bracket.RightRounds);
 		}
-		return [fight];
+		return [BracketVM.WinnersBracket.FinalMatch, BracketVM.LosersBracket.FinalMatch, BracketVM.GrandFinal];
 	}
 
 	private static List<Fight> GetOrderedFights(List<RoundViewModel> rounds)

@@ -152,13 +152,13 @@ namespace HEMA.WpfApp
 		{
 			var saveStruct = JsonSerializer.Deserialize<SaveStruct>(json);
 
-			if (saveStruct == null || saveStruct.Fights.Count == 0)
+			if (saveStruct == null || saveStruct.Fights?.Count == 0)
 			{
 				return;
 			}
 
 			DuplicateFightDialogResult? applyActionToAll = new() { ApplyToAll = true, Action = DuplicateFightAction.Ignore };
-			foreach (var incomingFight in saveStruct.Fights)
+			foreach (var incomingFight in saveStruct.Fights ?? [])
 			{
 				var existingFight = MainWindow.Fights.FirstOrDefault(fight =>
 					fight.RedName == incomingFight.RedName &&

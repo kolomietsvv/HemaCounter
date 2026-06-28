@@ -89,23 +89,33 @@
                     Background="{DynamicResource TitleBarBrush}" 
                     Height="32">
 				<DockPanel>
-					<TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType=Window}}"
-                               Foreground="{DynamicResource TitleForegroundBrush}"
-                               VerticalAlignment="Center"
-                               Margin="10,0,0,0"/>
-					<StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Right">
+					<StackPanel Orientation="Horizontal" 
+								HorizontalAlignment="Left" 
+								DockPanel.Dock="Left" 
+								WindowChrome.IsHitTestVisibleInChrome="True">
+						<Button Content="Бои (B)"
+								Click="OpenFightsList"
+								Style="{StaticResource TitleBarMenuButtonStyle}"/>
+						<Button Content="Рейтинг (L)"
+                                Click="OpenRaitingButton_Click"
+								Style="{StaticResource TitleBarMenuButtonStyle}"/>
+						<Button Content="Открыть (O)"
+                                Click="OpenFileButton_Click"
+								Style="{StaticResource TitleBarMenuButtonStyle}"/>
+					</StackPanel>
+					<StackPanel Orientation="Horizontal" 
+								HorizontalAlignment="Right" 
+								DockPanel.Dock="Right" 
+								WindowChrome.IsHitTestVisibleInChrome="True">
 						<Button Content="🗕"
-                                Command="{x:Static SystemCommands.MinimizeWindowCommand}"
-                                CommandTarget="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+								Click="MinimizeButton_Click"
                                 Style="{StaticResource TitleBarButtonStyle}"/>
 						<Button Content="🗖"
-                                Command="{x:Static SystemCommands.MaximizeWindowCommand}"
-                                CommandTarget="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
+                                Click="MaximizeButton_Click"
                                 Style="{StaticResource TitleBarButtonStyle}"/>
 						<Button Content="✕"
-                                Command="{x:Static SystemCommands.CloseWindowCommand}"
-                                CommandTarget="{Binding RelativeSource={RelativeSource AncestorType=Window}}"
-                                Style="{StaticResource TitleBarButtonStyle}"/>
+                                Click="CloseButton_Click"
+								Style="{StaticResource TitleBarButtonStyle}"/>
 					</StackPanel>
 				</DockPanel>
 			</Border>
@@ -215,10 +225,7 @@
 						Background="PaleVioletRed" Padding="0,15,20,0" BorderThickness="0"
 				   FontSize="50" HorizontalAlignment="Left" VerticalAlignment="Stretch" Grid.Row="0"/>
 					<StackPanel HorizontalAlignment="Center" Margin="0,5" Orientation="Horizontal">
-						<Button Content="📋" Tag="B" HorizontalContentAlignment="Right" FontSize="40" Grid.Row="0" Margin="2,1" Width="115" Click="OpenFightsList" />
 						<Button Content="⌚" Tag="T" HorizontalContentAlignment="Right" FontSize="40" Grid.Row="0" Margin="2,1" Width="115" Click="ShowPopupTime_Click" />
-						<Button Content="📄" Tag="O" HorizontalContentAlignment="Right" FontSize="40" Grid.Row="0" Margin="2,1" Width="115" Click="OpenFileButton_Click" />
-						<Button Content="🥇" Tag="Д" HorizontalContentAlignment="Right" FontSize="40" Grid.Row="0" Margin="2,1" Width="115" Click="OpenRaitingButton_Click" />
 					</StackPanel>
 					<!-- ТЕКУЩИЙ СИНИЙ -->
 					<Label x:Name="CurrentBlueLbl" Content="{Binding Fight.BlueName}" HorizontalContentAlignment="Left" Width="720" Background="CadetBlue" Padding="20,15,0,0" BorderThickness="0" FontSize="50" HorizontalAlignment="Right" VerticalAlignment="Stretch" Grid.Row="0" Panel.ZIndex="-1" />
